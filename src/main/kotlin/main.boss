@@ -1,0 +1,5 @@
+funkcija glavna(){
+    ispis("Zdravo svima!")
+}
+
+glavna()
