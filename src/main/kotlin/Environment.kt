@@ -3,6 +3,13 @@ class Environment(
     private val variables: HashMap<String, RuntimeValue> = HashMap(),
     private val constants: MutableSet<String> = mutableSetOf()
 ){
+
+    init {
+        if (parent == null){
+            createScope(this)
+        }
+    }
+
     fun declareVariable(name: String, value: RuntimeValue, isConstant: Boolean = false): RuntimeValue{
         if(variables.containsKey(name)){
             throw Exception("Error: $name has already been defined")
@@ -10,12 +17,7 @@ class Environment(
 
         variables[name] = value
         if(isConstant){
-            println("[debug] Adding constant")
             constants.add(name)
-            constants.forEach {
-                print("$it, ")
-            }
-            println()
         }
         return value
     }
@@ -44,5 +46,12 @@ class Environment(
         val env = resolve(name)
         // We already know name is not null, so we can assert
         return env.variables[name]!!
+    }
+
+    fun createScope(env: Environment){
+        env.declareVariable("pi", NumberValue(3.14159), isConstant = true)
+        env.declareVariable("tacno", BoolValue(true), isConstant = true)
+        env.declareVariable("netacno", BoolValue(false), isConstant = true)
+        env.declareVariable("nista", NullValue(), isConstant = true)
     }
 }

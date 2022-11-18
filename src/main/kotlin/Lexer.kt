@@ -2,14 +2,22 @@ import java.lang.Exception
 
 enum class TokenType{
     Number,
+    String,
     Identifier,
-    OpenParen,
-    CloseParen,
-    Equals,
+    OpenParen,      // (
+    CloseParen,     // )
+    OpenBracket,    // [
+    CloseBracket,   // ]
+    OpenBrace,      // {
+    CloseBrace,     // }
+    Comma,          // ,
+    Colon,          // :
+    Equals,         // =
     Var,
     Konst,
     BinaryOperator,
     EOF,
+    DoubleQuote,
     NOTIMPLEMENTED
 }
 
@@ -51,18 +59,48 @@ fun tokenize(src: String): ArrayList<Token>{
         else if(sourceCode[0] == ")"){
             tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseParen))
         }
+        else if(sourceCode[0] == "["){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenBracket))
+        }
+        else if(sourceCode[0] == "]"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseBracket))
+        }
+        else if(sourceCode[0] == "{"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenBrace))
+        }
+        else if(sourceCode[0] == "}"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseBrace))
+        }
         else if(sourceCode[0] == "+" || sourceCode[0] == "-" || sourceCode[0] == "*" || sourceCode[0] == "/" || sourceCode[0] == "%"){
             tokens.add(Token(sourceCode.removeAt(0), TokenType.BinaryOperator))
         }
         else if(sourceCode[0] == "="){
             tokens.add(Token(sourceCode.removeAt(0), TokenType.Equals))
         }
+        else if(sourceCode[0] == ":"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Colon))
+        }
+        else if(sourceCode[0] == ","){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Comma))
+        }
         else{
             // Multi-character tokens
 
-            // Whitespace, semicolons
-            if(sourceCode[0].isIgnored()){
-                sourceCode.removeAt(0)
+            if(sourceCode[0] == "\""){
+                //String literals
+                // Add the opening quotation mark
+                tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote))
+                var string = ""
+                while (sourceCode.isNotEmpty() && sourceCode[0] != "\""){
+                    string += sourceCode.removeAt(0)
+                }
+                // Add the string value
+                tokens.add(Token(string, TokenType.String))
+
+                // If exists, add closing quotation mark
+                if(sourceCode.isNotEmpty() && sourceCode[0] == "\""){
+                    tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote))
+                }
             }
 
             // Numbers
@@ -72,6 +110,11 @@ fun tokenize(src: String): ArrayList<Token>{
                     number += sourceCode.removeAt(0)
                 }
                 tokens.add(Token(number, TokenType.Number))
+            }
+
+            // Whitespace, semicolons
+            else if(sourceCode[0].isIgnored()){
+                sourceCode.removeAt(0)
             }
 
             // Identifiers
@@ -89,6 +132,7 @@ fun tokenize(src: String): ArrayList<Token>{
                     tokens.add(Token(identifier, TokenType.Identifier))
                 }
             }
+
             else {
                 // Something unexpected
                 throw Exception("Unexpected token found: '${sourceCode[0]}'")

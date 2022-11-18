@@ -1,3 +1,6 @@
+import java.util.Objects
+import java.util.StringJoiner
+
 fun interpret(astNode: Statement, environment: Environment): RuntimeValue{
     when (astNode.kind){
         NodeType.Program -> {
@@ -6,8 +9,14 @@ fun interpret(astNode: Statement, environment: Environment): RuntimeValue{
         NodeType.NumericLiteral -> {
             return NumberValue((astNode as NumericLiteral).value)
         }
+        NodeType.StringLiteral -> {
+            return StringValue((astNode as StringLiteral).value)
+        }
         NodeType.Identifier -> {
             return interpretIdentifier(astNode as Identifier, environment)
+        }
+        NodeType.Object -> {
+            return interpretObjectExpression(astNode as ObjectLiteral, environment)
         }
         NodeType.BinaryExpression -> {
             return interpretBinaryExpression(astNode as BinaryExpression, environment)
@@ -46,8 +55,16 @@ fun interpretBinaryExpression(binaryExpression: BinaryExpression, environment: E
     if (left.type == ValueType.Number && right.type == ValueType.Number){
         return interpretNumericBinaryExpression(left as NumberValue, right as NumberValue, binaryExpression.operator)
     }
+    else if(left.type == ValueType.String && right.type == ValueType.String && binaryExpression.operator == "+"){
+        // String concatenation
+        return interpretStringBinaryExpression(left as StringValue, right as StringValue)
+    }
 
     return NullValue()
+}
+
+fun interpretStringBinaryExpression(left: StringValue, right: StringValue): RuntimeValue {
+    return StringValue(left.value + right.value)
 }
 
 fun interpretNumericBinaryExpression(left: NumberValue, right: NumberValue, operator: String): NumberValue {
@@ -80,4 +97,8 @@ fun interpretAssignment(node: AssignmentExpression, env: Environment): RuntimeVa
         throw Exception("Invalid lvalue provided")
     }
     return env.assignVariable((node.assignee as Identifier).symbol, interpret(node.value, env))
+}
+
+fun interpretObjectExpression(obj: ObjectLiteral, env: Environment): RuntimeValue{
+
 }

@@ -4,17 +4,24 @@ enum class NodeType {
     VariableDeclaration,
 
     //Expressions
-    NumericLiteral,
     Identifier,
     BinaryExpression,
-    AssignmentExpression
+    AssignmentExpression,
+
+    // Literals
+    NumericLiteral,
+    StringLiteral,
+    Object,
+    Property
 }
 
 interface Statement {
     val kind: NodeType
 }
 
-data class Program(val body: ArrayList<Statement>) : Statement {
+data class Program(
+    val body: ArrayList<Statement>
+) : Statement {
     override val kind: NodeType
         get() = NodeType.Program
 }
@@ -60,4 +67,28 @@ data class NumericLiteral(
 ) : Expression {
     override val kind: NodeType
         get() = NodeType.NumericLiteral
+}
+
+data class StringLiteral(
+    val value: String
+) : Expression {
+    override val kind: NodeType
+        get() = NodeType.StringLiteral
+
+}
+
+data class Property(
+    val key: String,
+    val value: Expression
+) : Expression {
+    override val kind: NodeType
+        get() = NodeType.Property
+}
+
+data class ObjectLiteral(
+    val properties: ArrayList<Property>
+) : Expression {
+    override val kind: NodeType
+        get() = NodeType.Object
+
 }

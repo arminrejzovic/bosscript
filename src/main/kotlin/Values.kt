@@ -1,7 +1,9 @@
 enum class ValueType {
     Null,
     Number,
-    Bool
+    Bool,
+    String,
+    Object
 }
 
 interface RuntimeValue{
@@ -22,9 +24,23 @@ data class NumberValue(
         get() = ValueType.Number
 }
 
+data class StringValue(
+    val value: String = ""
+): RuntimeValue{
+    override val type: ValueType
+        get() = ValueType.String
+}
+
 data class BoolValue(
     val value: Boolean = false
 ): RuntimeValue{
     override val type: ValueType
-        get() = ValueType.Number
+        get() = ValueType.Bool
+}
+
+data class ObjectValue(
+    val properties: HashMap<String, RuntimeValue>
+): RuntimeValue{
+    override val type: ValueType
+        get() = ValueType.Object
 }

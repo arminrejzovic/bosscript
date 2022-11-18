@@ -54,7 +54,7 @@ class Parser {
     }
 
     private fun parseAssignmentExpression(): Expression{
-        val left = parseAdditiveExpression()
+        val left = parseObjectExpression()
         if (current().type == TokenType.Equals){
             // Assignment
             consume()
@@ -100,6 +100,12 @@ class Parser {
             TokenType.Number -> {
                 return NumericLiteral(consume().value.toDouble())
             }
+            TokenType.DoubleQuote -> {
+                consume()
+                val str = expect(TokenType.String, "String literal expected")
+                expect(TokenType.DoubleQuote, "Expected \"\"")
+                return StringLiteral("${str.value}")
+            }
             TokenType.OpenParen -> {
                 consume()
                 val value = parseExpression()
@@ -115,6 +121,31 @@ class Parser {
                 throw Exception("Unexpected token found: [${current()}]")
             }
         }
+    }
+
+    private fun parseObjectExpression(): Expression{
+        if (current().type != TokenType.OpenBrace){
+            return parseAdditiveExpression()
+        }
+        consume() // consume the open brace
+
+        val properties = arrayListOf<Property>()
+
+        while (notEOF() && current().type != TokenType.CloseBrace){
+            val key = expect(TokenType.Identifier, "Object key expected").value
+
+            expect(TokenType.Colon, "Missing :")
+            val value = parseExpression()
+
+            properties.add(Property(key, value))
+
+            if(current().type != TokenType.CloseBrace){
+                expect(TokenType.Comma, "Expected , or }")
+            }
+        }
+        expect(TokenType.CloseBrace, "Expected }")
+
+        return ObjectLiteral(properties)
     }
 
     private fun current(): Token{
