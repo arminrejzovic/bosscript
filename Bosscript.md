@@ -137,7 +137,7 @@ This is true only for simple objects. Objects, in the sense of class instances, 
 like other variables.
 
 <pre>
-<span class="keyword">klasa</span> Primjer{...}
+<span class="keyword">model</span> Primjer{...}
 
 <span class="keyword">var</span> primjer = Primjer()
 </pre>
@@ -311,12 +311,42 @@ dok(1 == 1){
 
 ## Classes
 
-All classes are defined using the `klasa` keyword. Each class must have a constructor method named `konstruktor`. There 
+All classes are defined using the `model` keyword. Each class must have a constructor method named `konstruktor`. There 
 can only be one constructor method in a class. It can take any number of parameters, including no parameters at all. 
+The instance (i.e. `this` keyword) is referenced with the keyword `instanca`.
 
-<pre>
-<span class="keyword">ako</span>(x > 10 <span class="keyword">ili</span> x < 5 <span class="keyword">te</span> x%2==0){
-    
+```typescript
+model Tacka{
+    konstruktor(x: broj, y: broj){
+        instanca.x = x
+        instanca.y = y
+    }
 }
-</pre>
+```
+
+Class fields and methods have an access modifier, but aside from that, the syntax is identical to regular functions.
+
+```typescript
+model Tacka{
+    privatna funkcija uradiNesto(){}
+    javna funkcija tekstFormat(){
+        vrati instanca.x + ":" + instanca.y
+    }
+    privatna var primjer = 10;
+}
+```
+
+Static methods are declared using the `opsta` keyword before the `function` keyword.
+
+```typescript
+model Tacka{
+    // Mock factory method
+    javna opsta funkcija kreirajTacku(x: broj, y:broj){
+        var t = Tacka(x,y)
+        vrati t
+    }
+}
+```
+
+
 
