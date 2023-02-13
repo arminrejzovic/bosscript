@@ -8,7 +8,8 @@
  * 4. Comparison Expression
  * 5. Additive Expression
  * 6. Multiplicative Expression
- * 7. Unary Expression
+ * 7. Call Expression
+ * 8. Member Expression
  * 8. Primary Expression
  * --- Parsed Last ---
  */
@@ -28,7 +29,7 @@ class Parser {
             TokenType.Konst -> {
                 return parseVariableDeclaration(isConstant = true)
             }
-            else ->{
+            else -> {
                 return parseExpression()
             }
         }
@@ -43,23 +44,23 @@ class Parser {
         // consume var or konst keyword
         consume()
         val identifier = expect(TokenType.Identifier, "Expected identifier").value
-        val isAssignment = peekExpect(TokenType.Equals)
+        val isAssignment = peekExpect(TokenType.SimpleAssign)
         if(isAssignment){
-            return VariableDeclaration(isConstant, identifier, parseExpression())
+            return VariableDeclaration(identifier, parseExpression())
         }
         else {
             if(isConstant) throw Exception("Constants must have a value")
-            return VariableDeclaration(isConstant = false, identifier, null)
+            return VariableDeclaration(identifier, null)
         }
     }
 
     private fun parseAssignmentExpression(): Expression{
         val left = parseObjectExpression()
-        if (current().type == TokenType.Equals){
+        if (current().type == TokenType.SimpleAssign){
             // Assignment
             consume()
             val right = parseAssignmentExpression()
-            return AssignmentExpression(assignee = left, value = right)
+            return AssignmentExpression(assignee = left, value = right, assignmentOperator = "")
         }
         return left
     }
@@ -83,14 +84,85 @@ class Parser {
      *  Parses multiplication, division and modulo
      */
     private fun parseMultiplicativeExpression(): Expression{
-        var left = parsePrimaryExpression()
+        var left = parseCallMemberExpression()
         while (current().value == "*" || current().value == "/" || current().value == "%"){
             val operator = consume().value
-            val right = parsePrimaryExpression()
+            val right = parseCallMemberExpression()
             left = BinaryExpression(left, right, operator)
         }
         return left
     }
+
+    private fun parseCallMemberExpression(): Expression{
+        val member = parseMemberExpression()
+        if(current().type == TokenType.OpenParen){
+            return parseCallExpression(member)
+        }
+        return member
+    }
+
+    private fun parseMemberExpression(): Expression{
+        var obj = parsePrimaryExpression()
+        while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket){
+            val operator = consume()
+            var property: Expression
+            var isComputed: Boolean
+
+            if(operator.type == TokenType.Dot){
+                // objekat x = {...}
+                // x.ime
+
+                isComputed = false
+                property = parsePrimaryExpression()
+
+                if(property.kind != NodeType.Identifier){
+                    throw Exception("RHS is not a property. Expected an Identifier")
+                }
+            }
+
+            else{
+                // x["ime"], x[kljuc], x[dobaviKljuc()], etc.
+                isComputed = true
+                property = parseExpression()
+                expect(TokenType.CloseBracket, "Expected ].")
+            }
+
+            obj = MemberExpression(targetObject = obj, property = property, isComputed = isComputed)
+
+        }
+        return obj
+    }
+
+    private fun parseCallExpression(caller: Expression): Expression{
+        var callExpression = CallExpression(
+            args=parseArgs(),
+            callee=caller
+        )
+        if(current().type == TokenType.OpenParen){
+            callExpression = parseCallExpression(callExpression) as CallExpression
+        }
+
+        return callExpression
+    }
+
+    private fun parseArgs(): ArrayList<Expression>{
+        expect(TokenType.OpenParen, "Expected open parentheses")
+        val args = if (current().type == TokenType.CloseParen) arrayListOf() else parseArgumentsList()
+
+        expect(TokenType.CloseParen, "Missing closing parenthesis")
+        return args
+    }
+
+    private fun parseArgumentsList(): ArrayList<Expression>{
+        val args = arrayListOf(parseAssignmentExpression())
+
+        while (current().type == TokenType.Comma && consume() != null){
+            args.add(parseAssignmentExpression())
+        }
+
+        return args
+    }
+
 
     private fun parsePrimaryExpression(): Expression{
         when(current().type){
@@ -112,11 +184,6 @@ class Parser {
                 expect(TokenType.CloseParen, "Missing closing parenthesis")
                 return value
             }
-            TokenType.CloseParen -> TODO()
-            TokenType.Equals -> TODO()
-            TokenType.Var -> TODO()
-            TokenType.BinaryOperator -> TODO()
-            TokenType.EOF -> TODO()
             else -> {
                 throw Exception("Unexpected token found: [${current()}]")
             }

@@ -89,7 +89,7 @@ fun interpretNumericBinaryExpression(left: NumberValue, right: NumberValue, oper
 fun interpretVariableDeclaration(declaration: VariableDeclaration, env: Environment): RuntimeValue{
     val value = if (declaration.value == null) NullValue() else interpret(declaration.value, env)
 
-    return env.declareVariable(declaration.identifier, value, declaration.isConstant)
+    return env.declareVariable(declaration.identifier, value, false) //declaration.isConstant)
 }
 
 fun interpretAssignment(node: AssignmentExpression, env: Environment): RuntimeValue{
@@ -100,5 +100,10 @@ fun interpretAssignment(node: AssignmentExpression, env: Environment): RuntimeVa
 }
 
 fun interpretObjectExpression(obj: ObjectLiteral, env: Environment): RuntimeValue{
+    val newObject = ObjectValue(properties = HashMap())
+    obj.properties.forEach {
+        newObject.properties[it.key] = interpret(it.value, env)
+    }
 
+    return newObject
 }

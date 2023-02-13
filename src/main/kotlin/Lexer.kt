@@ -1,9 +1,11 @@
-import java.lang.Exception
+import kotlin.Exception
 
 enum class TokenType{
+    // Literals ---------------------------------
     Number,
     String,
     Identifier,
+    // Symbols ----------------------------------
     OpenParen,      // (
     CloseParen,     // )
     OpenBracket,    // [
@@ -11,20 +13,69 @@ enum class TokenType{
     OpenBrace,      // {
     CloseBrace,     // }
     Comma,          // ,
+    Dot,            // .
     Colon,          // :
-    Equals,         // =
+    Semicolon,      // ;
+    SimpleAssign,   // =
+    DoubleQuote,    // "
+    Hashtag,        // #
+    Exponent,       // ^
+    LogicalAnd,     // &&
+    LogicalOr,      // ||
+    LogicalNot,      // !
+    // KEYWORDS ---------------------------------
+    //    Variables
     Var,
     Konst,
+    //    Classes
+    Klasa,          // Class
+    Privatna,       // Private
+    Javna,          // Public
+    Opsta,          // Static
+    Konstruktor,    // constructor() method
+    Instanca,       // constructor() method
+    Baza,           // super
+    Kreiraj,        // new
+    //    Loops
+    Za,
+    Svako,
+    Od,
+    Do,
+    Korak,
+    Dok,
+    Radi,
+    //    Functions
+    Funkcija,
+    Vrati,
+    Se,
+    //    Package imports
+    Paket,
+    //    If-else
+    Ako,
+    Ili,
+    Inace,
+    Osim,
+    //    Special
+    Nedefinisano,
+    Tacno,
+    Netacno,
+    // OPERATORS --------------------------------
     BinaryOperator,
+    RelationalOperator,
+    EqualityOperator,
+    // SPECIAL TOKENS ---------------------------
     EOF,
-    DoubleQuote,
-    NOTIMPLEMENTED
+    NOTIMPLEMENTED,
+    ComplexAssign
 }
 
 data class Token(
     val value: String,
-    val type: TokenType
+    val type: TokenType,
+    val line: Int,
+    val col: Int
 ){
+    fun getLineCol() = "$line:$col"
 }
 
 fun String.isAlpha(): Boolean{
@@ -35,53 +86,147 @@ fun String.isNumeric(): Boolean{
     return this.toDoubleOrNull() != null
 }
 
-fun String.isIgnored(): Boolean{
-    return this == " " || this == "\n" || this == "\r" || this == "\t" || this == ";"
+fun String.isIgnoredWhitespace(): Boolean{
+    return this == " " || this == "\r" || this == "\t"
 }
 
 val keywords = mapOf(
     "var" to TokenType.Var,
     "konst" to TokenType.Konst,
-    "funkcija" to TokenType.NOTIMPLEMENTED,
-    "vrati" to TokenType.NOTIMPLEMENTED,
-    "ako" to TokenType.NOTIMPLEMENTED,
+    "klasa" to TokenType.Klasa,
+    "privatna" to TokenType.Privatna,
+    "javna" to TokenType.Javna,
+    "opsta" to TokenType.Opsta,
+    "konstruktor" to TokenType.Konstruktor,
+    "instanca" to TokenType.Instanca,
+    "baza" to TokenType.Baza,
+    "kreiraj" to TokenType.Kreiraj,
+    "za" to TokenType.Za,
+    "svako" to TokenType.Svako,
+    "od" to TokenType.Od,
+    "do" to TokenType.Do,
+    "korak" to TokenType.Korak,
+    "dok" to TokenType.Dok,
+    "radi" to TokenType.Radi,
+    "funkcija" to TokenType.Funkcija,
+    "vrati" to TokenType.Vrati,
+    "se" to TokenType.Se,
+    "paket" to TokenType.Paket,
+    "ako" to TokenType.Ako,
+    "ili" to TokenType.Ili,
+    "osim" to TokenType.Osim,
+    "inace" to TokenType.Inace,
+    "nedefinisano" to TokenType.Nedefinisano,
+    "tacno" to TokenType.Tacno,
+    "netacno" to TokenType.Netacno
 )
 
 fun tokenize(src: String): ArrayList<Token>{
     val tokens = ArrayList<Token>()
+    var line = 1
+    var col = 1
 
     val sourceCode = src.split("").drop(1).dropLast(1).toMutableList()
 
     while (sourceCode.size > 0){
         if(sourceCode[0] == "("){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenParen))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenParen, line, col++))
         }
         else if(sourceCode[0] == ")"){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseParen))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseParen, line, col++))
         }
         else if(sourceCode[0] == "["){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenBracket))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenBracket, line, col++))
         }
         else if(sourceCode[0] == "]"){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseBracket))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseBracket, line, col++))
         }
         else if(sourceCode[0] == "{"){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenBrace))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.OpenBrace, line, col++))
         }
         else if(sourceCode[0] == "}"){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseBrace))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.CloseBrace, line, col++))
+        }
+        else if(sourceCode[0] == "^"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Exponent, line, col++))
+        }
+        else if(sourceCode[0] == "&"){
+            if(sourceCode.size > 1 && sourceCode[1] == "&"){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.LogicalAnd, line, col))
+                col+=2
+            }
+            else{
+                throw Exception("Unexpected token found at[$line:$col]: '${sourceCode[0]}'")
+            }
+        }
+        else if(sourceCode[0] == "|"){
+            if(sourceCode.size > 1 && sourceCode[1] == "|"){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.LogicalAnd, line, col))
+                col+=2
+            }
+            else{
+                throw Exception("Unexpected token found at[$line:$col]: '${sourceCode[0]}'")
+            }
         }
         else if(sourceCode[0] == "+" || sourceCode[0] == "-" || sourceCode[0] == "*" || sourceCode[0] == "/" || sourceCode[0] == "%"){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.BinaryOperator))
+            if(sourceCode.size > 1 && sourceCode[1] == "="){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.ComplexAssign, line, col))
+                col+=2
+            }
+            else{
+                tokens.add(Token(sourceCode.removeAt(0), TokenType.BinaryOperator, line, col++))
+            }
         }
         else if(sourceCode[0] == "="){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.Equals))
+            if(sourceCode.size > 1 && sourceCode[1] == "="){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.EqualityOperator, line, col))
+                col += 2
+            }
+            else{
+                tokens.add(Token(sourceCode.removeAt(0), TokenType.SimpleAssign, line, col++))
+            }
+        }
+        else if(sourceCode[0] == "!"){
+            if(sourceCode.size > 1 && sourceCode[1] == "="){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.EqualityOperator, line, col))
+                col += 2
+            }
+            else{
+                tokens.add(Token(sourceCode.removeAt(0), TokenType.LogicalNot, line, col++))
+            }
         }
         else if(sourceCode[0] == ":"){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.Colon))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Colon, line, col++))
+        }
+        else if(sourceCode[0] == ";"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Semicolon, line, col++))
         }
         else if(sourceCode[0] == ","){
-            tokens.add(Token(sourceCode.removeAt(0), TokenType.Comma))
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Comma, line, col++))
+        }
+        else if(sourceCode[0] == "."){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Dot, line, col++))
+        }
+        else if(sourceCode[0] == "#"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.Hashtag, line, col++))
+        }
+        else if(sourceCode[0] == "<" || sourceCode[0] == ">"){
+            if(sourceCode.size > 1 && sourceCode[1] == "="){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.RelationalOperator, line, col))
+                col += 2
+            }
+            else{
+                tokens.add(Token(sourceCode.removeAt(0), TokenType.RelationalOperator, line, col++))
+            }
+        }
+        else if(sourceCode[0] == "\n"){
+            line++
+            col = 1
+            sourceCode.removeAt(0)
+        }
+        else if(sourceCode[0].isIgnoredWhitespace()){
+            sourceCode.removeAt(0)
+            col += 1
         }
         else{
             // Multi-character tokens
@@ -89,32 +234,36 @@ fun tokenize(src: String): ArrayList<Token>{
             if(sourceCode[0] == "\""){
                 //String literals
                 // Add the opening quotation mark
-                tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote))
+                tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote, line, col++))
                 var string = ""
                 while (sourceCode.isNotEmpty() && sourceCode[0] != "\""){
                     string += sourceCode.removeAt(0)
                 }
                 // Add the string value
-                tokens.add(Token(string, TokenType.String))
+                tokens.add(Token(string, TokenType.String, line, col))
+                col += string.length
 
                 // If exists, add closing quotation mark
                 if(sourceCode.isNotEmpty() && sourceCode[0] == "\""){
-                    tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote))
+                    tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote, line, col++))
                 }
             }
 
             // Numbers
             else if(sourceCode[0].isNumeric()){
                 var number = ""
-                while (sourceCode.isNotEmpty() && sourceCode[0].isNumeric()){
+                while (sourceCode.isNotEmpty() && sourceCode[0].isNumeric() || sourceCode[0] == "_" || sourceCode[0] == "."){
                     number += sourceCode.removeAt(0)
                 }
-                tokens.add(Token(number, TokenType.Number))
-            }
-
-            // Whitespace, semicolons
-            else if(sourceCode[0].isIgnored()){
-                sourceCode.removeAt(0)
+                val validNumberPattern = Regex("^-?(0|[1-9](_?[0-9])*)(\\.[0-9](_?[0-9])*)?([eE][-+]?[0-9]+)?")
+                if(validNumberPattern.matches(number)){
+                    number = number.replace("_", "")
+                    tokens.add(Token(number, TokenType.Number, line, col))
+                    col += number.length
+                }
+                else{
+                    throw Exception("Unexpected token at [$line:$col]")
+                }
             }
 
             // Identifiers
@@ -126,19 +275,20 @@ fun tokenize(src: String): ArrayList<Token>{
                 // Check for reserved keywords
                 val reserved = keywords[identifier]
                 if (reserved != null){
-                    tokens.add(Token(identifier, reserved))
+                    tokens.add(Token(identifier, reserved, line, col))
                 }
                 else {
-                    tokens.add(Token(identifier, TokenType.Identifier))
+                    tokens.add(Token(identifier, TokenType.Identifier, line, col))
                 }
+                col += identifier.length
             }
 
             else {
                 // Something unexpected
-                throw Exception("Unexpected token found: '${sourceCode[0]}'")
+                throw Exception("Unexpected token found at[$line:$col]: '${sourceCode[0]}'")
             }
         }
     }
-    tokens.add(Token("EOF", TokenType.EOF))
+    tokens.add(Token("EOF", TokenType.EOF, line, col))
     return tokens
 }

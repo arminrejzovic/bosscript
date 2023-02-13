@@ -1,5 +1,0 @@
-var man = {
-    ime: "Mirel",
-    prezime: "Bajric",
-    godine: 19
-}
