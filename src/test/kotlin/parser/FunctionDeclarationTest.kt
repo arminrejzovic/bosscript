@@ -38,6 +38,81 @@ class FunctionDeclarationTest {
     }
 
     @Test
+    fun testFunctionUntypedParam() {
+        val src = """
+            funkcija x(a){
+                
+            }
+        """.trimIndent()
+
+        val parser = Parser()
+        val program = parser.parseProgram(src)
+
+        val expectedResult = arrayListOf(
+            FunctionDeclaration(
+                name = Identifier(
+                    symbol = "x"
+                ),
+                params = arrayListOf(
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "a"
+                        ),
+                        type = null
+                    )
+                ),
+                returnType = null,
+                body = BlockStatement(
+                    body = arrayListOf()
+                )
+            )
+        )
+        assert(program.body == expectedResult)
+    }
+
+    @Test
+    fun testFunctionTypedAndUntypedParams() {
+        val src = """
+            funkcija x(a, b:broj){
+                
+            }
+        """.trimIndent()
+
+        val parser = Parser()
+        val program = parser.parseProgram(src)
+
+        val expectedResult = arrayListOf(
+            FunctionDeclaration(
+                name = Identifier(
+                    symbol = "x"
+                ),
+                params = arrayListOf(
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "a"
+                        ),
+                        type = null
+                    ),
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "b"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "broj",
+                            isArrayType = false
+                        )
+                    )
+                ),
+                returnType = null,
+                body = BlockStatement(
+                    body = arrayListOf()
+                )
+            )
+        )
+        assert(program.body == expectedResult)
+    }
+
+    @Test
     fun testFunctionOneParam() {
         val src = """
             funkcija x(num:broj):broj{
@@ -205,7 +280,7 @@ class FunctionDeclarationTest {
     @Test
     fun testFunctionVoidReturn() {
         val src = """
-            funkcija x(a: tekst,b: tekst[],c: tekst){
+            funkcija x(a: tekst, b: tekst[], c: tekst){
                 vrati se;
             }
         """.trimIndent()

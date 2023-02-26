@@ -397,8 +397,11 @@ class Parser {
 
         do {
             val typename = parseIdentifier()
-            expect(TokenType.Colon, "Missing :")
-            val typeAnnotation = parseTypeAnnotation()
+            var typeAnnotation: TypeAnnotation? = null
+            if(current().type == TokenType.Colon){
+                consume()
+                typeAnnotation = parseTypeAnnotation()
+            }
             params.add(FunctionParameter(identifier = typename, type = typeAnnotation))
         } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
 

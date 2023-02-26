@@ -60,7 +60,7 @@ data class FunctionDeclaration(
 
 data class FunctionParameter(
     val identifier: Identifier,
-    val type: TypeAnnotation,
+    val type: TypeAnnotation?,
     override val kind: NodeType = NodeType.FunctionParameter
 ):Statement
 
