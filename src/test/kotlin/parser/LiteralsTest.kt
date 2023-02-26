@@ -1,5 +1,6 @@
 package parser
 
+import BooleanLiteral
 import NumericLiteral
 import StringLiteral
 import org.junit.jupiter.api.Test
@@ -33,6 +34,22 @@ class LiteralsTest {
 
         val expectedResult = arrayListOf(
             NumericLiteral(value=6969.0)
+        )
+
+        assert(program.body == expectedResult)
+    }
+
+    @Test
+    fun testBooleanLiteral(){
+        val src = """
+            tacno;
+        """.trimIndent()
+
+        val parser = Parser()
+        val program = parser.parseProgram(src)
+
+        val expectedResult = arrayListOf(
+            BooleanLiteral(value=true)
         )
 
         assert(program.body == expectedResult)
