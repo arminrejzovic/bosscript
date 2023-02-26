@@ -3,8 +3,10 @@ package parser
 import BinaryExpression
 import BlockStatement
 import FunctionDeclaration
+import FunctionParameter
 import Identifier
 import ReturnStatement
+import TypeAnnotation
 import org.junit.jupiter.api.Test
 import udemy.Parser
 
@@ -26,6 +28,7 @@ class FunctionDeclarationTest {
                     symbol = "x"
                 ),
                 params = arrayListOf(),
+                returnType = null,
                 body = BlockStatement(
                     body = arrayListOf()
                 )
@@ -37,7 +40,7 @@ class FunctionDeclarationTest {
     @Test
     fun testFunctionOneParam() {
         val src = """
-            funkcija x(num){
+            funkcija x(num:broj):broj{
                 
             }
         """.trimIndent()
@@ -51,9 +54,19 @@ class FunctionDeclarationTest {
                     symbol = "x"
                 ),
                 params = arrayListOf(
-                    Identifier(
-                        symbol = "num"
-                    )
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "num"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "broj",
+                            isArrayType = false
+                        )
+                    ),
+                ),
+                returnType = TypeAnnotation(
+                    typeName = "broj",
+                    isArrayType = false
                 ),
                 body = BlockStatement(
                     body = arrayListOf()
@@ -66,7 +79,7 @@ class FunctionDeclarationTest {
     @Test
     fun testFunctionMultipleParams() {
         val src = """
-            funkcija x(a,b,c){
+            funkcija x(a:tekst,b:tekst,c:tekst):tekst{
                 
             }
         """.trimIndent()
@@ -80,15 +93,37 @@ class FunctionDeclarationTest {
                     symbol = "x"
                 ),
                 params = arrayListOf(
-                    Identifier(
-                        symbol = "a"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "a"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     ),
-                    Identifier(
-                        symbol = "b"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "b"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     ),
-                    Identifier(
-                        symbol = "c"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "c"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     )
+                ),
+                returnType = TypeAnnotation(
+                    typeName = "tekst",
+                    isArrayType = false
                 ),
                 body = BlockStatement(
                     body = arrayListOf()
@@ -101,7 +136,7 @@ class FunctionDeclarationTest {
     @Test
     fun testFunctionReturnExpression() {
         val src = """
-            funkcija x(a,b,c){
+            funkcija x(a:broj,b:broj,c:broj):broj{
                 vrati a+b;
             }
         """.trimIndent()
@@ -115,15 +150,37 @@ class FunctionDeclarationTest {
                     symbol = "x"
                 ),
                 params = arrayListOf(
-                    Identifier(
-                        symbol = "a"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "a"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "broj",
+                            isArrayType = false
+                        )
                     ),
-                    Identifier(
-                        symbol = "b"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "b"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "broj",
+                            isArrayType = false
+                        )
                     ),
-                    Identifier(
-                        symbol = "c"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "c"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "broj",
+                            isArrayType = false
+                        )
                     )
+                ),
+                returnType = TypeAnnotation(
+                    typeName = "broj",
+                    isArrayType = false
                 ),
                 body = BlockStatement(
                     body = arrayListOf(
@@ -148,7 +205,7 @@ class FunctionDeclarationTest {
     @Test
     fun testFunctionVoidReturn() {
         val src = """
-            funkcija x(a,b,c){
+            funkcija x(a: tekst,b: tekst[],c: tekst){
                 vrati se;
             }
         """.trimIndent()
@@ -162,16 +219,35 @@ class FunctionDeclarationTest {
                     symbol = "x"
                 ),
                 params = arrayListOf(
-                    Identifier(
-                        symbol = "a"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "a"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     ),
-                    Identifier(
-                        symbol = "b"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "b"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = true
+                        )
                     ),
-                    Identifier(
-                        symbol = "c"
+                    FunctionParameter(
+                        identifier = Identifier(
+                            symbol = "c"
+                        ),
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     )
                 ),
+                returnType = null,
                 body = BlockStatement(
                     body = arrayListOf(
                         ReturnStatement(

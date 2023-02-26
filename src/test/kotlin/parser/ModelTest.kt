@@ -4,7 +4,9 @@ import BlockStatement
 import Identifier
 import ModelDefinitionStatement
 import ModelProperty
+import TypeAnnotation
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import udemy.Parser
 
 class ModelTest {
@@ -31,28 +33,38 @@ class ModelTest {
                 properties = arrayListOf(
                     ModelProperty(
                         name = "ime",
-                        type = Identifier(symbol = "tekst"),
-                        isArrayType = false
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     ),
                     ModelProperty(
                         name = "prezime",
-                        type = Identifier(symbol = "tekst"),
-                        isArrayType = false
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = false
+                        )
                     ),
                     ModelProperty(
                         name = "godiste",
-                        type = Identifier(symbol = "broj"),
-                        isArrayType = false
+                        type = TypeAnnotation(
+                            typeName = "broj",
+                            isArrayType = false
+                        )
                     ),
                     ModelProperty(
                         name = "lista",
-                        type = Identifier(symbol = "tekst"),
-                        isArrayType = true
+                        type = TypeAnnotation(
+                            typeName = "tekst",
+                            isArrayType = true
+                        )
                     ),
                     ModelProperty(
                         name = "ucenik",
-                        type = Identifier(symbol = "logicki"),
-                        isArrayType = false
+                        type = TypeAnnotation(
+                            typeName = "logicki",
+                            isArrayType = false
+                        )
                     ),
                 )
             )
@@ -78,5 +90,46 @@ class ModelTest {
             )
         )
         assert(program.body == expectedResult)
+    }
+
+    @Test
+    fun testMissingCommaInModelDefinition(){
+        val src = """
+            model Korisnik{
+                ime: tekst
+                prezime: tekst
+            }
+        """.trimIndent()
+
+        val parser = Parser()
+
+        val exception = assertThrows<Exception> {
+            parser.parseProgram(src)
+        }
+
+        val expectedError = "Expected , or }"
+        val error = exception.message
+
+        assert(error == expectedError)
+    }
+
+    @Test
+    fun testMissingTypeInModelDefinition(){
+        val src = """
+            model Korisnik{
+                ime: tekst,
+                prezime
+            }
+        """.trimIndent()
+
+        val parser = Parser()
+
+        val exception = assertThrows<Exception> {
+            parser.parseProgram(src)
+        }
+
+        val expectedError = "Missing :"
+        val error = exception.message
+        assert(error == expectedError)
     }
 }

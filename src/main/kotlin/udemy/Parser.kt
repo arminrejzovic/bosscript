@@ -10,6 +10,7 @@ import EmptyStatement
 import Expression
 import ForStatement
 import FunctionDeclaration
+import FunctionParameter
 import Identifier
 import IfStatement
 import LogicalExpression
@@ -25,6 +26,7 @@ import Statement
 import StringLiteral
 import Token
 import TokenType
+import TypeAnnotation
 import UnaryExpression
 import UnlessStatement
 import VariableDeclaration
@@ -70,6 +72,7 @@ class Parser {
     private fun expect(expectedType: TokenType, errorMessage: String): Token{
         val prev = tokens.removeAt(0)
         if(prev.type != expectedType){
+            println("Expected ${expectedType.name}, got ${prev.type}")
             throw Exception(errorMessage)
         }
         return prev
@@ -178,14 +181,7 @@ class Parser {
         val name = expect(TokenType.Identifier, "Model property name expected, got ${current().type}").value
 
         expect(TokenType.Colon, "Missing :")
-        val type = parseIdentifier()
-        var isArray = false
-
-        if(current().type == TokenType.OpenBracket){
-            consume()
-            expect(TokenType.CloseBracket, "Missing ]")
-            isArray = true
-        }
+        val type = parseTypeAnnotation()
 
         if(current().type != TokenType.CloseBrace){
             expect(TokenType.Comma, "Expected , or }")
@@ -193,8 +189,7 @@ class Parser {
 
         return ModelProperty(
             name = name,
-            type = type,
-            isArrayType = isArray
+            type = type
         )
     }
 
@@ -345,17 +340,27 @@ class Parser {
         val functionName = parseIdentifier()
         expect(TokenType.OpenParen, "Missing '('")
 
-        var params: ArrayList<Identifier> = arrayListOf()
+        var params: ArrayList<FunctionParameter> = arrayListOf()
+
         if(current().type != TokenType.CloseParen){
             params = parseFormalParameterList()
         }
 
         expect(TokenType.CloseParen, "Missing ')'")
-         val functionBody = parseBlockStatement()
+        var returnType: TypeAnnotation? = null
+
+        if(current().type == TokenType.Colon){
+            // Non-void return function
+            consume()
+            returnType = parseTypeAnnotation()
+        }
+
+        val functionBody = parseBlockStatement()
 
         return FunctionDeclaration(
             name = functionName,
             params = params,
+            returnType = returnType,
             body = functionBody
         )
     }
@@ -387,11 +392,14 @@ class Parser {
      *      : Identifier
      *      | FormalParameterList "," Identifier
      */
-    private fun parseFormalParameterList(): ArrayList<Identifier>{
-        val params = arrayListOf<Identifier>()
+    private fun parseFormalParameterList(): ArrayList<FunctionParameter>{
+        val params = arrayListOf<FunctionParameter>()
 
         do {
-            params.add(parseIdentifier())
+            val typename = parseIdentifier()
+            expect(TokenType.Colon, "Missing :")
+            val typeAnnotation = parseTypeAnnotation()
+            params.add(FunctionParameter(identifier = typename, type = typeAnnotation))
         } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
 
         return params
@@ -703,9 +711,30 @@ class Parser {
      *      : IDENTIFIER
      *      ;
      */
+
     private fun parseIdentifier(): Identifier{
         val identifier = expect(TokenType.Identifier, "Identifier expected").value
         return Identifier(symbol = identifier)
+    }
+
+    /**
+     * TypeAnnotation
+     *      : Identifier
+     *      | Identifier[]
+     *      ;
+     */
+    private fun parseTypeAnnotation(): TypeAnnotation{
+        val typename = parseIdentifier()
+        var isArray = false
+        if(current().type == TokenType.OpenBracket){
+            consume()
+            expect(TokenType.CloseBracket, "Missing ]")
+            isArray = true
+        }
+        return TypeAnnotation(
+            typeName = typename.symbol,
+            isArrayType = isArray
+        )
     }
 
     private fun parseAssignmentOperator(): String{

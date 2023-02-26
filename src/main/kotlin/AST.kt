@@ -26,6 +26,8 @@ enum class NodeType {
     ReturnStatement,
     ModelDefinition,
     ModelPropertyDefinition,
+    TypeAnnotation,
+    FunctionParameter,
 }
 
 interface Statement {
@@ -50,10 +52,17 @@ data class BlockStatement(
 
 data class FunctionDeclaration(
     val name: Identifier,
-    val params: ArrayList<Identifier>,
+    val params: ArrayList<FunctionParameter>,
+    val returnType: TypeAnnotation?,
     val body: BlockStatement,
     override val kind: NodeType = NodeType.FunctionDeclaration
 ) : Statement
+
+data class FunctionParameter(
+    val identifier: Identifier,
+    val type: TypeAnnotation,
+    override val kind: NodeType = NodeType.FunctionParameter
+):Statement
 
 data class ReturnStatement(
     val argument: Expression?,
@@ -138,9 +147,14 @@ data class ModelDefinitionStatement(
 
 data class ModelProperty(
     val name: String,
-    val type: Identifier,
-    val isArrayType: Boolean,
+    val type: TypeAnnotation,
     override val kind: NodeType = NodeType.ModelPropertyDefinition
+): Statement
+
+data class TypeAnnotation(
+    val typeName: String,
+    val isArrayType: Boolean,
+    override val kind: NodeType = NodeType.TypeAnnotation
 ): Statement
 
 interface Expression : Statement
