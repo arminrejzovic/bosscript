@@ -1,6 +1,3 @@
-import java.util.Objects
-import java.util.StringJoiner
-
 fun interpret(astNode: Statement, environment: Environment): RuntimeValue{
     when (astNode.kind){
         NodeType.Program -> {

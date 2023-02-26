@@ -1,17 +1,12 @@
 enum class NodeType {
-    // Statements
     Program,
     Block,
     VariableDeclaration,
-
-    //Expressions
     Identifier,
     BinaryExpression,
     AssignmentExpression,
     MemberExpression,
-
     CallExpression,
-    // Literals
     NumericLiteral,
     StringLiteral,
     Object,
@@ -29,12 +24,8 @@ enum class NodeType {
     ForStatement,
     FunctionDeclaration,
     ReturnStatement,
-    ClassDeclaration,
-    ClassFieldDeclaration,
-    ClassMethodDeclaration,
-    ThisExpression,
-    Super,
-    NewExpression,
+    ModelDefinition,
+    ModelPropertyDefinition,
 }
 
 interface Statement {
@@ -110,29 +101,6 @@ data class VariableStatement(
     override val kind: NodeType = NodeType.VariableStatement
 ) : Statement
 
-data class ClassDeclaration(
-    val name: Identifier,
-    val superclass: Identifier?,
-    val body: ArrayList<Statement>,
-    override val kind: NodeType = NodeType.ClassDeclaration
-) : Statement
-
-data class ClassFieldDeclaration(
-    val visibility: String,
-    val isConstant: Boolean,
-    val identifier: String,
-    val value: Expression?,
-    override val kind: NodeType = NodeType.ClassFieldDeclaration
-): Statement
-
-data class ClassMethodDeclaration(
-    val visibility: String,
-    val identifier: Identifier,
-    val params: ArrayList<Identifier>,
-    val body: BlockStatement,
-    override val kind: NodeType = NodeType.ClassMethodDeclaration
-): Statement
-
 data class AssignmentExpression(
     val assignee: Expression,
     val value: Expression,
@@ -161,6 +129,19 @@ data class VariableDeclaration(
     override val kind: NodeType
         get() = NodeType.VariableDeclaration
 }
+
+data class ModelDefinitionStatement(
+    val name: Identifier,
+    val properties: ArrayList<ModelProperty>,
+    override val kind: NodeType = NodeType.ModelDefinition
+): Statement
+
+data class ModelProperty(
+    val name: String,
+    val type: Identifier,
+    val isArrayType: Boolean,
+    override val kind: NodeType = NodeType.ModelPropertyDefinition
+): Statement
 
 interface Expression : Statement
 
@@ -231,18 +212,4 @@ data class CallExpression(
     val callee: Expression,
     override val kind: NodeType = NodeType.CallExpression
 ) : Expression
-
-data class ThisExpression(
-    override val kind: NodeType = NodeType.ThisExpression
-): Expression
-
-data class Super(
-    override val kind: NodeType = NodeType.Super
-): Expression
-
-data class NewExpression(
-    val callee: Expression,
-    val arguments: ArrayList<Expression>,
-    override val kind: NodeType = NodeType.NewExpression
-): Expression
 

@@ -5,9 +5,6 @@ import BinaryExpression
 import BlockStatement
 import BooleanLiteral
 import CallExpression
-import ClassDeclaration
-import ClassFieldDeclaration
-import ClassMethodDeclaration
 import DoWhileStatement
 import EmptyStatement
 import Expression
@@ -17,7 +14,8 @@ import Identifier
 import IfStatement
 import LogicalExpression
 import MemberExpression
-import NewExpression
+import ModelDefinitionStatement
+import ModelProperty
 import NodeType
 import NullLiteral
 import NumericLiteral
@@ -25,8 +23,6 @@ import Program
 import ReturnStatement
 import Statement
 import StringLiteral
-import Super
-import ThisExpression
 import Token
 import TokenType
 import UnaryExpression
@@ -35,6 +31,7 @@ import VariableDeclaration
 import VariableStatement
 import WhileStatement
 import tokenize
+import java.util.StringJoiner
 
 
 class Parser {
@@ -78,6 +75,13 @@ class Parser {
         return prev
     }
 
+    private fun warning(message: String){
+        val reset = "\u001b[0m"
+        val yellow = "\u001b[33m"
+
+        println(yellow + "[WARN] $message" + reset)
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
 
     // Parsing methods
@@ -106,7 +110,7 @@ class Parser {
      *      | UnlessStatement
      *      | FunctionDeclaration
      *      | ReturnStatement
-     *      | ClassDeclaration
+     *      | ModelDefinitionStatement
      *      ;
      */
     private fun parseStatement(): Statement{
@@ -135,8 +139,8 @@ class Parser {
             TokenType.Vrati -> {
                 return parseReturnStatement()
             }
-            TokenType.Klasa -> {
-                return parseClassDeclaration()
+            TokenType.Model -> {
+                return parseModelDefinitionStatement()
             }
             TokenType.Svako -> {
                 throw Exception("You are probably missing 'za' before 'svako'")
@@ -148,6 +152,50 @@ class Parser {
                 return parseExpressionStatement()
             }
         }
+    }
+
+    private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
+        expect(TokenType.Model, "A model is defined using the model keyword")
+        val name = parseIdentifier()
+        expect(TokenType.OpenBrace, "A model definition is surrounded with braces")
+        val properties = arrayListOf<ModelProperty>()
+        while (current().type != TokenType.EOF && current().type != TokenType.CloseBrace){
+            properties.add(parseModelProperty())
+        }
+        expect(TokenType.CloseBrace, "Missing }")
+
+        if(properties.isEmpty()){
+            warning("Model '${name.symbol}' is empty")
+        }
+
+        return ModelDefinitionStatement(
+            name = name,
+            properties = properties
+        )
+    }
+
+    private fun parseModelProperty(): ModelProperty{
+        val name = expect(TokenType.Identifier, "Model property name expected, got ${current().type}").value
+
+        expect(TokenType.Colon, "Missing :")
+        val type = parseIdentifier()
+        var isArray = false
+
+        if(current().type == TokenType.OpenBracket){
+            consume()
+            expect(TokenType.CloseBracket, "Missing ]")
+            isArray = true
+        }
+
+        if(current().type != TokenType.CloseBrace){
+            expect(TokenType.Comma, "Expected , or }")
+        }
+
+        return ModelProperty(
+            name = name,
+            type = type,
+            isArrayType = isArray
+        )
     }
 
     private fun parseExpressionStatement(): Expression{
@@ -286,72 +334,6 @@ class Parser {
         )
     }
 
-    private fun parseClassDeclaration(): Statement {
-        expect(TokenType.Klasa, "Error at ${getLineCol()}: Classes are declared with 'klasa' keyword")
-        val id = parseIdentifier()
-        var superclass: Identifier? = null
-
-        if(current().value == "<"){
-            consume()
-            superclass = parseIdentifier()
-        }
-
-        return ClassDeclaration(
-            name = id,
-            superclass = superclass,
-            body = parseClassBody()
-        )
-    }
-
-    private fun parseClassBody(): ArrayList<Statement>{
-        val body = arrayListOf<Statement>()
-        expect(TokenType.OpenBrace, "Error at ${getLineCol()}: Class body is defined between curly braces")
-
-        do {
-            println("Parsing ${current().value}")
-            body.add(parseClassProperty())
-        } while (current().type != TokenType.CloseBrace)
-
-        expect(TokenType.CloseBrace, "Error at ${getLineCol()}: Class body is defined between curly braces")
-        return body
-    }
-
-    private fun parseClassProperty(): Statement{
-        if (current().type == TokenType.Javna || current().type == TokenType.Privatna){
-            // valid class property
-            val accessModifier = consume().value
-
-            if(current().type == TokenType.Funkcija){
-                // class method
-                val function = parseFunctionDeclaration()
-                return ClassMethodDeclaration(
-                    visibility = accessModifier,
-                    identifier = function.name,
-                    params = function.params,
-                    body = function.body
-                )
-            }
-            else{
-                // must be variable
-                if(current().type != TokenType.Var || current().type != TokenType.Konst){
-                    val isConst = consume().type == TokenType.Konst
-                    val variable = parseVariableDeclaration()
-                    return ClassFieldDeclaration(
-                        visibility = accessModifier,
-                        isConstant = isConst,
-                        identifier = variable.identifier,
-                        value = variable.value
-                    )
-                }
-                else{
-                    throw Exception("Error at ${getLineCol()}: Unexpected token")
-                }
-            }
-        }
-        else{
-            throw Exception("Error at ${getLineCol()}: Class properties must have an explicit access modifier ('javna' or 'privatna')")
-        }
-    }
 
     /**
      * FunctionDeclaration
@@ -623,10 +605,6 @@ class Parser {
      *      ;
      */
     private fun parseCallMemberExpression(): Expression {
-        if(current().type == TokenType.Baza){
-            return parseCallExpression(Super())
-        }
-
         val member = parseMemberExpression()
 
         if(current().type == TokenType.OpenParen){
@@ -841,28 +819,10 @@ class Parser {
             TokenType.Nedefinisano -> {
                 return parseNullLiteral()
             }
-            TokenType.Instanca -> {
-                consume()
-                return ThisExpression()
-            }
-            TokenType.Kreiraj -> {
-                return parseNewExpression()
-            }
             else -> {
                 return parseIdentifier()
             }
         }
-    }
-
-    /**
-     * "kreiraj" MemberExpression Arguments
-     */
-    private fun parseNewExpression(): Expression {
-        expect(TokenType.Kreiraj, "Error at ${getLineCol()}: Class instances are created using the 'kreiraj' operator")
-        return NewExpression(
-            callee = parseMemberExpression(),
-            arguments = parseArguments()
-        )
     }
 
     /**

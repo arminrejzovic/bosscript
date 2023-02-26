@@ -27,15 +27,9 @@ enum class TokenType{
     //    Variables
     Var,
     Konst,
-    //    Classes
-    Klasa,          // Class
-    Privatna,       // Private
-    Javna,          // Public
-    Opsta,          // Static
-    Konstruktor,    // constructor() method
-    Instanca,       // constructor() method
+    //    Models
+    Model,
     Baza,           // super
-    Kreiraj,        // new
     //    Loops
     Za,
     Svako,
@@ -93,14 +87,7 @@ fun String.isIgnoredWhitespace(): Boolean{
 val keywords = mapOf(
     "var" to TokenType.Var,
     "konst" to TokenType.Konst,
-    "klasa" to TokenType.Klasa,
-    "privatna" to TokenType.Privatna,
-    "javna" to TokenType.Javna,
-    "opsta" to TokenType.Opsta,
-    "konstruktor" to TokenType.Konstruktor,
-    "instanca" to TokenType.Instanca,
-    "baza" to TokenType.Baza,
-    "kreiraj" to TokenType.Kreiraj,
+
     "za" to TokenType.Za,
     "svako" to TokenType.Svako,
     "od" to TokenType.Od,
@@ -118,7 +105,8 @@ val keywords = mapOf(
     "inace" to TokenType.Inace,
     "nedefinisano" to TokenType.Nedefinisano,
     "tacno" to TokenType.Tacno,
-    "netacno" to TokenType.Netacno
+    "netacno" to TokenType.Netacno,
+    "model" to TokenType.Model
 )
 
 fun tokenize(src: String): ArrayList<Token>{
