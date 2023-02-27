@@ -29,7 +29,6 @@ enum class TokenType{
     Konst,
     //    Models
     Model,
-    Baza,           // super
     //    Loops
     Za,
     Svako,
@@ -87,7 +86,6 @@ fun String.isIgnoredWhitespace(): Boolean{
 val keywords = mapOf(
     "var" to TokenType.Var,
     "konst" to TokenType.Konst,
-
     "za" to TokenType.Za,
     "svako" to TokenType.Svako,
     "od" to TokenType.Od,

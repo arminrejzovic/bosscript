@@ -29,6 +29,8 @@ enum class NodeType {
     TypeAnnotation,
     FunctionParameter,
     ArrayLiteral,
+    ArrowFunction,
+    FunctionExpression,
 }
 
 interface Statement {
@@ -58,6 +60,13 @@ data class FunctionDeclaration(
     val body: BlockStatement,
     override val kind: NodeType = NodeType.FunctionDeclaration
 ) : Statement
+
+data class FunctionExpression(
+    val params: ArrayList<FunctionParameter>,
+    val returnType: TypeAnnotation?,
+    val body: BlockStatement,
+    override val kind: NodeType = NodeType.FunctionExpression
+) : Expression
 
 data class FunctionParameter(
     val identifier: Identifier,

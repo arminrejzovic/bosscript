@@ -11,6 +11,7 @@ import EmptyStatement
 import Expression
 import ForStatement
 import FunctionDeclaration
+import FunctionExpression
 import FunctionParameter
 import Identifier
 import IfStatement
@@ -493,17 +494,47 @@ class Parser {
      */
     private fun parseVariableInitializer(): Expression{
         expect(TokenType.SimpleAssign, "Expected assignment operator")
-        return parseAssignmentExpression()
+        return parseExpression()
     }
 
     /**
      * Expression:
-     *      : AdditiveExpression
-     *      |
+     *      : FunctionExpression
+     *      | AdditiveExpression
      *      ;
      */
     private fun parseExpression(): Expression{
+        if(current().type == TokenType.Funkcija){
+            return parseFunctionExpression()
+        }
         return parseAssignmentExpression()
+    }
+
+    private fun parseFunctionExpression(): FunctionExpression{
+        expect(TokenType.Funkcija, "Functions are declared using the funkcija keyword")
+        expect(TokenType.OpenParen, "Expected (")
+        var params: ArrayList<FunctionParameter> = arrayListOf()
+
+        if(current().type != TokenType.CloseParen){
+            params = parseFormalParameterList()
+        }
+
+        expect(TokenType.CloseParen, "Missing ')'")
+        var returnType: TypeAnnotation? = null
+
+        if(current().type == TokenType.Colon){
+            // Non-void return function
+            consume()
+            returnType = parseTypeAnnotation()
+        }
+
+        val functionBody = parseBlockStatement()
+
+        return FunctionExpression(
+            params = params,
+            returnType = returnType,
+            body = functionBody
+        )
     }
 
     /**
@@ -670,7 +701,7 @@ class Parser {
         val argList = arrayListOf<Expression>()
 
         do {
-            argList.add(parseAssignmentExpression())
+            argList.add(parseExpression())
         } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
 
         return argList

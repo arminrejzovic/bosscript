@@ -152,7 +152,7 @@ class LogicalOperatorsTest {
     @Test
     fun testComplexIf(){
         val src = """
-            ako(y > 5 || z > 10 && x < 3){}
+            ako(y > 5 || (z > 10 && x < 3)){}
         """.trimIndent()
 
         val parser = Parser()
