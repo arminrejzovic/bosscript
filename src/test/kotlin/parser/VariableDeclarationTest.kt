@@ -80,7 +80,7 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             VariableStatement(
-                declarations= arrayListOf(
+                declarations = arrayListOf(
                     VariableDeclaration(identifier="x", value=null),
                     VariableDeclaration(identifier="y", value=null)
                 ),

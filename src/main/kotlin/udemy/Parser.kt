@@ -1,5 +1,6 @@
 package udemy
 
+import ArrayLiteral
 import AssignmentExpression
 import BinaryExpression
 import BlockStatement
@@ -20,7 +21,9 @@ import ModelProperty
 import NodeType
 import NullLiteral
 import NumericLiteral
+import ObjectLiteral
 import Program
+import Property
 import ReturnStatement
 import Statement
 import StringLiteral
@@ -845,6 +848,12 @@ class Parser {
             TokenType.OpenParen -> {
                 return parseParenthesizedExpression()
             }
+            TokenType.OpenBracket -> {
+                return parseArrayLiteral()
+            }
+            TokenType.OpenBrace -> {
+                return parseObjectLiteral()
+            }
             TokenType.Tacno, TokenType.Netacno -> {
                 return parseBooleanLiteral()
             }
@@ -903,5 +912,50 @@ class Parser {
         val expression = parseExpression()
         expect(TokenType.CloseParen, "Expected ')'")
         return expression
+    }
+
+    private fun parseArrayLiteral(): ArrayLiteral{
+        val array = arrayListOf<Expression>()
+        expect(TokenType.OpenBracket, "Missing [")
+
+        if(current().type == TokenType.CloseBracket){
+            // Empty array
+            consume()
+            return ArrayLiteral(arrayListOf())
+        }
+
+        do {
+            val exp = parseExpression()
+            array.add(exp)
+        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
+
+        expect(TokenType.CloseBracket, "Missing ]")
+
+        return ArrayLiteral(
+            arr = array
+        )
+    }
+
+    private fun parseObjectLiteral(): ObjectLiteral{
+        expect(TokenType.OpenBrace, "Missing {")
+        val properties = arrayListOf<Property>()
+
+        while (notEOF() && current().type != TokenType.CloseBrace){
+            val key = expect(TokenType.Identifier, "Object key expected").value
+
+            expect(TokenType.Colon, "Missing :")
+            val value = parseExpression()
+
+            properties.add(Property(key, value))
+
+            if(current().type != TokenType.CloseBrace){
+                expect(TokenType.Comma, "Expected , or }")
+            }
+        }
+        expect(TokenType.CloseBrace, "Expected }")
+
+        return ObjectLiteral(
+            properties = properties
+        )
     }
 }

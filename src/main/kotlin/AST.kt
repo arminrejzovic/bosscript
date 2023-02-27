@@ -28,6 +28,7 @@ enum class NodeType {
     ModelPropertyDefinition,
     TypeAnnotation,
     FunctionParameter,
+    ArrayLiteral,
 }
 
 interface Statement {
@@ -188,12 +189,9 @@ data class NumericLiteral(
 }
 
 data class StringLiteral(
-    val value: String
-) : Expression {
-    override val kind: NodeType
-        get() = NodeType.StringLiteral
-
-}
+    val value: String,
+    override val kind: NodeType = NodeType.StringLiteral
+) : Expression
 
 data class BooleanLiteral(
     val value: Boolean,
@@ -207,18 +205,19 @@ data class NullLiteral(
 
 data class Property(
     val key: String,
-    val value: Expression
-) : Expression {
-    override val kind: NodeType
-        get() = NodeType.Property
-}
+    val value: Expression,
+    override val kind: NodeType = NodeType.Property
+) : Expression
 
 data class ObjectLiteral(
-    val properties: ArrayList<Property>
-) : Expression {
-    override val kind: NodeType
-        get() = NodeType.Object
-}
+    val properties: ArrayList<Property>,
+    override val kind: NodeType = NodeType.Object
+) : Expression
+
+data class ArrayLiteral(
+    val arr: ArrayList<Expression>,
+    override val kind: NodeType = NodeType.ArrayLiteral
+): Expression
 
 
 data class CallExpression(
