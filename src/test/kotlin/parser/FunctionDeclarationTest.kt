@@ -6,7 +6,6 @@ import FunctionDeclaration
 import FunctionParameter
 import Identifier
 import ReturnStatement
-import StringLiteral
 import TypeAnnotation
 import org.junit.jupiter.api.Test
 import udemy.Parser

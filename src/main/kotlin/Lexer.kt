@@ -60,7 +60,8 @@ enum class TokenType{
     // SPECIAL TOKENS ---------------------------
     EOF,
     NOTIMPLEMENTED,
-    ComplexAssign
+    ComplexAssign,
+    Break
 }
 
 data class Token(
@@ -94,6 +95,7 @@ val keywords = mapOf(
     "korak" to TokenType.Korak,
     "dok" to TokenType.Dok,
     "radi" to TokenType.Radi,
+    "prekid" to TokenType.Break,
     "funkcija" to TokenType.Funkcija,
     "vrati" to TokenType.Vrati,
     "se" to TokenType.Se,

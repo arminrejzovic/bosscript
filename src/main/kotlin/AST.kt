@@ -31,6 +31,7 @@ enum class NodeType {
     ArrayLiteral,
     ArrowFunction,
     FunctionExpression,
+    BreakStatement,
 }
 
 interface Statement {
@@ -39,6 +40,10 @@ interface Statement {
 
 data class EmptyStatement(
     override val kind: NodeType = NodeType.EmptyStatement
+) : Statement
+
+data class BreakStatement(
+    override val kind: NodeType = NodeType.BreakStatement
 ) : Statement
 
 data class Program(

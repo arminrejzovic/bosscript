@@ -5,6 +5,7 @@ import AssignmentExpression
 import BinaryExpression
 import BlockStatement
 import BooleanLiteral
+import BreakStatement
 import CallExpression
 import DoWhileStatement
 import EmptyStatement
@@ -140,6 +141,9 @@ class Parser {
             TokenType.Dok, TokenType.Za, TokenType.Radi -> {
                 return parseIterationStatement()
             }
+            TokenType.Break -> {
+                return parseBreakStatement()
+            }
             TokenType.Funkcija -> {
                 return parseFunctionDeclaration()
             }
@@ -248,7 +252,7 @@ class Parser {
         val endCondition = parseExpression()
         var step: Expression? = null
         if(current().type == TokenType.Korak){
-            consume()
+            consume(/*korak*/)
             step = parseExpression()
         }
         expect(TokenType.CloseParen, "Expected ')'")
@@ -275,6 +279,11 @@ class Parser {
             condition = condition,
             body = body
         )
+    }
+
+    private fun parseBreakStatement(): BreakStatement{
+        expect(TokenType.Break, "Expected 'prekid'")
+        return BreakStatement()
     }
 
     /**
