@@ -22,7 +22,7 @@ enum class TokenType{
     Exponent,       // ^
     LogicalAnd,     // &&
     LogicalOr,      // ||
-    LogicalNot,      // !
+    LogicalNot,     // !
     // KEYWORDS ---------------------------------
     //    Variables
     Var,
@@ -39,6 +39,7 @@ enum class TokenType{
     Radi,
     //    Functions
     Funkcija,
+    Arrow,  // =>
     Vrati,
     Se,
     //    Package imports
@@ -166,6 +167,10 @@ fun tokenize(src: String): ArrayList<Token>{
         else if(sourceCode[0] == "="){
             if(sourceCode.size > 1 && sourceCode[1] == "="){
                 tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.EqualityOperator, line, col))
+                col += 2
+            }
+            else if(sourceCode.size > 1 && sourceCode[1] == ">"){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.Arrow, line, col))
                 col += 2
             }
             else{

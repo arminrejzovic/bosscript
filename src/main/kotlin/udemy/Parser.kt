@@ -359,7 +359,14 @@ class Parser {
             returnType = parseTypeAnnotation()
         }
 
-        val functionBody = parseBlockStatement()
+        val functionBody: BlockStatement = if(current().type == TokenType.Arrow){
+            // Inline function
+            consume(/*The arrow*/)
+            BlockStatement(body = arrayListOf(ReturnStatement(argument = parseExpression())))
+        } else{
+            // Normal function
+            parseBlockStatement()
+        }
 
         return FunctionDeclaration(
             name = functionName,
@@ -528,7 +535,14 @@ class Parser {
             returnType = parseTypeAnnotation()
         }
 
-        val functionBody = parseBlockStatement()
+        val functionBody: BlockStatement = if(current().type == TokenType.Arrow){
+            // Inline function
+            consume(/*The arrow*/)
+            BlockStatement(body = arrayListOf(ReturnStatement(argument = parseExpression())))
+        } else{
+            // Normal function
+            parseBlockStatement()
+        }
 
         return FunctionExpression(
             params = params,
