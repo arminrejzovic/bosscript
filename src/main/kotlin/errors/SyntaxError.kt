@@ -1,3 +1,3 @@
 package errors
 
-class SyntaxError : Exception() {}
+class SyntaxError(message: String) : Exception(message) {}
