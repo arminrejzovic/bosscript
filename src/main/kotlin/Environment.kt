@@ -1,3 +1,8 @@
+import udemy.Bool
+import udemy.Null
+import udemy.Number
+import udemy.RuntimeValue
+
 class Environment(
     private val parent: Environment? = null,
     private val variables: HashMap<String, RuntimeValue> = HashMap(),
@@ -49,9 +54,9 @@ class Environment(
     }
 
     fun createScope(env: Environment){
-        env.declareVariable("pi", NumberValue(3.14159), isConstant = true)
-        env.declareVariable("tacno", BoolValue(true), isConstant = true)
-        env.declareVariable("netacno", BoolValue(false), isConstant = true)
-        env.declareVariable("nista", NullValue(), isConstant = true)
+        env.declareVariable("pi", Number(3.14159), isConstant = true)
+        env.declareVariable("tacno", Bool(true), isConstant = true)
+        env.declareVariable("netacno", Bool(false), isConstant = true)
+        env.declareVariable("nista", Null(), isConstant = true)
     }
 }

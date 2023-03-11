@@ -1,4 +1,0 @@
-package lexer
-
-class LexerTest {
-}

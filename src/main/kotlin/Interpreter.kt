@@ -1,17 +1,23 @@
+import udemy.Null
+import udemy.Number
+import udemy.RuntimeValue
+import udemy.Text
+
 fun interpret(astNode: Statement, environment: Environment): RuntimeValue{
     when (astNode.kind){
         NodeType.Program -> {
             return interpretProgram(astNode as Program, environment)
         }
         NodeType.NumericLiteral -> {
-            return NumberValue((astNode as NumericLiteral).value)
+            return Number((astNode as NumericLiteral).value)
         }
         NodeType.StringLiteral -> {
-            return StringValue((astNode as StringLiteral).value)
+            return Text((astNode as StringLiteral).value)
         }
         NodeType.Identifier -> {
             return interpretIdentifier(astNode as Identifier, environment)
         }
+        /*
         NodeType.Object -> {
             return interpretObjectExpression(astNode as ObjectLiteral, environment)
         }
@@ -24,6 +30,7 @@ fun interpret(astNode: Statement, environment: Environment): RuntimeValue{
         NodeType.AssignmentExpression -> {
             return interpretAssignment(astNode as AssignmentExpression, environment)
         }
+         */
         else -> {
             println(astNode.toString().toIndentString())
             throw Exception("Unrecognized AST node found")
@@ -36,7 +43,7 @@ fun interpretIdentifier(identifier: Identifier, environment: Environment): Runti
 }
 
 fun interpretProgram(program: Program, environment: Environment): RuntimeValue{
-    var lastEvaluated: RuntimeValue = NullValue()
+    var lastEvaluated: RuntimeValue = Null()
 
     program.body.forEach {
         lastEvaluated = interpret(it, environment)
@@ -44,7 +51,7 @@ fun interpretProgram(program: Program, environment: Environment): RuntimeValue{
 
     return lastEvaluated
 }
-
+/*
 fun interpretBinaryExpression(binaryExpression: BinaryExpression, environment: Environment): RuntimeValue{
     val left = interpret(binaryExpression.left, environment)
     val right = interpret(binaryExpression.right, environment)
@@ -104,3 +111,4 @@ fun interpretObjectExpression(obj: ObjectLiteral, env: Environment): RuntimeValu
 
     return newObject
 }
+*/
