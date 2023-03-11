@@ -1,6 +1,7 @@
 package udemy
 
 import ArrayLiteral
+import AssignmentExpression
 import BinaryExpression
 import BooleanLiteral
 import Environment
@@ -14,7 +15,6 @@ import VariableDeclaration
 import VariableStatement
 import errors.SyntaxError
 import java.lang.Exception
-import kotlin.math.exp
 import kotlin.math.pow
 
 class Interpreter {
@@ -192,7 +192,12 @@ class Interpreter {
             }
 
             NodeType.VariableStatement -> {
-                parseVariableStatement(node as VariableStatement, environment)
+                evaluateVariableStatement(node as VariableStatement, environment)
+                return Null()
+            }
+
+            NodeType.AssignmentExpression -> {
+                evaluateAssignmentExpression(node as AssignmentExpression, environment)
                 return Null()
             }
 
@@ -204,15 +209,22 @@ class Interpreter {
 
     /* HELPER METHODS */
 
-    private fun parseVariableStatement(stmt: VariableStatement, env: Environment){
+    private fun evaluateVariableStatement(stmt: VariableStatement, env: Environment){
         stmt.declarations.forEach {
-            parseVariableDeclaration(it, env,  stmt.isConstant)
+            evaluateVariableDeclaration(it, env,  stmt.isConstant)
         }
     }
 
-    private fun parseVariableDeclaration(declaration: VariableDeclaration, env: Environment, isConstant: Boolean) {
+    private fun evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment, isConstant: Boolean) {
         val value = if (declaration.value == null) Null() else evaluate(declaration.value, env)
 
         env.declareVariable(declaration.identifier, value, isConstant)
+    }
+
+    private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment){
+        if (expr.assignee.kind != NodeType.Identifier){
+            throw Exception("Invalid assignment target")
+        }
+        env.assignVariable((expr.assignee as Identifier).symbol, evaluate(expr.value, env))
     }
 }
