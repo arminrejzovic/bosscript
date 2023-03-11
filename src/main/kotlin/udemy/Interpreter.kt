@@ -3,6 +3,7 @@ package udemy
 import ArrayLiteral
 import AssignmentExpression
 import BinaryExpression
+import BlockStatement
 import BooleanLiteral
 import Environment
 import Identifier
@@ -201,6 +202,10 @@ class Interpreter {
                 return Null()
             }
 
+            NodeType.Block -> {
+                return evaluateBlockStatement(node as BlockStatement, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
             }
@@ -226,5 +231,15 @@ class Interpreter {
             throw Exception("Invalid assignment target")
         }
         env.assignVariable((expr.assignee as Identifier).symbol, evaluate(expr.value, env))
+    }
+
+    private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue{
+        val blockEnv = Environment(parent = env)
+        var result: RuntimeValue = Null()
+        block.body.forEach {
+            result = evaluate(it, blockEnv)
+        }
+
+        return result
     }
 }

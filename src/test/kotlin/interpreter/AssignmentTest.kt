@@ -21,9 +21,6 @@ class AssignmentTest {
             a;
         """.trimIndent()
 
-        val parser = Parser()
-        val program = parser.parseProgram(src)
-
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
