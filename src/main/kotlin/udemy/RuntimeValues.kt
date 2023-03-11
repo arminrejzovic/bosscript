@@ -96,7 +96,18 @@ data class Object(
             )
         )
     )
-): RuntimeValue
+): RuntimeValue{
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Object
+
+        if (properties != other.properties) return false
+
+        return true
+    }
+}
 
 data class Function(
     val name: String,

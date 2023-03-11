@@ -63,7 +63,7 @@ class Interpreter {
                 val objNode = node as ObjectLiteral
                 val obj = Object(properties = hashMapOf())
                 objNode.properties.forEach {
-                    obj.properties[it.key] = evaluate(it, environment)
+                    obj.properties[it.key] = evaluate(it.value, environment)
                 }
                 return obj
             }
@@ -197,7 +197,7 @@ class Interpreter {
             }
 
             else -> {
-                throw SyntaxError("Unexpected token")
+                throw SyntaxError("Unexpected token, $node")
             }
         }
     }
