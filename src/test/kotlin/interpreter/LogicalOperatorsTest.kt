@@ -53,6 +53,23 @@ class LogicalOperatorsTest {
     }
 
     @Test
+    fun testEqualsNumberVsIdentifier(){
+        val src = """
+            5 == x;
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = arrayListOf(
+            Bool(
+                value = false
+            )
+        )
+        assert(result == expectedResult)
+    }
+
+    @Test
     fun testEqualsNumbers(){
         val src = """
             5 == 3;

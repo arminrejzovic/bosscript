@@ -10,6 +10,8 @@ import NumericLiteral
 import ObjectLiteral
 import Statement
 import StringLiteral
+import VariableDeclaration
+import VariableStatement
 import errors.SyntaxError
 import java.lang.Exception
 import kotlin.math.exp
@@ -189,9 +191,28 @@ class Interpreter {
                 return environment.getVariable(identifierNode.symbol)
             }
 
+            NodeType.VariableStatement -> {
+                parseVariableStatement(node as VariableStatement, environment)
+                return Null()
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token")
             }
         }
+    }
+
+    /* HELPER METHODS */
+
+    private fun parseVariableStatement(stmt: VariableStatement, env: Environment){
+        stmt.declarations.forEach {
+            parseVariableDeclaration(it, env,  stmt.isConstant)
+        }
+    }
+
+    private fun parseVariableDeclaration(declaration: VariableDeclaration, env: Environment, isConstant: Boolean) {
+        val value = if (declaration.value == null) Null() else evaluate(declaration.value, env)
+
+        env.declareVariable(declaration.identifier, value, isConstant)
     }
 }
