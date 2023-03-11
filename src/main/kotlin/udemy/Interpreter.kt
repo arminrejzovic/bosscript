@@ -4,6 +4,7 @@ import ArrayLiteral
 import BinaryExpression
 import BooleanLiteral
 import Environment
+import Identifier
 import NodeType
 import NumericLiteral
 import ObjectLiteral
@@ -25,6 +26,10 @@ class Interpreter {
             result.add(evaluate(it))
         }
         return result
+    }
+
+    init {
+        globalEnv.declareVariable("x", Number(value = 10.0))
     }
 
     private fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue{
@@ -121,10 +126,67 @@ class Interpreter {
                             value =  (left.value as Double).pow(right.value as Double)
                         )
                     }
+                    "<" -> {
+                        if(left.value !is Double || right.value !is Double){
+                            throw Exception("Type error: Operator '+' is not defined for provided operands")
+                        }
+
+                        return Bool(
+                            value = (left.value as Double) < (right.value as Double)
+                        )
+                    }
+
+                    "<=" -> {
+                        if(left.value !is Double || right.value !is Double){
+                            throw Exception("Type error: Operator '+' is not defined for provided operands")
+                        }
+
+                        return Bool(
+                            value = (left.value as Double) <= (right.value as Double)
+                        )
+                    }
+
+                    ">" -> {
+                        if(left.value !is Double || right.value !is Double){
+                            throw Exception("Type error: Operator '+' is not defined for provided operands")
+                        }
+
+                        return Bool(
+                            value = (left.value as Double) > (right.value as Double)
+                        )
+                    }
+
+                    ">=" -> {
+                        if(left.value !is Double || right.value !is Double){
+                            throw Exception("Type error: Operator '+' is not defined for provided operands")
+                        }
+
+                        return Bool(
+                            value = (left.value as Double) >= (right.value as Double)
+                        )
+                    }
+
+                    "==" -> {
+                        return Bool(
+                            value = left.value == right.value
+                        )
+                    }
+
+                    "!=" -> {
+                        return Bool(
+                            value = left.value != right.value
+                        )
+                    }
+
                     else -> {
                         throw NotImplementedError("Unsupported operator")
                     }
                 }
+            }
+
+            NodeType.Identifier -> {
+                val identifierNode = node as Identifier
+                return environment.getVariable(identifierNode.symbol)
             }
 
             else -> {
