@@ -186,3 +186,4 @@ class FunctionCallTest {
 
         assert(result.last() == expectedResult)
     }
+}

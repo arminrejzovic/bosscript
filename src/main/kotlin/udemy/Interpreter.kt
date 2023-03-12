@@ -10,6 +10,7 @@ import Environment
 import FunctionDeclaration
 import FunctionExpression
 import Identifier
+import IfStatement
 import MemberExpression
 import NodeType
 import NumericLiteral
@@ -17,6 +18,7 @@ import ObjectLiteral
 import ReturnStatement
 import Statement
 import StringLiteral
+import UnlessStatement
 import VariableDeclaration
 import VariableStatement
 import errors.SyntaxError
@@ -228,6 +230,16 @@ class Interpreter {
                 }
             }
 
+            NodeType.IfStatement -> {
+                evaluateIfStatement(node as IfStatement, environment)
+                return Null()
+            }
+
+            NodeType.UnlessStatement -> {
+                evaluateUnlessStatement(node as UnlessStatement, environment)
+                return Null()
+            }
+
             NodeType.CallExpression -> {
                 return evaluateFunctionCall(node as CallExpression, environment)
             }
@@ -310,6 +322,34 @@ class Interpreter {
         val functionEnv = Environment(parent = env, variables = activationRecord)
 
         return evaluateBlockStatement(fn.body, functionEnv)
+    }
+
+    private fun evaluateIfStatement(stmt: IfStatement, env: Environment){
+        val condition = evaluate(stmt.condition, env)
+        if(condition.value !is Boolean){
+            throw Exception("Type Error: Condition is not a boolean")
+        }
+
+        if (condition.value == true){
+            evaluate(stmt.consequent, env)
+        }
+        else if (stmt.alternate != null) {
+            evaluate(stmt.alternate, env)
+        }
+    }
+
+    private fun evaluateUnlessStatement(stmt: UnlessStatement, env: Environment){
+        val condition = evaluate(stmt.condition, env)
+        if(condition.value !is Boolean){
+            throw Exception("Type Error: Condition is not a boolean")
+        }
+
+        if (condition.value == false){
+            evaluate(stmt.consequent, env)
+        }
+        else if (stmt.alternate != null) {
+            evaluate(stmt.alternate, env)
+        }
     }
 
     private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue{
