@@ -5,6 +5,7 @@ import AssignmentExpression
 import BinaryExpression
 import BlockStatement
 import BooleanLiteral
+import CallExpression
 import Environment
 import FunctionDeclaration
 import Identifier
@@ -16,7 +17,7 @@ import StringLiteral
 import VariableDeclaration
 import VariableStatement
 import errors.SyntaxError
-import java.lang.Exception
+import kotlin.Exception
 import kotlin.math.pow
 
 class Interpreter {
@@ -211,6 +212,10 @@ class Interpreter {
                 return evaluateFunctionDeclaration(node as FunctionDeclaration, environment)
             }
 
+            NodeType.CallExpression -> {
+                return evaluateFunctionCall(node as CallExpression, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
             }
@@ -260,5 +265,20 @@ class Interpreter {
         env.declareVariable(name = declaration.name.symbol, fn)
 
         return fn
+    }
+
+    private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue{
+        val fn = evaluate(call.callee)
+        if(fn !is Function){
+            throw Exception("Is not a function!")
+        }
+        val activationRecord = hashMapOf<String, RuntimeValue>()
+        fn.params.forEachIndexed{index, param ->
+            activationRecord[param.identifier.symbol] = evaluate(call.args[index])
+        }
+        println(activationRecord)
+        val functionEnv = Environment(parent = env, variables = activationRecord)
+
+        return evaluateBlockStatement(fn.body, functionEnv)
     }
 }
