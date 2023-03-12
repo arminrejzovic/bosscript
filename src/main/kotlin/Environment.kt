@@ -1,8 +1,5 @@
-import udemy.Bool
-import udemy.Function
-import udemy.Null
+import udemy.*
 import udemy.Number
-import udemy.RuntimeValue
 import java.util.Scanner
 
 class Environment(
@@ -13,7 +10,7 @@ class Environment(
 
     init {
         if (parent == null){
-            createScope(this)
+            createGlobalEnvironment(this)
         }
     }
 
@@ -55,10 +52,63 @@ class Environment(
         return env.variables[name]!!
     }
 
-    fun createScope(env: Environment){
+    private fun createGlobalEnvironment(env: Environment){
         env.declareVariable("pi", Number(3.14159), isConstant = true)
-        env.declareVariable("tacno", Bool(true), isConstant = true)
-        env.declareVariable("netacno", Bool(false), isConstant = true)
-        env.declareVariable("nista", Null(), isConstant = true)
+
+        env.declareVariable(
+            "ispis",
+            object : NativeFunction(name = "ispis"){
+                override fun call(vararg args: RuntimeValue): Null {
+                    args.forEach {
+                        println(it)
+                    }
+                    return Null()
+                }
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
+            "upozorenje",
+            object : NativeFunction(name = "upozorenje"){
+                override fun call(vararg args: RuntimeValue): Null {
+                    val reset = "\u001b[0m"
+                    val yellow = "\u001b[33m"
+                    args.forEach {
+                        println(yellow + "⚠ " + it.value.toString() + reset)
+                    }
+                    return Null()
+                }
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
+            "greska",
+            object : NativeFunction(name = "greska"){
+                override fun call(vararg args: RuntimeValue): Null {
+                    val reset = "\u001b[0m"
+                    val red = "\u001b[31m"
+
+                    args.forEach {
+                        println(red + "⚠ " + it.value.toString() + reset)
+                    }
+                    return Null()
+                }
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
+            "unos",
+            object : NativeFunction(name = "unos"){
+                override fun call(vararg args: RuntimeValue): Text {
+                    val scanner = Scanner(System.`in`)
+                    val str = scanner.next()
+                    return Text(value = str)
+                }
+            },
+            isConstant = true
+        )
     }
 }

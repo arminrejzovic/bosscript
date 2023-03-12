@@ -389,17 +389,26 @@ class Interpreter {
 
     private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue{
         val fn = evaluate(call.callee, env)
-        if(fn !is Function){
-            throw Exception("Is not a function!")
-        }
-        val activationRecord = hashMapOf<String, RuntimeValue>()
-        fn.params.forEachIndexed{index, param ->
-            activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
-        }
-        println(activationRecord)
-        val functionEnv = Environment(parent = env, variables = activationRecord)
+        if(fn is Function){
+            val activationRecord = hashMapOf<String, RuntimeValue>()
+            fn.params.forEachIndexed{index, param ->
+                activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
+            }
+            println(activationRecord)
+            val functionEnv = Environment(parent = env, variables = activationRecord)
 
-        return evaluateBlockStatement(fn.body, functionEnv)
+            return evaluateBlockStatement(fn.body, functionEnv)
+        }
+        else if(fn is NativeFunction){
+            val args = arrayListOf<RuntimeValue>()
+            call.args.forEach {
+                args.add(evaluate(it, env))
+            }
+            return fn.call(*(args.toTypedArray()))
+        }
+        else{
+            throw Exception("Is not a function")
+        }
     }
 
     private fun evaluateIfStatement(stmt: IfStatement, env: Environment){

@@ -16,90 +16,61 @@ interface RuntimeValue{
 
 data class Number(
     override val value: Double,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
-
-    )
-): RuntimeValue
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+): RuntimeValue{
+    override fun toString(): String {
+        return "$value"
+    }
+}
 
 data class Text(
     override val value: String,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue
+): RuntimeValue{
+    override fun toString(): String {
+        return value
+    }
+}
 
 data class Bool(
     override val value: Boolean,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue
+): RuntimeValue{
+    override fun toString(): String {
+        return if (value) "tacno" else "netacno"
+    }
+}
 
 data class Null(
     override val value: Nothing? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-):RuntimeValue
+):RuntimeValue{
+    override fun toString(): String {
+        return "nista"
+    }
+}
 
 data class Array(
     override val value: ArrayList<RuntimeValue>,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue
+): RuntimeValue{
+    override fun toString(): String {
+        if(value.isEmpty()){
+            return "[]"
+        }
+        var str = "["
+        value.forEach {
+            str += "${it.value}, "
+        }
+        str += "\b\b]"
+        return str
+    }
+}
 
 data class Object(
     val properties: HashMap<String, RuntimeValue>,
     override val value: Any? = null,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
-        "tekst" to Function(
-            name = "tekst",
-            params = arrayListOf(),
-            returnType = TypeAnnotation(
-                typeName = "tekst",
-                isArrayType = false
-            ),
-            body = BlockStatement(
-                body = arrayListOf(
-                    ReturnStatement(
-                        argument = StringLiteral(
-                            value = properties.toString()
-                        )
-                    )
-                )
-            ),
-            parentEnv = null
-        ),
-        "kljucevi" to Function(
-            name = "kljucevi",
-            params = arrayListOf(),
-            returnType = TypeAnnotation(
-                typeName = "tekst",
-                isArrayType = true
-            ),
-            body = BlockStatement(
-                body = arrayListOf(
-                    ReturnStatement(
-                        argument = ArrayLiteral(
-                            arr = properties.keys.map { StringLiteral(it) } as ArrayList<Expression>
-                        )
-                    )
-                )
-            ),
-            parentEnv = null
-        ),
-        "vrijednosti" to Function(
-            name = "vrijednosti",
-            params = arrayListOf(),
-            returnType = TypeAnnotation(
-                typeName = "tekst",
-                isArrayType = true
-            ),
-            body = BlockStatement(
-                body = arrayListOf(
-                    ReturnStatement(
-                        argument = ArrayLiteral(
-                            arr = properties.values.map { StringLiteral(it.toString()) } as ArrayList<Expression>
-                        )
-                    )
-                )
-            ),
-            parentEnv = null
-        )
-    )
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ): RuntimeValue{
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -137,9 +108,12 @@ data class Function(
     }
 }
 
-data class NativeFunction(
+abstract class NativeFunction(
     val name: String,
-    val kotlinFunction: (args: ArrayList<RuntimeValue>) -> RuntimeValue,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue
+): RuntimeValue{
+    abstract fun call(vararg args: RuntimeValue): RuntimeValue
+}
+
+

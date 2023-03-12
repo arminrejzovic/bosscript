@@ -71,4 +71,6 @@ class ForLoopTest {
 
         assert(result == expectedResult)
     }
+
+    // TODO Enforce loop body being a block statement
 }
