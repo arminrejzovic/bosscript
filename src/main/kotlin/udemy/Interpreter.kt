@@ -7,6 +7,7 @@ import BlockStatement
 import BooleanLiteral
 import CallExpression
 import Environment
+import ForStatement
 import FunctionDeclaration
 import FunctionExpression
 import Identifier
@@ -22,7 +23,6 @@ import UnlessStatement
 import VariableDeclaration
 import VariableStatement
 import errors.SyntaxError
-import kotlin.Exception
 import kotlin.math.pow
 
 class Interpreter {
@@ -205,8 +205,7 @@ class Interpreter {
             }
 
             NodeType.AssignmentExpression -> {
-                evaluateAssignmentExpression(node as AssignmentExpression, environment)
-                return Null()
+                return evaluateAssignmentExpression(node as AssignmentExpression,  environment)
             }
 
             NodeType.Block -> {
@@ -244,6 +243,10 @@ class Interpreter {
                 return evaluateFunctionCall(node as CallExpression, environment)
             }
 
+            NodeType.ForStatement -> {
+                evaluateForStatement(node as ForStatement, environment)
+                return Null()
+            }
 
             else -> {
                 throw SyntaxError("Unexpected token, $node")
@@ -265,11 +268,86 @@ class Interpreter {
         env.declareVariable(declaration.identifier, value, isConstant)
     }
 
-    private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment){
-        if (expr.assignee.kind != NodeType.Identifier){
+    private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue{
+        if (expr.assignee.kind != NodeType.Identifier && expr.assignee.kind != NodeType.MemberExpression){
             throw Exception("Invalid assignment target")
         }
-        env.assignVariable((expr.assignee as Identifier).symbol, evaluate(expr.value, env))
+        val varName = (expr.assignee as Identifier).symbol
+        when(expr.assignmentOperator){
+            "=" -> {
+                return env.assignVariable(varName, evaluate(expr.value, env))
+            }
+            "+=" -> {
+                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                if(currentValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+                val updateByValue = evaluate(expr.value, env)
+                if(updateByValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+
+                val newValue = currentValue.value as Double + updateByValue.value as Double
+                return env.assignVariable(varName, Number(value = newValue))
+            }
+
+            "-=" -> {
+                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                if(currentValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+                val updateByValue = evaluate(expr.value, env)
+                if(updateByValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+
+                val newValue = currentValue.value as Double - updateByValue.value as Double
+                return env.assignVariable(varName, Number(value = newValue))
+            }
+
+            "*=" -> {
+                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                if(currentValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+                val updateByValue = evaluate(expr.value, env)
+                if(updateByValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+
+                val newValue = currentValue.value as Double * updateByValue.value as Double
+                return env.assignVariable(varName, Number(value = newValue))
+            }
+
+            "/=" -> {
+                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                if(currentValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+                val updateByValue = evaluate(expr.value, env)
+                if(updateByValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+
+                val newValue = currentValue.value as Double / updateByValue.value as Double
+                return env.assignVariable(varName, Number(value = newValue))
+            }
+
+            "%=" -> {
+                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                if(currentValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+                val updateByValue = evaluate(expr.value, env)
+                if(updateByValue.value !is Double){
+                    throw Exception("Type error: lhs not a number")
+                }
+
+                val newValue = currentValue.value as Double % updateByValue.value as Double
+                return env.assignVariable(varName, Number(value = newValue))
+            }
+            else -> return Null()
+        }
     }
 
     private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue{
@@ -349,6 +427,52 @@ class Interpreter {
         }
         else if (stmt.alternate != null) {
             evaluate(stmt.alternate, env)
+        }
+    }
+
+    private fun evaluateForStatement(stmt: ForStatement, env: Environment){
+        val startValue = evaluate(stmt.startValue, env)
+        val endValue = evaluate(stmt.endValue, env)
+
+        if(startValue.value !is Double || endValue.value !is Double){
+            throw Exception("Type Error: For loop bounds must be numbers")
+        }
+
+        val start = startValue.value as Double
+        val end = endValue.value as Double
+
+        var step: Double = 0.0
+        if(stmt.step == null){
+            // Infer the step if not provided
+            step = if (start > end) -1.0 else 1.0
+        }
+        else{
+            // Otherwise interpret the provided step
+            val stepVal = evaluate(stmt.step, env)
+            if(stepVal.value !is Double){
+                throw Exception("Type Error: For loop step must be a number")
+            }
+            step = stepVal.value as Double
+        }
+
+
+        val activationRecord = hashMapOf<String, RuntimeValue>()
+        activationRecord[stmt.counter.symbol] = startValue
+        val loopEnv = Environment(variables = activationRecord, parent =  env)
+
+
+        if (start < end){
+            // Regular ascending loop
+            var i = start
+            while (i < end) {
+                evaluate(stmt.body, loopEnv)
+                i += step
+                println("[Debug] Loop iteration")
+                loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
+            }
+        }
+        else{
+            // Backward loop
         }
     }
 

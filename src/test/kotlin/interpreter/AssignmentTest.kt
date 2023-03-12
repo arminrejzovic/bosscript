@@ -18,14 +18,12 @@ class AssignmentTest {
         val src = """
             var a = 10 + 5 * 8;
             a = 61;
-            a;
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Null(),
             Null(),
             Number(
                 value = 61.0
@@ -55,5 +53,48 @@ class AssignmentTest {
         }
 
         assert(error == expectedError)
+    }
+
+    @Test
+    fun testAllComplexAssign(){
+        val src = """
+            var a = 10;
+            a += 2;
+            
+            a -= 2;
+            
+            a *= 2;
+            
+            a /= 2;
+            
+            a %= 2;
+            
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = arrayListOf(
+            Null(),
+            Number(
+                value = 12.0
+            ),
+            Number(
+                value = 10.0
+            ),
+            Number(
+                value = 20.0
+            ),
+            Number(
+                value = 10.0
+            ),
+            Number(
+                value = 0.0
+            )
+        )
+
+        println(result)
+        println(expectedResult)
+        assert(result == expectedResult)
     }
 }

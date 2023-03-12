@@ -1,5 +1,6 @@
 package parser
 
+import AssignmentExpression
 import Identifier
 import MemberExpression
 import NumericLiteral
@@ -8,7 +9,7 @@ import udemy.Parser
 
 class MemberExpressionsTest {
     @Test
-    fun testSimpleMember(){
+    fun testSimpleMember() {
         val src = """
             x.y;
         """.trimIndent()
@@ -32,7 +33,7 @@ class MemberExpressionsTest {
     }
 
     @Test
-    fun testChainedMember(){
+    fun testChainedMember() {
         val src = """
             x.y.z;
         """.trimIndent()
@@ -62,7 +63,7 @@ class MemberExpressionsTest {
     }
 
     @Test
-    fun testComputedMember(){
+    fun testComputedMember() {
         val src = """
             x[1];
         """.trimIndent()
@@ -86,7 +87,7 @@ class MemberExpressionsTest {
     }
 
     @Test
-    fun testMemberNestedInComputedMember(){
+    fun testMemberNestedInComputedMember() {
         val src = """
             x[y.z];
         """.trimIndent()
@@ -112,6 +113,39 @@ class MemberExpressionsTest {
             )
         )
 
+        assert(program.body == expectedResult)
+    }
+
+    @Test
+    fun testMemberAssign() {
+        val src = """
+            x.y.z = 10;
+        """.trimIndent()
+
+        val parser = Parser()
+        val program = parser.parseProgram(src)
+
+        val expectedResult = arrayListOf(
+            AssignmentExpression(
+                assignee = MemberExpression(
+                    isComputed = false,
+                    targetObject = MemberExpression(
+                        isComputed = false,
+                        targetObject = Identifier(
+                            symbol = "x"
+                        ),
+                        property = Identifier(
+                            symbol = "y"
+                        )
+                    ),
+                    property = Identifier(
+                        symbol = "z"
+                    )
+                ),
+                value = NumericLiteral(value = 10.0),
+                assignmentOperator = "="
+            ),
+        )
         assert(program.body == expectedResult)
     }
 }
