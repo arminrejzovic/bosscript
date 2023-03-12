@@ -11,22 +11,21 @@ import StringLiteral
 import VariableDeclaration
 import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
-import udemy.Object
-import udemy.Parser
-import udemy.Text
+import udemy.*
 
 class ObjectTest {
     @Test
     fun testEmptyObjectVar() {
         val src = """
-            var x = {};
+            var xf = {};
+            xf;
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
+            Null(),
             Object(
                 properties = hashMapOf()
             )

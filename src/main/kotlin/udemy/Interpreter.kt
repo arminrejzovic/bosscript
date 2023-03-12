@@ -8,6 +8,7 @@ import BooleanLiteral
 import CallExpression
 import Environment
 import FunctionDeclaration
+import FunctionExpression
 import Identifier
 import NodeType
 import NumericLiteral
@@ -212,9 +213,14 @@ class Interpreter {
                 return evaluateFunctionDeclaration(node as FunctionDeclaration, environment)
             }
 
+            NodeType.FunctionExpression -> {
+                return evaluateFunctionExpression(node as FunctionExpression, environment)
+            }
+
             NodeType.CallExpression -> {
                 return evaluateFunctionCall(node as CallExpression, environment)
             }
+
 
             else -> {
                 throw SyntaxError("Unexpected token, $node")
@@ -265,6 +271,16 @@ class Interpreter {
         env.declareVariable(name = declaration.name.symbol, fn)
 
         return fn
+    }
+
+    private fun evaluateFunctionExpression(expr: FunctionExpression, env: Environment): Function {
+        return Function(
+            name = "",
+            params = expr.params,
+            returnType = expr.returnType,
+            body = expr.body,
+            parentEnv = env
+        )
     }
 
     private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue{
