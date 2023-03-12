@@ -1,7 +1,9 @@
 import udemy.Bool
+import udemy.Function
 import udemy.Null
 import udemy.Number
 import udemy.RuntimeValue
+import java.util.Scanner
 
 class Environment(
     private val parent: Environment? = null,

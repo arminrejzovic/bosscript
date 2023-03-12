@@ -6,6 +6,7 @@ import BinaryExpression
 import BlockStatement
 import BooleanLiteral
 import Environment
+import FunctionDeclaration
 import Identifier
 import NodeType
 import NumericLiteral
@@ -206,6 +207,10 @@ class Interpreter {
                 return evaluateBlockStatement(node as BlockStatement, environment)
             }
 
+            NodeType.FunctionDeclaration -> {
+                return evaluateFunctionDeclaration(node as FunctionDeclaration, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
             }
@@ -241,5 +246,19 @@ class Interpreter {
         }
 
         return result
+    }
+
+    private fun evaluateFunctionDeclaration(declaration: FunctionDeclaration, env: Environment): Function{
+        val fn = Function(
+            name = declaration.name.symbol,
+            params = declaration.params,
+            returnType = declaration.returnType,
+            body = declaration.body,
+            parentEnv = env
+        )
+
+        env.declareVariable(name = declaration.name.symbol, fn)
+
+        return fn
     }
 }

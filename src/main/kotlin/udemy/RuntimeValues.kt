@@ -2,6 +2,7 @@ package udemy
 
 import ArrayLiteral
 import BlockStatement
+import Environment
 import Expression
 import FunctionParameter
 import ReturnStatement
@@ -59,7 +60,8 @@ data class Object(
                         )
                     )
                 )
-            )
+            ),
+            parentEnv = null
         ),
         "kljucevi" to Function(
             name = "kljucevi",
@@ -76,7 +78,8 @@ data class Object(
                         )
                     )
                 )
-            )
+            ),
+            parentEnv = null
         ),
         "vrijednosti" to Function(
             name = "vrijednosti",
@@ -93,7 +96,8 @@ data class Object(
                         )
                     )
                 )
-            )
+            ),
+            parentEnv = null
         )
     )
 ): RuntimeValue{
@@ -114,6 +118,28 @@ data class Function(
     val params: ArrayList<FunctionParameter>,
     val returnType: TypeAnnotation?,
     val body: BlockStatement,
+    val parentEnv: Environment?, // closure
+    override val value: Any? = null,
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+): RuntimeValue{
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Function
+
+        if (name != other.name) return false
+        if (params != other.params) return false
+        if (returnType != other.returnType) return false
+        if (body != other.body) return false
+
+        return true
+    }
+}
+
+data class NativeFunction(
+    val name: String,
+    val kotlinFunction: (args: ArrayList<RuntimeValue>) -> RuntimeValue,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ): RuntimeValue

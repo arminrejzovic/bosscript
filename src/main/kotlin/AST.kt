@@ -168,7 +168,7 @@ data class ModelProperty(
 
 data class TypeAnnotation(
     val typeName: String,
-    val isArrayType: Boolean,
+    val isArrayType: Boolean = false,
     override val kind: NodeType = NodeType.TypeAnnotation
 ): Statement
 
