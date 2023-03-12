@@ -10,9 +10,11 @@ import Environment
 import FunctionDeclaration
 import FunctionExpression
 import Identifier
+import MemberExpression
 import NodeType
 import NumericLiteral
 import ObjectLiteral
+import ReturnStatement
 import Statement
 import StringLiteral
 import VariableDeclaration
@@ -217,6 +219,15 @@ class Interpreter {
                 return evaluateFunctionExpression(node as FunctionExpression, environment)
             }
 
+            NodeType.ReturnStatement -> {
+                val returnNode = node as ReturnStatement
+                return if(returnNode.argument != null){
+                    evaluate(returnNode.argument, environment)
+                } else{
+                    Null()
+                }
+            }
+
             NodeType.CallExpression -> {
                 return evaluateFunctionCall(node as CallExpression, environment)
             }
@@ -253,6 +264,9 @@ class Interpreter {
         val blockEnv = Environment(parent = env)
         var result: RuntimeValue = Null()
         block.body.forEach {
+            if(it.kind == NodeType.ReturnStatement){
+                return evaluate(it, blockEnv)
+            }
             result = evaluate(it, blockEnv)
         }
 
@@ -284,17 +298,23 @@ class Interpreter {
     }
 
     private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue{
-        val fn = evaluate(call.callee)
+        val fn = evaluate(call.callee, env)
         if(fn !is Function){
             throw Exception("Is not a function!")
         }
         val activationRecord = hashMapOf<String, RuntimeValue>()
         fn.params.forEachIndexed{index, param ->
-            activationRecord[param.identifier.symbol] = evaluate(call.args[index])
+            activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
         }
         println(activationRecord)
         val functionEnv = Environment(parent = env, variables = activationRecord)
 
         return evaluateBlockStatement(fn.body, functionEnv)
+    }
+
+    private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue{
+        val target = evaluate(expr.targetObject, env)
+        val property = evaluate(expr.property, env)
+        TODO()
     }
 }

@@ -11,10 +11,9 @@ import NumericLiteral
 import VariableDeclaration
 import VariableStatement
 import org.junit.jupiter.api.Test
+import udemy.*
 import udemy.Function
-import udemy.Interpreter
 import udemy.Number
-import udemy.Parser
 
 class FunctionCallTest {
     @Test
@@ -166,4 +165,24 @@ class FunctionCallTest {
 
         assert(result == expectedResult)
     }
-}
+
+    @Test
+    fun testReturn() {
+        val src = """
+            funkcija xf(x){
+                vrati 5 + x;
+                x;
+            }
+            var a = xf(5);
+            a;
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = Number(
+                value = 10.0
+            )
+
+        assert(result.last() == expectedResult)
+    }
