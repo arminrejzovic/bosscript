@@ -2,10 +2,18 @@ import udemy.Interpreter
 
 fun main() {
     val src = """
-            var a = unos();
-            ispis(a);
+            funkcija m(){
+               var a = unos();
+                ispis(a);
+            }
+            m();
         """.trimIndent()
 
     val interpreter = Interpreter()
-    val result = interpreter.evaluateProgram(src)
+    interpreter.evaluateProgram(src)
+
+    val src2 = """
+        ispis(nedefinisano);
+        """.trimIndent()
+    interpreter.evaluateProgram(src2)
 }

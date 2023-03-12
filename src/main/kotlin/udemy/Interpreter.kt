@@ -394,7 +394,6 @@ class Interpreter {
             fn.params.forEachIndexed{index, param ->
                 activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
             }
-            println(activationRecord)
             val functionEnv = Environment(parent = env, variables = activationRecord)
 
             return evaluateBlockStatement(fn.body, functionEnv)
@@ -476,7 +475,6 @@ class Interpreter {
             while (i < end) {
                 evaluate(stmt.body, loopEnv)
                 i += step
-                println("[Debug] Loop iteration")
                 loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
             }
         }

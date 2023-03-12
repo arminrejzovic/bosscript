@@ -1,12 +1,8 @@
 package udemy
 
-import ArrayLiteral
 import BlockStatement
 import Environment
-import Expression
 import FunctionParameter
-import ReturnStatement
-import StringLiteral
 import TypeAnnotation
 
 interface RuntimeValue{
@@ -46,7 +42,7 @@ data class Null(
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ):RuntimeValue{
     override fun toString(): String {
-        return "nista"
+        return "nedefinisano"
     }
 }
 
@@ -115,5 +111,7 @@ abstract class NativeFunction(
 ): RuntimeValue{
     abstract fun call(vararg args: RuntimeValue): RuntimeValue
 }
+
+// TODO Implement toString for objects, functions, native functions
 
 
