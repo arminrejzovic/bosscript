@@ -72,5 +72,23 @@ class ForLoopTest {
         assert(result == expectedResult)
     }
 
+    @Test
+    fun testBackwardForLoop(){
+        val src = """
+            za svako(i od 10 do 0){
+                ispis(i);
+            }
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = arrayListOf(
+            Null()
+        )
+
+        assert(result == expectedResult)
+    }
+
     // TODO Enforce loop body being a block statement
 }

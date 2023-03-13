@@ -452,7 +452,7 @@ class Interpreter {
         var step: Double = 0.0
         if(stmt.step == null){
             // Infer the step if not provided
-            step = if (start > end) -1.0 else 1.0
+            step = 1.0
         }
         else{
             // Otherwise interpret the provided step
@@ -480,6 +480,12 @@ class Interpreter {
         }
         else{
             // Backward loop
+            var i = start
+            while (i > end) {
+                evaluate(stmt.body, loopEnv)
+                i -= step
+                loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
+            }
         }
     }
 
