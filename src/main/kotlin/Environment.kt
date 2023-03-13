@@ -104,7 +104,7 @@ class Environment(
             object : NativeFunction(name = "unos"){
                 override fun call(vararg args: RuntimeValue): Text {
                     val scanner = Scanner(System.`in`)
-                    val str = scanner.next()
+                    val str = scanner.nextLine()
                     return Text(value = str)
                 }
             },

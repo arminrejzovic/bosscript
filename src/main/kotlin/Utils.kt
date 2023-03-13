@@ -23,3 +23,7 @@ fun String.toIndentString(): String = buildString(length) {
         }
     }
 }
+
+fun Double.isInteger(): Boolean {
+    return this % 1 == 0.0
+}

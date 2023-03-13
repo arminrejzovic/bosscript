@@ -4,8 +4,9 @@ import BlockStatement
 import Environment
 import FunctionParameter
 import TypeAnnotation
+import isInteger
 
-interface RuntimeValue{
+interface RuntimeValue {
     val value: Any?
     val builtIns: HashMap<String, RuntimeValue>
 }
@@ -13,8 +14,11 @@ interface RuntimeValue{
 data class Number(
     override val value: Double,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue{
+) : RuntimeValue {
     override fun toString(): String {
+        if(value.isInteger()){
+            return "${value.toInt()}"
+        }
         return "$value"
     }
 }
@@ -22,7 +26,7 @@ data class Number(
 data class Text(
     override val value: String,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue{
+) : RuntimeValue {
     override fun toString(): String {
         return value
     }
@@ -31,7 +35,7 @@ data class Text(
 data class Bool(
     override val value: Boolean,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue{
+) : RuntimeValue {
     override fun toString(): String {
         return if (value) "tacno" else "netacno"
     }
@@ -40,7 +44,7 @@ data class Bool(
 data class Null(
     override val value: Nothing? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-):RuntimeValue{
+) : RuntimeValue {
     override fun toString(): String {
         return "nedefinisano"
     }
@@ -49,17 +53,9 @@ data class Null(
 data class Array(
     override val value: ArrayList<RuntimeValue>,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue{
+) : RuntimeValue {
     override fun toString(): String {
-        if(value.isEmpty()){
-            return "[]"
-        }
-        var str = "["
-        value.forEach {
-            str += "${it.value}, "
-        }
-        str += "\b\b]"
-        return str
+        return value.toString()
     }
 }
 
@@ -67,7 +63,7 @@ data class Object(
     val properties: HashMap<String, RuntimeValue>,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue{
+) : RuntimeValue {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -77,6 +73,10 @@ data class Object(
         if (properties != other.properties) return false
 
         return true
+    }
+
+    override fun toString(): String {
+        return properties.toString().replace("=", ": ")
     }
 }
 
@@ -88,7 +88,7 @@ data class Function(
     val parentEnv: Environment?, // closure
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-): RuntimeValue{
+) : RuntimeValue {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -102,14 +102,26 @@ data class Function(
 
         return true
     }
+
+    override fun toString(): String {
+        val paramString =
+            params.map { "${it.identifier.symbol}:${it.type?.typeName ?: "nepoznato"}" }
+                .toString()
+                .replace("[", "")
+                .replace("]", "")
+        return "ƒ $name($paramString) => ${returnType?.typeName ?: "nepoznato"}"
+    }
 }
 
 abstract class NativeFunction(
     val name: String,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
-): RuntimeValue{
+) : RuntimeValue {
     abstract fun call(vararg args: RuntimeValue): RuntimeValue
+    override fun toString(): String {
+        return "ƒ $name() {[native code]}"
+    }
 }
 
 // TODO Implement toString for objects, functions, native functions

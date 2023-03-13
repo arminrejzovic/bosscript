@@ -14,7 +14,7 @@ class NativeFunctionTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val result = interpreter.evaluateProgram(src)
+        interpreter.evaluateProgram(src)
     }
 
     @Test
@@ -24,7 +24,7 @@ class NativeFunctionTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val result = interpreter.evaluateProgram(src)
+        interpreter.evaluateProgram(src)
     }
 
     @Test
@@ -37,6 +37,55 @@ class NativeFunctionTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val result = interpreter.evaluateProgram(src)
+        interpreter.evaluateProgram(src)
+    }
+
+    @Test
+    fun testPrintObject(){
+        val src = """
+            var obj = {
+                a: 10,
+                b: "Hello",
+                c: [1,2,3],
+                d: tacno
+            };
+            ispis(obj);
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        interpreter.evaluateProgram(src)
+    }
+
+    @Test
+    fun testPrintNativeFunction(){
+        val src = """
+            ispis(ispis);
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        interpreter.evaluateProgram(src)
+    }
+
+    @Test
+    fun testPrintUserDefinedFunction(){
+        val src = """
+            funkcija test(a, b){
+                vrati a + b;
+            }
+            ispis(test);
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        interpreter.evaluateProgram(src)
+    }
+
+    @Test
+    fun testPrintMultiple(){
+        val src = """
+            ispis("Hello", "World", 1);
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        interpreter.evaluateProgram(src)
     }
 }

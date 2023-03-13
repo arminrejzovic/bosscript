@@ -11,9 +11,4 @@ fun main() {
 
     val interpreter = Interpreter()
     interpreter.evaluateProgram(src)
-
-    val src2 = """
-        ispis(nedefinisano);
-        """.trimIndent()
-    interpreter.evaluateProgram(src2)
 }
