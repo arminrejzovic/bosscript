@@ -168,4 +168,54 @@ class WhileLoopTest {
         )
         assert(program.body == expectedResult)
     }
+
+    @Test
+    fun testShorthandWhile(){
+        val src = """
+            var x = 0;
+            dok(x != 10) => x += 1;
+        """.trimIndent()
+
+        val parser = Parser()
+        val program = parser.parseProgram(src)
+
+        val expectedResult = arrayListOf(
+            VariableStatement(
+                declarations = arrayListOf(
+                    VariableDeclaration(
+                        identifier = "x",
+                        value = NumericLiteral(
+                            value = 0.0
+                        )
+                    )
+                ),
+                isConstant = false
+            ),
+            WhileStatement(
+                condition = BinaryExpression(
+                    left = Identifier(
+                        symbol = "x"
+                    ),
+                    right = NumericLiteral(
+                        value = 10.0
+                    ),
+                    operator = "!="
+                ),
+                body = BlockStatement(
+                    body = arrayListOf(
+                        AssignmentExpression(
+                            assignee = Identifier(
+                                symbol = "x"
+                            ),
+                            value = NumericLiteral(
+                                value = 1.0
+                            ),
+                            assignmentOperator = "+="
+                        )
+                    )
+                )
+            )
+        )
+        assert(program.body == expectedResult)
+    }
 }

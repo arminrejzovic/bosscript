@@ -2,6 +2,7 @@ package parser
 
 import BinaryExpression
 import BlockStatement
+import CallExpression
 import ForStatement
 import Identifier
 import NumericLiteral
@@ -234,5 +235,47 @@ class ForLoopTest {
 
 
         //assert(error == expectedError)
+    }
+
+    @Test
+    fun testShorthandForLoopWithStep(){
+        val src = """
+            za svako(x od 0 do 10 korak 2) => ispis(x);
+        """.trimIndent()
+
+        val parser = Parser()
+        val program = parser.parseProgram(src)
+
+        val expectedResult = arrayListOf(
+            ForStatement(
+                counter = Identifier(
+                    symbol = "x"
+                ),
+                startValue = NumericLiteral(
+                    value = 0.0
+                ),
+                endValue = NumericLiteral(
+                    10.0
+                ),
+                body = BlockStatement(
+                    body = arrayListOf(
+                        CallExpression(
+                            args = arrayListOf(
+                                Identifier(
+                                    symbol = "x"
+                                )
+                            ),
+                            callee = Identifier(
+                                symbol = "ispis"
+                            )
+                        )
+                    )
+                ),
+                step = NumericLiteral(
+                    value = 2.0
+                )
+            )
+        )
+        assert(program.body == expectedResult)
     }
 }

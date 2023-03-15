@@ -93,13 +93,13 @@ data class IfStatement(
 
 data class WhileStatement(
     val condition: Expression,
-    val body: Statement,
+    val body: BlockStatement,
     override val kind: NodeType = NodeType.WhileStatement
 ) : Statement
 
 data class DoWhileStatement(
     val condition: Expression,
-    val body: Statement,
+    val body: BlockStatement,
     override val kind: NodeType = NodeType.DoWhileStatement
 ) : Statement
 
@@ -108,7 +108,7 @@ data class ForStatement(
     val startValue: Expression,
     val endValue: Expression,
     val step: Expression?,
-    val body: Statement,
+    val body: BlockStatement,
     override val kind: NodeType = NodeType.ForStatement
 ) : Statement
 

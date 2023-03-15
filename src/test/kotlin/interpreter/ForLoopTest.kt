@@ -1,15 +1,9 @@
 package interpreter
 
-import BinaryExpression
-import BlockStatement
-import ForStatement
-import Identifier
-import NumericLiteral
 import org.junit.jupiter.api.Test
 import udemy.Interpreter
 import udemy.Null
 import udemy.Number
-import udemy.Parser
 
 class ForLoopTest {
     @Test

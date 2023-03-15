@@ -495,3 +495,5 @@ class Interpreter {
         TODO()
     }
 }
+
+// TODO Extract methods from evaluate

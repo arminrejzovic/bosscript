@@ -235,9 +235,19 @@ class Parser {
         val condition = parseExpression()
         expect(TokenType.CloseParen, "Expected ')'")
 
+        // Same rules like in for-loop (shorthand and full loop)
+        var body = BlockStatement(body = arrayListOf())
+        if(current().type == TokenType.Arrow){
+            // Shorthand syntax
+            consume(/*Arrow*/)
+            body.body.add(parseStatement())
+        } else{
+            body = parseBlockStatement()
+        }
+
         return WhileStatement(
             condition = condition,
-            body = parseStatement()
+            body = body
         )
     }
 
@@ -256,7 +266,22 @@ class Parser {
             step = parseExpression()
         }
         expect(TokenType.CloseParen, "Expected ')'")
-        val body = parseStatement()
+
+        // For Statement body must be Block Statement
+        // But shorthand syntax for single-line for loops is allowed: za svako(...) => ispis();
+        // Shorthand syntax is parsed as BlockStatement(body=<the single expression>)
+        var body = BlockStatement(body = arrayListOf())
+
+        if(current().type == TokenType.Arrow){
+            // Shorthand syntax
+            consume(/*Arrow*/)
+            body.body.add(parseStatement())
+        }
+        else{
+            // Regular loop
+            body = parseBlockStatement()
+        }
+
         return ForStatement(
             counter = counter,
             startValue = startCondition,
@@ -268,7 +293,7 @@ class Parser {
 
     private fun parseDoWhileStatement(): DoWhileStatement{
         expect(TokenType.Radi, "Expected 'radi'")
-        val body = parseStatement()
+        val body = parseBlockStatement()
         expect(TokenType.Dok, "Expected 'dok' after 'radi'")
         expect(TokenType.OpenParen, "Expected '('")
         val condition = parseExpression()
