@@ -1,0 +1,4 @@
+package benchmarks
+
+class PerformanceTests {
+}

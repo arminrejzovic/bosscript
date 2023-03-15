@@ -17,7 +17,8 @@ data class Number(
 ) : RuntimeValue {
     override fun toString(): String {
         if(value.isInteger()){
-            return "${value.toInt()}"
+            val regex = Regex("\\.0\\b")
+            return value.toString().replace(regex, "")
         }
         return "$value"
     }
@@ -47,6 +48,15 @@ data class Null(
 ) : RuntimeValue {
     override fun toString(): String {
         return "nedefinisano"
+    }
+}
+
+data class VoidReturn(
+    override val value: Nothing? = null,
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+) : RuntimeValue {
+    override fun toString(): String {
+        return "void"
     }
 }
 
@@ -109,7 +119,9 @@ data class Function(
                 .toString()
                 .replace("[", "")
                 .replace("]", "")
-        return "ƒ $name($paramString) => ${returnType?.typeName ?: "nepoznato"}"
+        val italics = "\u001B[3m"
+        val reset = "\u001B[0m"
+        return "ƒ $name($paramString) → ${returnType?.typeName ?: "${italics}nepoznato${reset}"}"
     }
 }
 
