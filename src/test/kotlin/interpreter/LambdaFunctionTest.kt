@@ -93,19 +93,20 @@ class LambdaFunctionTest {
     @Test
     fun testLambdaAsArg() {
         val src = """
+            funkcija onClick(cb){
+                vrati "onClick called";
+            }
             onClick(funkcija(){});
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Text(
-                value = "Test"
-            )
+        val expectedResult = Text(
+            value = "onClick called"
         )
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 
     @Test

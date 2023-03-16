@@ -16,6 +16,7 @@ class IfElseTests {
     @Test
     fun testSimpleIf() {
         val src = """
+            var x = 10;
             ako(x == 10.0){
                 x = 22;
             }
@@ -39,6 +40,7 @@ class IfElseTests {
     @Test
     fun testRegularIf() {
         val src = """
+            var x = 10;
             ako (x > 10) {
                 x = 69;
             }
@@ -93,6 +95,7 @@ class IfElseTests {
     @Test
     fun testSimpleIfElse() {
         val src = """
+            var x = 10;
             ako(x == 3){
                 x=10;
             }
@@ -119,6 +122,8 @@ class IfElseTests {
     @Test
     fun testBranchingIfElse() {
         val src = """
+            var x = 10;
+            
             ako(x < 5){
                 x = 5;
             }
@@ -134,15 +139,14 @@ class IfElseTests {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Number(
-                value = 20.0
-            )
+        val expectedResult = Number(
+            value = 20.0
         )
+
 
         println(result)
         println(expectedResult)
-        assert(result.last() == expectedResult.last())
+        assert(result.last() == expectedResult)
     }
 
     @Test
@@ -201,6 +205,7 @@ class IfElseTests {
     @Test
     fun testSimpleUnless() {
         val src = """
+            var x = 10;
             osim ako(x > 20){
                 x=1;
             }

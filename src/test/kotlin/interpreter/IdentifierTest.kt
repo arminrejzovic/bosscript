@@ -9,6 +9,7 @@ class IdentifierTest {
     @Test
     fun testIdentifier(){
         val src = """
+            var x = 10;
             x;
         """.trimIndent()
 
@@ -21,6 +22,6 @@ class IdentifierTest {
             )
         )
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult.last())
     }
 }

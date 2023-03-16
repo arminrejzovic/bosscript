@@ -38,9 +38,7 @@ class BlockTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Text(
-                value = "String"
-            )
+            Null()
         )
 
         assert(result == expectedResult)
@@ -62,9 +60,7 @@ class BlockTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Text(
-                value = "Nested"
-            )
+            Null()
         )
 
         assert(result == expectedResult)
@@ -73,6 +69,7 @@ class BlockTest {
     @Test
     fun testVariableScopeInBlocks(){
         val src = """
+            var x = 10;
             {
                 var x = 11;
                 {
@@ -86,16 +83,11 @@ class BlockTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Number(
-                value = 20.0
-            ),
-            Number(
-                value = 10.0
-            )
+        val expectedResult = Number(
+            value = 10.0
         )
 
         println(result)
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 }

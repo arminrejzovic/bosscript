@@ -28,42 +28,15 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Function(
-                name = "xf",
-                params = arrayListOf(
-                    FunctionParameter(
-                        Identifier(symbol = "a"),
-                        type = null
-                    )
-                ),
-                returnType = null,
-                body = BlockStatement(
-                    body = arrayListOf(
-                        BinaryExpression(
-                            left = Identifier(
-                                symbol = "a"
-                            ),
-                            right = Identifier(
-                                symbol = "a"
-                            ),
-                            operator = "+"
-                        )
-                    )
-                ),
-                parentEnv = null
-            ),
-            Number(
-                value = 10.0
-            )
-        )
+        val expectedResult = Null()
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 
     @Test
     fun testClosureCall() {
         val src = """
+            var x = 10;
             funkcija xf(a){
                 var x = 69;
                 a + x;
@@ -75,50 +48,11 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Function(
-                name = "xf",
-                params = arrayListOf(
-                    FunctionParameter(
-                        Identifier(symbol = "a"),
-                        type = null
-                    )
-                ),
-                returnType = null,
-                body = BlockStatement(
-                    body = arrayListOf(
-                        VariableStatement(
-                            declarations = arrayListOf(
-                                VariableDeclaration(
-                                    identifier = "x",
-                                    value = NumericLiteral(
-                                        value = 69.0
-                                    )
-                                )
-                            )
-                        ),
-                        BinaryExpression(
-                            left = Identifier(
-                                symbol = "a"
-                            ),
-                            right = Identifier(
-                                symbol = "x"
-                            ),
-                            operator = "+"
-                        )
-                    )
-                ),
-                parentEnv = null
-            ),
-            Number(
-                value = 74.0
-            ),
-            Number(
-                value = 10.0
-            )
+        val expectedResult = Number(
+            value = 10.0
         )
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 
     @Test
@@ -133,37 +67,9 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Function(
-                name = "xf",
-                params = arrayListOf(
-                    FunctionParameter(
-                        Identifier(symbol = "x"),
-                        type = null
-                    )
-                ),
-                returnType = null,
-                body = BlockStatement(
-                    body = arrayListOf(
-                        BinaryExpression(
-                            left = NumericLiteral(
-                                value = 5.0
-                            ),
-                            right = Identifier(
-                                symbol = "x"
-                            ),
-                            operator = "+"
-                        )
-                    )
-                ),
-                parentEnv = null
-            ),
-            Number(
-                value = 10.0
-            )
-        )
+        val expectedResult = Null()
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 
     @Test

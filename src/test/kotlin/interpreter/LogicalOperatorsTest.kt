@@ -19,7 +19,7 @@ import udemy.Parser
 
 class LogicalOperatorsTest {
     @Test
-    fun testGreaterThan(){
+    fun testGreaterThan() {
         val src = """
             5 > 3;
         """.trimIndent()
@@ -36,7 +36,7 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testLessThan(){
+    fun testLessThan() {
         val src = """
             5 < 3;
         """.trimIndent()
@@ -53,24 +53,24 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsNumberVsIdentifier(){
+    fun testEqualsNumberVsIdentifier() {
         val src = """
+            var x = 10;
             5 == x;
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Bool(
-                value = false
-            )
+        val expectedResult = Bool(
+            value = false
         )
-        assert(result == expectedResult)
+
+        assert(result.last() == expectedResult)
     }
 
     @Test
-    fun testEqualsNumbers(){
+    fun testEqualsNumbers() {
         val src = """
             5 == 3;
         """.trimIndent()
@@ -87,7 +87,7 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsStrings(){
+    fun testEqualsStrings() {
         val src = """
             "5" == "3";
         """.trimIndent()
@@ -104,7 +104,7 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsStringsTrue(){
+    fun testEqualsStringsTrue() {
         val src = """
             "Hello" == "Hello";
         """.trimIndent()
@@ -121,7 +121,7 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsBooleans(){
+    fun testEqualsBooleans() {
         val src = """
             tacno == tacno;
         """.trimIndent()
@@ -138,7 +138,7 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsArrays(){
+    fun testEqualsArrays() {
         val src = """
             [1,2,3,4] == [1,2,3];
         """.trimIndent()
@@ -155,7 +155,7 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsArraysTrue(){
+    fun testEqualsArraysTrue() {
         val src = """
             [1,2,3] == [1,2,3];
         """.trimIndent()
@@ -172,19 +172,21 @@ class LogicalOperatorsTest {
     }
 
     @Test
-    fun testEqualsObjects(){
+    fun testEqualsObjects() {
         val src = """
-            {ime: "Armin"} == {ime: "Armin"};
+            var a = {ime: "Armin"};
+            var b = {ime: "Armin"};
+            
+            a == b;
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Bool(
-                value = true
-            )
+        val expectedResult = Bool(
+            value = true
         )
-        assert(result == expectedResult)
+
+        assert(result.last() == expectedResult)
     }
 }
