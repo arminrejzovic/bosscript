@@ -74,7 +74,11 @@ data class Token(
 }
 
 fun String.isAlpha(): Boolean{
-    return this.lowercase() != this.uppercase()
+    return (this.lowercase() != this.uppercase()) || this == "$" || this == "_"
+}
+
+fun String.isValidVariableChar(): Boolean{
+    return this.isAlpha() || this.isNumeric() || this == "$" || this == "_"
 }
 
 fun String.isNumeric(): Boolean{
@@ -261,8 +265,8 @@ fun tokenize(src: String): ArrayList<Token>{
 
             // Identifiers
             else if(sourceCode[0].isAlpha()){
-                var identifier = ""
-                while (sourceCode.isNotEmpty() && sourceCode[0].isAlpha()){
+                var identifier = sourceCode.removeAt(0)
+                while (sourceCode.isNotEmpty() && sourceCode[0].isValidVariableChar()){
                     identifier += sourceCode.removeAt(0)
                 }
                 // Check for reserved keywords
