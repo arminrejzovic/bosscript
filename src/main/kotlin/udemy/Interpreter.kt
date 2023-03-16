@@ -38,10 +38,6 @@ class Interpreter {
         return result
     }
 
-    init {
-        globalEnv.declareVariable("x", Number(value = 10.0))
-    }
-
     private fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue{
         when(node.kind){
             // ---------------------------------------------------------------------------------------------------------
@@ -221,22 +217,15 @@ class Interpreter {
             }
 
             NodeType.ReturnStatement -> {
-                val returnNode = node as ReturnStatement
-                return if(returnNode.argument != null){
-                    evaluate(returnNode.argument, environment)
-                } else{
-                    Null()
-                }
+                return evaluateReturnStatement(node as ReturnStatement, environment)
             }
 
             NodeType.IfStatement -> {
-                evaluateIfStatement(node as IfStatement, environment)
-                return Null()
+                return evaluateIfStatement(node as IfStatement, environment)
             }
 
             NodeType.UnlessStatement -> {
-                evaluateUnlessStatement(node as UnlessStatement, environment)
-                return Null()
+                return evaluateUnlessStatement(node as UnlessStatement, environment)
             }
 
             NodeType.CallExpression -> {
@@ -244,8 +233,7 @@ class Interpreter {
             }
 
             NodeType.ForStatement -> {
-                evaluateForStatement(node as ForStatement, environment)
-                return Null()
+                return evaluateForStatement(node as ForStatement, environment) ?: Null()
             }
 
             else -> {
@@ -278,7 +266,7 @@ class Interpreter {
                 return env.assignVariable(varName, evaluate(expr.value, env))
             }
             "+=" -> {
-                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                val currentValue = env.getVariable(expr.assignee.symbol)
                 if(currentValue.value !is Double){
                     throw Exception("Type error: lhs not a number")
                 }
@@ -292,7 +280,7 @@ class Interpreter {
             }
 
             "-=" -> {
-                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                val currentValue = env.getVariable(expr.assignee.symbol)
                 if(currentValue.value !is Double){
                     throw Exception("Type error: lhs not a number")
                 }
@@ -306,7 +294,7 @@ class Interpreter {
             }
 
             "*=" -> {
-                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                val currentValue = env.getVariable(expr.assignee.symbol)
                 if(currentValue.value !is Double){
                     throw Exception("Type error: lhs not a number")
                 }
@@ -320,7 +308,7 @@ class Interpreter {
             }
 
             "/=" -> {
-                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                val currentValue = env.getVariable(expr.assignee.symbol)
                 if(currentValue.value !is Double){
                     throw Exception("Type error: lhs not a number")
                 }
@@ -334,7 +322,7 @@ class Interpreter {
             }
 
             "%=" -> {
-                val currentValue = env.getVariable((expr.assignee as Identifier).symbol)
+                val currentValue = env.getVariable(expr.assignee.symbol)
                 if(currentValue.value !is Double){
                     throw Exception("Type error: lhs not a number")
                 }
@@ -353,13 +341,12 @@ class Interpreter {
     private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue{
         val blockEnv = Environment(parent = env)
         var result: RuntimeValue = Null()
-        block.body.forEach {
-            if(it.kind == NodeType.ReturnStatement){
-                return evaluate(it, blockEnv)
+        for (stmt in block.body){
+            val stmtResult = evaluate(stmt, blockEnv)
+            if(result !is ReturnValue && stmtResult is ReturnValue){
+                result = stmtResult
             }
-            result = evaluate(it, blockEnv)
         }
-
         return result
     }
 
@@ -388,57 +375,68 @@ class Interpreter {
     }
 
     private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue{
-        val fn = evaluate(call.callee, env)
-        if(fn is Function){
-            val activationRecord = hashMapOf<String, RuntimeValue>()
-            fn.params.forEachIndexed{index, param ->
-                activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
+        when (val fn = evaluate(call.callee, env)) {
+            is Function -> {
+                val activationRecord = hashMapOf<String, RuntimeValue>()
+                fn.params.forEachIndexed{index, param ->
+                    activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
+                }
+                val functionEnv = Environment(parent = env, variables = activationRecord)
+                val functionResult = evaluateBlockStatement(fn.body, functionEnv)
+                return if(functionResult is ReturnValue) functionResult.value else functionResult
             }
-            val functionEnv = Environment(parent = env, variables = activationRecord)
 
-            return evaluateBlockStatement(fn.body, functionEnv)
-        }
-        else if(fn is NativeFunction){
-            val args = arrayListOf<RuntimeValue>()
-            call.args.forEach {
-                args.add(evaluate(it, env))
+            is NativeFunction -> {
+                val args = arrayListOf<RuntimeValue>()
+                call.args.forEach {
+                    args.add(evaluate(it, env))
+                }
+                return fn.call(*(args.toTypedArray()))
             }
-            return fn.call(*(args.toTypedArray()))
-        }
-        else{
-            throw Exception("Is not a function")
+
+            else -> {
+                throw Exception("Is not a function")
+            }
         }
     }
 
-    private fun evaluateIfStatement(stmt: IfStatement, env: Environment){
+    private fun evaluateIfStatement(stmt: IfStatement, env: Environment): RuntimeValue{
         val condition = evaluate(stmt.condition, env)
         if(condition.value !is Boolean){
             throw Exception("Type Error: Condition is not a boolean")
         }
+
+        var result: RuntimeValue = Null()
 
         if (condition.value == true){
-            evaluate(stmt.consequent, env)
+            result = evaluate(stmt.consequent, env)
         }
         else if (stmt.alternate != null) {
-            evaluate(stmt.alternate, env)
+            result = evaluate(stmt.alternate, env)
         }
+
+        return result
     }
 
-    private fun evaluateUnlessStatement(stmt: UnlessStatement, env: Environment){
+    private fun evaluateUnlessStatement(stmt: UnlessStatement, env: Environment): RuntimeValue{
         val condition = evaluate(stmt.condition, env)
         if(condition.value !is Boolean){
             throw Exception("Type Error: Condition is not a boolean")
         }
 
+        var result: RuntimeValue = Null()
+
         if (condition.value == false){
-            evaluate(stmt.consequent, env)
+            result = evaluate(stmt.consequent, env)
         }
         else if (stmt.alternate != null) {
-            evaluate(stmt.alternate, env)
+            result = evaluate(stmt.alternate, env)
         }
+
+        return result
     }
 
-    private fun evaluateForStatement(stmt: ForStatement, env: Environment){
+    private fun evaluateForStatement(stmt: ForStatement, env: Environment): ReturnValue?{
         val startValue = evaluate(stmt.startValue, env)
         val endValue = evaluate(stmt.endValue, env)
 
@@ -449,7 +447,7 @@ class Interpreter {
         val start = startValue.value as Double
         val end = endValue.value as Double
 
-        var step: Double = 0.0
+        val step: Double
         if(stmt.step == null){
             // Infer the step if not provided
             step = 1.0
@@ -468,12 +466,14 @@ class Interpreter {
         activationRecord[stmt.counter.symbol] = startValue
         val loopEnv = Environment(variables = activationRecord, parent =  env)
 
-
         if (start < end){
             // Regular ascending loop
             var i = start
             while (i < end) {
-                evaluate(stmt.body, loopEnv)
+                val iterationResult = evaluate(stmt.body, loopEnv)
+                if(iterationResult is ReturnValue){
+                    return iterationResult
+                }
                 i += step
                 loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
             }
@@ -482,11 +482,23 @@ class Interpreter {
             // Backward loop
             var i = start
             while (i > end) {
-                evaluate(stmt.body, loopEnv)
+                val iterationResult = evaluate(stmt.body, loopEnv)
+                if(iterationResult is ReturnValue){
+                    return iterationResult
+                }
                 i -= step
                 loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
             }
         }
+        return null
+    }
+
+    private fun evaluateReturnStatement(stmt: ReturnStatement, env: Environment): ReturnValue{
+        if(stmt.argument == null){
+            // void return
+            return ReturnValue(value = Null())
+        }
+        return ReturnValue(value = evaluate(stmt.argument, env))
     }
 
     private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue{
