@@ -238,4 +238,62 @@ class MemberExpressionsTest {
 
         assert(expectedResult == result)
     }
+
+    @Test
+    fun testArrayIndex() {
+        val src = """
+            var x = [1,2,3,4,5,6];
+            x[2];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Number(
+            value = 3.0
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
+    }
+
+    @Test
+    fun testArrayAssignByIndex() {
+        val src = """
+            var x = [1,2,3,4,5,6];
+            x[2] = 99;
+            ispis(x);
+            x[2];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Number(
+            value = 99.0
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
+    }
+
+    @Test
+    fun test2DArray() {
+        val src = """
+            var x = [
+                ["A", "B", "C"],
+                ["D", "E", "F"],
+                ["G", "H", "I"]
+            ];
+            
+            x[1][0];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Text(
+            value = "D"
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
+    }
 }
