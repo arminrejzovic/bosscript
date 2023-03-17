@@ -191,8 +191,7 @@ class Interpreter {
             }
 
             NodeType.Identifier -> {
-                val identifierNode = node as Identifier
-                return environment.getVariable(identifierNode.symbol)
+                return evaluateIdentifier(node as Identifier, environment)
             }
 
             NodeType.VariableStatement -> {
@@ -236,10 +235,18 @@ class Interpreter {
                 return evaluateForStatement(node as ForStatement, environment) ?: Null()
             }
 
+            NodeType.MemberExpression -> {
+                return evaluateMemberExpression(node as MemberExpression, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
             }
         }
+    }
+
+    private fun evaluateIdentifier(identifier: Identifier, environment: Environment): RuntimeValue {
+        return environment.getVariable(identifier.symbol)
     }
 
     /* HELPER METHODS */
@@ -258,8 +265,22 @@ class Interpreter {
 
     private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue{
         if (expr.assignee.kind != NodeType.Identifier && expr.assignee.kind != NodeType.MemberExpression){
-            throw Exception("Invalid assignment target")
+            throw Exception("Invalid assignment target: ${expr.assignee}")
         }
+
+        if(expr.assignee.kind == NodeType.MemberExpression){
+            expr.assignee as MemberExpression
+            val target = evaluate(expr.assignee.targetObject, env)
+            try {
+                target as Object
+                if(expr.assignee.property is Identifier){
+                    return target.setProperty(expr.assignee.property.symbol, evaluate(expr.value, env))
+                }
+            } catch (e: ClassCastException) {
+                throw Exception("${target.javaClass.simpleName} is not an Object")
+            }
+        }
+
         val varName = (expr.assignee as Identifier).symbol
         when(expr.assignmentOperator){
             "=" -> {
@@ -503,8 +524,25 @@ class Interpreter {
 
     private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue{
         val target = evaluate(expr.targetObject, env)
-        val property = evaluate(expr.property, env)
-        TODO()
+        if(expr.isComputed){
+            when(val prop = evaluate(expr.property)){
+                is Text -> {
+                    // obj["hello"];
+                    TODO()
+                }
+                is Number -> {
+                    // obj[1];
+                    TODO()
+                }
+                else -> {
+                    throw Exception("Type ${prop.javaClass} cannot be used as an index type")
+                }
+            }
+        }
+        else{
+            val propertyName = expr.property as Identifier
+            return target.getProperty(propertyName.symbol)
+        }
     }
 }
 
