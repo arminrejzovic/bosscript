@@ -23,6 +23,7 @@ import UnlessStatement
 import VariableDeclaration
 import VariableStatement
 import errors.SyntaxError
+import isInteger
 import kotlin.math.pow
 
 class Interpreter {
@@ -268,16 +269,31 @@ class Interpreter {
             throw Exception("Invalid assignment target: ${expr.assignee}")
         }
 
-        if(expr.assignee.kind == NodeType.MemberExpression){
-            expr.assignee as MemberExpression
+        // TODO Handle MemberExpression assignments with other operators (x.y.z += 10)
+        if(expr.assignee is MemberExpression){
             val target = evaluate(expr.assignee.targetObject, env)
-            try {
-                target as Object
-                if(expr.assignee.property is Identifier){
-                    return target.setProperty(expr.assignee.property.symbol, evaluate(expr.value, env))
+            when(target){
+                is Object -> {
+                    if(expr.assignee.property is Identifier){
+                        return target.setProperty(expr.assignee.property.symbol, evaluate(expr.value, env))
+                    }
+                    else{
+                        val prop = evaluate(expr.assignee.property, env)
+                        if(prop is Text){
+                            return target.setProperty(prop.value, evaluate(expr.value, env))
+                        }
+                    }
                 }
-            } catch (e: ClassCastException) {
-                throw Exception("${target.javaClass.simpleName} is not an Object")
+                is Array -> {
+                    val prop = evaluate(expr.assignee.property, env)
+                    if(prop is Number){
+                        target.set(prop.value.toInt(), evaluate(expr.value, env))
+                        return Null()
+                    }
+                }
+                else -> {
+                    throw Exception("${target.javaClass.simpleName} is not an Object")
+                }
             }
         }
 
@@ -528,11 +544,20 @@ class Interpreter {
             when(val prop = evaluate(expr.property)){
                 is Text -> {
                     // obj["hello"];
-                    TODO()
+                    return target.getProperty(prop.value)
                 }
                 is Number -> {
                     // obj[1];
-                    TODO()
+                    if(!prop.value.isInteger()){
+                        throw Exception("Index must be an integer")
+                    }
+
+                    if (target is Array){
+                        return target.getElement(prop.value.toInt())
+                    }
+                    else{
+                        throw Exception("${target.javaClass.simpleName} is not indexable")
+                    }
                 }
                 else -> {
                     throw Exception("Type ${prop.javaClass} cannot be used as an index type")

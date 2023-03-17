@@ -114,7 +114,7 @@ class MemberExpressionsTest {
 
         try {
             interpreter.evaluateProgram(src)
-        }catch (e: Exception){
+        } catch (e: Exception){
             error = e.message ?: ""
         }
 
@@ -148,10 +148,94 @@ class MemberExpressionsTest {
         val expectedError = "Number is not an Object"
         try {
             interpreter.evaluateProgram(src)
-        }catch (e: Exception){
+        } catch (e: Exception){
             error = e.message ?: ""
         }
 
         assert(error == expectedError)
+    }
+
+    @Test
+    fun testComputedPropertyAccess() {
+        val src = """
+            var x = {
+                a: 10,
+                b: 3
+            };
+            x["a"];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Number(
+            value = 10.0
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
+    }
+
+    @Test
+    fun testNonExistentComputedPropertyAccess() {
+        val src = """
+            var x = {
+                a: 10,
+                b: 3
+            };
+            x["c"];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        var error = ""
+        val expectedError = "Property c does not exist on object"
+        try {
+            interpreter.evaluateProgram(src)
+        } catch (e: Exception){
+            error = e.message ?: ""
+        }
+
+        assert(error == expectedError)
+    }
+
+    @Test
+    fun testComputedPropertyAssignment() {
+        val src = """
+            var x = {
+                a: 10,
+                b: 3
+            };
+            x["a"] = 99;
+            x["a"];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Number(
+            value = 99.0
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
+    }
+
+    @Test
+    fun testNonExistingComputedPropertyAssignment() {
+        val src = """
+            var x = {
+                a: 10,
+                b: 3
+            };
+            x["c"] = 99;
+            x.c;
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Number(
+            value = 99.0
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
     }
 }

@@ -59,7 +59,6 @@ enum class TokenType{
     EqualityOperator,
     // SPECIAL TOKENS ---------------------------
     EOF,
-    NOTIMPLEMENTED,
     ComplexAssign,
     Break
 }

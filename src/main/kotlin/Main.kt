@@ -1,3 +1,4 @@
+import udemy.Parser
 import java.io.File
 
 fun main(args: Array<String>) {
@@ -23,7 +24,5 @@ fun main(args: Array<String>) {
      */
 
     val testFile = File("C:\\Users\\armin\\IdeaProjects\\bosscript\\src\\test\\kotlin\\test.boss").readText()
-    val program = parser.generateAST(testFile)
-    val result = interpret(program, env)
-    println(result.toString())
+    val program = parser.parseProgram(testFile)
 }

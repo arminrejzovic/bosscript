@@ -131,6 +131,10 @@ data class Array(
     fun getElement(index: Int): RuntimeValue{
         return value[index]
     }
+
+    fun set(index: Int, newValue: RuntimeValue){
+        value[index] = newValue
+    }
 }
 
 data class Object(
