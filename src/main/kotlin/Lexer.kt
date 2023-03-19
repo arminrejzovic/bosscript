@@ -60,7 +60,9 @@ enum class TokenType{
     // SPECIAL TOKENS ---------------------------
     EOF,
     ComplexAssign,
-    Break
+    Break,
+    UnaryIncrement,
+    UnaryDecrement
 }
 
 data class Token(
@@ -165,6 +167,14 @@ fun tokenize(src: String): ArrayList<Token>{
                 tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.ComplexAssign, line, col))
                 col+=2
             }
+            else if(sourceCode.size > 1 && sourceCode[0] == "+" && sourceCode[1] == "+"){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.UnaryIncrement, line, col))
+                col+=2
+            }
+            else if(sourceCode.size > 1 && sourceCode[0] == "-" && sourceCode[1] == "-"){
+                tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.UnaryDecrement, line, col))
+                col+=2
+            }
             else{
                 tokens.add(Token(sourceCode.removeAt(0), TokenType.BinaryOperator, line, col++))
             }
@@ -226,7 +236,6 @@ fun tokenize(src: String): ArrayList<Token>{
         }
         else{
             // Multi-character tokens
-
             if(sourceCode[0] == "\""){
                 //String literals
                 // Add the opening quotation mark

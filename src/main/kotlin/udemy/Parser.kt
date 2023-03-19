@@ -892,8 +892,9 @@ class Parser {
      */
     private fun parseUnaryExpression(): Expression{
         var operator: String? = null
+        val validOperators = listOf("+", "-", "++", "--", "!")
 
-        if(current().value == "+" || current().value == "-"){
+        if(current().value in validOperators){
             operator = consume().value
         }
 

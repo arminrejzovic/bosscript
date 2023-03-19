@@ -21,6 +21,7 @@ import ObjectLiteral
 import ReturnStatement
 import Statement
 import StringLiteral
+import UnaryExpression
 import UnlessStatement
 import VariableDeclaration
 import VariableStatement
@@ -194,6 +195,10 @@ class Interpreter {
                 }
             }
 
+            NodeType.UnaryExpression -> {
+                return evaluateUnaryExpression(node as UnaryExpression, environment)
+            }
+
             NodeType.Identifier -> {
                 return evaluateIdentifier(node as Identifier, environment)
             }
@@ -261,6 +266,58 @@ class Interpreter {
         }
     }
 
+    private fun evaluateUnaryExpression(expr: UnaryExpression, env: Environment): RuntimeValue {
+        val arg = evaluate(expr.argument, env)
+
+        // TODO handle ++ and -- (Should modify operand)
+
+        when(expr.operator){
+            "+" -> {
+                if(arg is Text){
+                    return Number(
+                        value = arg.value.toDouble()
+                    )
+                }
+                if(arg is Number){
+                    return arg
+                }
+                throw Exception("Type error: Unary + is not defined for ${arg.javaClass.simpleName}")
+            }
+            "-" -> {
+                if(arg is Text){
+                    return Number(
+                        value = -(arg.value.toDouble())
+                    )
+                }
+                if(arg is Number){
+                    return Number(
+                        value = -arg.value
+                    )
+                }
+                throw Exception("Type error: Unary - is not defined for ${arg.javaClass.simpleName}")
+            }
+            "++" -> {
+                if(arg is Number){
+                    return Number(
+                        value = arg.value + 1
+                    )
+                }
+                throw Exception("Type error: Increment operator is not defined for ${arg.javaClass.simpleName}")
+            }
+            "--" -> {
+                if(arg is Number){
+                    return Number(
+                        value = arg.value - 1
+                    )
+                }
+                throw Exception("Type error: Decrement operator is not defined for ${arg.javaClass.simpleName}")
+            }
+            else -> {
+                throw Exception("Unexpected unary operator found: ${expr.operator}")
+            }
+        }
+    }
+
     private fun evaluateLogicalExpression(expr: LogicalExpression, env: Environment): Bool {
         val left = evaluate(expr.left, env)
         val right = evaluate(expr.right, env)
@@ -294,8 +351,6 @@ class Interpreter {
     private fun evaluateIdentifier(identifier: Identifier, environment: Environment): RuntimeValue {
         return environment.getVariable(identifier.symbol)
     }
-
-    /* HELPER METHODS */
 
     private fun evaluateVariableStatement(stmt: VariableStatement, env: Environment){
         stmt.declarations.forEach {
