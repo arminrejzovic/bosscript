@@ -6,6 +6,7 @@ import BinaryExpression
 import BlockStatement
 import BooleanLiteral
 import CallExpression
+import DoWhileStatement
 import Environment
 import ForStatement
 import FunctionDeclaration
@@ -23,6 +24,7 @@ import StringLiteral
 import UnlessStatement
 import VariableDeclaration
 import VariableStatement
+import WhileStatement
 import errors.SyntaxError
 import isInteger
 import kotlin.math.pow
@@ -235,6 +237,14 @@ class Interpreter {
 
             NodeType.ForStatement -> {
                 return evaluateForStatement(node as ForStatement, environment) ?: Null()
+            }
+
+            NodeType.WhileStatement -> {
+                return evaluateWhileStatement(node as WhileStatement, environment) ?: Null()
+            }
+
+            NodeType.DoWhileStatement -> {
+                return evaluateDoWhileStatement(node as DoWhileStatement, environment) ?: Null()
             }
 
             NodeType.MemberExpression -> {
@@ -562,6 +572,27 @@ class Interpreter {
                 loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
             }
         }
+        return null
+    }
+
+    private fun evaluateWhileStatement(stmt: WhileStatement, env: Environment): RuntimeValue? {
+        while (evaluate(stmt.condition, env).value == true){
+            val iterationResult = evaluate(stmt.body, env)
+            if(iterationResult is ReturnValue){
+                return iterationResult
+            }
+        }
+        return null
+    }
+
+    private fun evaluateDoWhileStatement(stmt: DoWhileStatement, env: Environment): RuntimeValue? {
+        do{
+            val iterationResult = evaluate(stmt.body, env)
+            if(iterationResult is ReturnValue){
+                return iterationResult
+            }
+        } while (evaluate(stmt.condition, env).value == true)
+
         return null
     }
 
