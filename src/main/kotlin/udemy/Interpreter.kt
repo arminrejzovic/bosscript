@@ -556,7 +556,41 @@ class Interpreter {
     }
 
     private fun evaluateSimpleAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue{
-        TODO()
+        if(expr.assignee is Identifier){
+            return env.assignVariable(expr.assignee.symbol, evaluate(expr.value, env))
+        }
+
+        if(expr.assignee is MemberExpression){
+            val target = evaluate(expr.assignee.targetObject, env)
+            val newValue = evaluate(expr.value, env)
+
+            if(target is Object){
+                if(expr.assignee.property is Identifier){
+                    // a.b.c = 10;
+                    return target.setProperty(expr.assignee.property.symbol, newValue)
+                }
+                else{
+                    // Computed value
+                    // a.b["c"] = 10;
+                    val prop = evaluate(expr.assignee.property, env)
+                    if(prop is Text){
+                        return target.setProperty(prop.value, evaluate(expr.value, env))
+                    }
+                    if(prop is Number){
+                        throw Exception("${target.javaClass.simpleName} is not indexable")
+                    }
+                }
+            }
+
+            if(target is Array){
+                val prop = evaluate(expr.assignee.property, env)
+                if(prop is Number){
+                    target.set(index = prop.value.toInt(), newValue)
+                    return Null()
+                }
+            }
+        }
+        throw Exception("Invalid assignment operation ")
     }
 
     private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue{
