@@ -195,19 +195,20 @@ class LogicalOperatorsTest {
     fun testComplexLogic() {
         val src = """
             funkcija test(x: broj,y: broj,z: broj){
-                ispis(x,y,z);
+               
                 ako(y > 5 || (z > 10 && x < 3)){
-                    ispis("TRUE");
                     vrati tacno;
+                    ispis("TRUE AFTER RETURN");
                 }
                 inace {
-                    ispis("FALSE");
                     vrati netacno;
+                    ispis("FALSE AFTER RETURN");
                 }
             }
             
             var a = test(3, 4, 7);
             var b = test(2, 6, 11);
+            ispis(a,b);
             [a,b];
         """.trimIndent()
 

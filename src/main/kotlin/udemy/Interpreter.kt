@@ -424,9 +424,11 @@ class Interpreter {
         val blockEnv = Environment(parent = env)
         var result: RuntimeValue = Null()
         for (stmt in block.body){
-            val stmtResult = evaluate(stmt, blockEnv)
-            if(result !is ReturnValue && stmtResult is ReturnValue){
-                result = stmtResult
+            if(result !is ReturnValue){
+                val stmtResult = evaluate(stmt, blockEnv)
+                if(stmtResult is ReturnValue){
+                    result = stmtResult
+                }
             }
         }
         return result

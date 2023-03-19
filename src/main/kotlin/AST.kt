@@ -29,7 +29,6 @@ enum class NodeType {
     TypeAnnotation,
     FunctionParameter,
     ArrayLiteral,
-    ArrowFunction,
     FunctionExpression,
     BreakStatement,
 }
