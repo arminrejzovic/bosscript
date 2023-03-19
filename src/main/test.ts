@@ -1,3 +1,0 @@
-const c = {
-    ime: "mirel"
-}
