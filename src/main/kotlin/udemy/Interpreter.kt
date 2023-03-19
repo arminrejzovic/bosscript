@@ -298,6 +298,7 @@ class Interpreter {
             }
             "++" -> {
                 if(arg is Number){
+                    arg.value++
                     return Number(
                         value = arg.value + 1
                     )
@@ -306,6 +307,7 @@ class Interpreter {
             }
             "--" -> {
                 if(arg is Number){
+                    arg.value--
                     return Number(
                         value = arg.value - 1
                     )
@@ -369,6 +371,18 @@ class Interpreter {
             throw Exception("Invalid assignment target: ${expr.assignee}")
         }
 
+        when(expr.assignmentOperator){
+            "=" -> return evaluateSimpleAssignment(expr, env)
+            "+=" -> return evaluatePlusAssignment(expr, env)
+            "-=" -> return evaluateMinusAssignment(expr, env)
+            "*=" -> return evaluateTimesAssignment(expr, env)
+            "/=" -> return evaluateDivisionAssignment(expr, env)
+            "%=" -> return evaluateRemainderAssignment(expr, env)
+            else -> throw Exception("Invalid assignment operator ${expr.assignmentOperator}")
+        }
+
+        throw Exception("Invalid assignment target: ${expr.assignee}")
+
         // TODO Handle MemberExpression assignments with other operators (x.y.z += 10)
         if(expr.assignee is MemberExpression){
             val target = evaluate(expr.assignee.targetObject, env)
@@ -387,7 +401,7 @@ class Interpreter {
                 is Array -> {
                     val prop = evaluate(expr.assignee.property, env)
                     if(prop is Number){
-                        target.set(prop.value.toInt(), evaluate(expr.value, env))
+                        target.set(index = prop.value.toInt(), newValue = evaluate(expr.value, env))
                         return Null()
                     }
                 }
@@ -473,6 +487,76 @@ class Interpreter {
             }
             else -> return Null()
         }
+    }
+
+    private fun evaluateRemainderAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
+        val target = evaluate(expr.assignee, env)
+        val addedValue = evaluate(expr.value, env)
+        if (target is Number && addedValue is Number){
+            target.value %= addedValue.value
+            println("Returning: $target")
+            return target
+        }
+        throw Exception("Type error: Operator '%=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+    }
+
+    private fun evaluateDivisionAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
+        val target = evaluate(expr.assignee, env)
+        val addedValue = evaluate(expr.value, env)
+        if (target is Number && addedValue is Number){
+            target.value /= addedValue.value
+            println("Returning: $target")
+            return target
+        }
+        throw Exception("Type error: Operator '/=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+    }
+
+    private fun evaluateTimesAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
+        val target = evaluate(expr.assignee, env)
+        val addedValue = evaluate(expr.value, env)
+        if (target is Number && addedValue is Number){
+            target.value *= addedValue.value
+            println("Returning: $target")
+            return target
+        }
+        throw Exception("Type error: Operator '*=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+    }
+
+    /**
+     * Evaluates -= operator
+     */
+    private fun evaluateMinusAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
+        val target = evaluate(expr.assignee, env)
+        val addedValue = evaluate(expr.value, env)
+        if (target is Number && addedValue is Number){
+            target.value -= addedValue.value
+            println("Returning: $target")
+            return target
+        }
+        throw Exception("Type error: Operator '-=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+    }
+
+    /**
+     * Evaluates += operator
+     */
+    private fun evaluatePlusAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
+        val target = evaluate(expr.assignee, env)
+        val addedValue = evaluate(expr.value, env)
+        if (target is Number && addedValue is Number){
+            target.value += addedValue.value
+            println("Returning: $target")
+            return target
+        }
+        if(target is Text && addedValue is Text){
+            target.value += addedValue
+            println("Returning: $target")
+            return target
+        }
+        throw Exception("Type error: Operator '+=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+    }
+
+    private fun evaluateSimpleAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue{
+        TODO()
     }
 
     private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue{

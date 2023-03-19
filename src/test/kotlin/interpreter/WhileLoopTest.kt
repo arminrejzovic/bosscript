@@ -96,4 +96,22 @@ class WhileLoopTest {
         )
         assert(result.last() == expectedResult)
     }
+
+    @Test
+    fun testShorthandWhileWithPlusPlus(){
+        val src = """
+            var x = 0;
+            dok(x != 10) => ++x;
+            ispis(x);
+            x;
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = Number(
+            value = 10.0
+        )
+        assert(result.last() == expectedResult)
+    }
 }

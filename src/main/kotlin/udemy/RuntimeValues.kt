@@ -14,9 +14,10 @@ interface RuntimeValue {
 }
 
 data class Number(
-    override val value: Double,
+    override var value: Double,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ) : RuntimeValue {
+
     override fun getProperty(prop: String): RuntimeValue {
         return builtIns[prop] ?: throw Exception("$prop does not exist on type Number")
     }
@@ -31,7 +32,7 @@ data class Number(
 }
 
 data class Text(
-    override val value: String,
+    override var value: String,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
         "malaSlova" to object : NativeFunction(name = "malaSlova") {
             override fun call(vararg args: RuntimeValue): RuntimeValue {

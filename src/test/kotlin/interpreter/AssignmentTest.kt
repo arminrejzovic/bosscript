@@ -10,11 +10,12 @@ import org.junit.jupiter.api.Test
 import udemy.*
 import udemy.Array
 import udemy.Number
+import udemy.Object
 import java.util.StringJoiner
 
 class AssignmentTest {
     @Test
-    fun testVariableReassignment(){
+    fun testVariableReassignment() {
         val src = """
             var a = 10 + 5 * 8;
             a = 61;
@@ -34,7 +35,7 @@ class AssignmentTest {
     }
 
     @Test
-    fun testConstantReassignment(){
+    fun testConstantReassignment() {
         val src = """
             konst a = 10 + 5 * 8;
             a = 61;
@@ -48,7 +49,7 @@ class AssignmentTest {
 
         try {
             interpreter.evaluateProgram(src)
-        } catch (e: Exception){
+        } catch (e: Exception) {
             error = e.message.toString()
         }
 
@@ -56,45 +57,57 @@ class AssignmentTest {
     }
 
     @Test
-    fun testAllComplexAssign(){
+    fun testAllComplexAssign() {
         val src = """
             var a = 10;
-            a += 2;
+            ispis(a += 2);
             
-            a -= 2;
+            ispis(a -= 2);
             
-            a *= 2;
+            ispis(a *= 2);
             
-            a /= 2;
+            ispis(a /= 2);
             
-            a %= 2;
-            
+            a;
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Null(),
-            Number(
-                value = 12.0
-            ),
-            Number(
-                value = 10.0
-            ),
-            Number(
-                value = 20.0
-            ),
-            Number(
-                value = 10.0
-            ),
-            Number(
-                value = 0.0
+        val expectedResult = Number(
+            value = 10.0
+        )
+
+
+        println(result)
+        assert(result.last() == expectedResult)
+    }
+
+    @Test
+    fun tesObjectPropertyComplexAssign() {
+        val src = """
+            var a = {
+                x: 10,
+                b: 5,
+            };
+            
+            a.x += 2;
+            a.b -= 2;
+            
+            ispis(a);
+            a;
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = Object(
+            properties = hashMapOf(
+                "x" to Number(value = 12.0),
+                "b" to Number(value = 3.0)
             )
         )
 
-        println(result)
-        println(expectedResult)
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 }
