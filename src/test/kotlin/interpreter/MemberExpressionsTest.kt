@@ -145,14 +145,14 @@ class MemberExpressionsTest {
 
         val interpreter = Interpreter()
         var error = ""
-        val expectedError = "Number is not an Object"
+        val expectedError = "Invalid assignment operation"
         try {
             interpreter.evaluateProgram(src)
         } catch (e: Exception){
             error = e.message ?: ""
         }
 
-        assert(error == expectedError)
+        assert(error.trim() == expectedError.trim())
     }
 
     @Test

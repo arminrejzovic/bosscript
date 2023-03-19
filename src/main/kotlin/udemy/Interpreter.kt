@@ -371,121 +371,14 @@ class Interpreter {
             throw Exception("Invalid assignment target: ${expr.assignee}")
         }
 
-        when(expr.assignmentOperator){
-            "=" -> return evaluateSimpleAssignment(expr, env)
-            "+=" -> return evaluatePlusAssignment(expr, env)
-            "-=" -> return evaluateMinusAssignment(expr, env)
-            "*=" -> return evaluateTimesAssignment(expr, env)
-            "/=" -> return evaluateDivisionAssignment(expr, env)
-            "%=" -> return evaluateRemainderAssignment(expr, env)
+        return when(expr.assignmentOperator){
+            "="  -> evaluateSimpleAssignment(expr, env)
+            "+=" -> evaluatePlusAssignment(expr, env)
+            "-=" -> evaluateMinusAssignment(expr, env)
+            "*=" -> evaluateTimesAssignment(expr, env)
+            "/=" -> evaluateDivisionAssignment(expr, env)
+            "%=" -> evaluateRemainderAssignment(expr, env)
             else -> throw Exception("Invalid assignment operator ${expr.assignmentOperator}")
-        }
-
-        throw Exception("Invalid assignment target: ${expr.assignee}")
-
-        // TODO Handle MemberExpression assignments with other operators (x.y.z += 10)
-        if(expr.assignee is MemberExpression){
-            val target = evaluate(expr.assignee.targetObject, env)
-            when(target){
-                is Object -> {
-                    if(expr.assignee.property is Identifier){
-                        return target.setProperty(expr.assignee.property.symbol, evaluate(expr.value, env))
-                    }
-                    else{
-                        val prop = evaluate(expr.assignee.property, env)
-                        if(prop is Text){
-                            return target.setProperty(prop.value, evaluate(expr.value, env))
-                        }
-                    }
-                }
-                is Array -> {
-                    val prop = evaluate(expr.assignee.property, env)
-                    if(prop is Number){
-                        target.set(index = prop.value.toInt(), newValue = evaluate(expr.value, env))
-                        return Null()
-                    }
-                }
-                else -> {
-                    throw Exception("${target.javaClass.simpleName} is not an Object")
-                }
-            }
-        }
-
-        val varName = (expr.assignee as Identifier).symbol
-        when(expr.assignmentOperator){
-            "=" -> {
-                return env.assignVariable(varName, evaluate(expr.value, env))
-            }
-            "+=" -> {
-                val currentValue = env.getVariable(expr.assignee.symbol)
-                if(currentValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-                val updateByValue = evaluate(expr.value, env)
-                if(updateByValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-
-                val newValue = currentValue.value as Double + updateByValue.value as Double
-                return env.assignVariable(varName, Number(value = newValue))
-            }
-
-            "-=" -> {
-                val currentValue = env.getVariable(expr.assignee.symbol)
-                if(currentValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-                val updateByValue = evaluate(expr.value, env)
-                if(updateByValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-
-                val newValue = currentValue.value as Double - updateByValue.value as Double
-                return env.assignVariable(varName, Number(value = newValue))
-            }
-
-            "*=" -> {
-                val currentValue = env.getVariable(expr.assignee.symbol)
-                if(currentValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-                val updateByValue = evaluate(expr.value, env)
-                if(updateByValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-
-                val newValue = currentValue.value as Double * updateByValue.value as Double
-                return env.assignVariable(varName, Number(value = newValue))
-            }
-
-            "/=" -> {
-                val currentValue = env.getVariable(expr.assignee.symbol)
-                if(currentValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-                val updateByValue = evaluate(expr.value, env)
-                if(updateByValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-
-                val newValue = currentValue.value as Double / updateByValue.value as Double
-                return env.assignVariable(varName, Number(value = newValue))
-            }
-
-            "%=" -> {
-                val currentValue = env.getVariable(expr.assignee.symbol)
-                if(currentValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-                val updateByValue = evaluate(expr.value, env)
-                if(updateByValue.value !is Double){
-                    throw Exception("Type error: lhs not a number")
-                }
-
-                val newValue = currentValue.value as Double % updateByValue.value as Double
-                return env.assignVariable(varName, Number(value = newValue))
-            }
-            else -> return Null()
         }
     }
 
@@ -494,7 +387,6 @@ class Interpreter {
         val addedValue = evaluate(expr.value, env)
         if (target is Number && addedValue is Number){
             target.value %= addedValue.value
-            println("Returning: $target")
             return target
         }
         throw Exception("Type error: Operator '%=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
@@ -505,7 +397,6 @@ class Interpreter {
         val addedValue = evaluate(expr.value, env)
         if (target is Number && addedValue is Number){
             target.value /= addedValue.value
-            println("Returning: $target")
             return target
         }
         throw Exception("Type error: Operator '/=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
@@ -516,7 +407,6 @@ class Interpreter {
         val addedValue = evaluate(expr.value, env)
         if (target is Number && addedValue is Number){
             target.value *= addedValue.value
-            println("Returning: $target")
             return target
         }
         throw Exception("Type error: Operator '*=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
@@ -530,7 +420,6 @@ class Interpreter {
         val addedValue = evaluate(expr.value, env)
         if (target is Number && addedValue is Number){
             target.value -= addedValue.value
-            println("Returning: $target")
             return target
         }
         throw Exception("Type error: Operator '-=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
@@ -544,12 +433,10 @@ class Interpreter {
         val addedValue = evaluate(expr.value, env)
         if (target is Number && addedValue is Number){
             target.value += addedValue.value
-            println("Returning: $target")
             return target
         }
         if(target is Text && addedValue is Text){
             target.value += addedValue
-            println("Returning: $target")
             return target
         }
         throw Exception("Type error: Operator '+=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
