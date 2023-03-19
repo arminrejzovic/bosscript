@@ -9,10 +9,14 @@ fun main() {
                 ispis(a);
             }
             m();
+            var x = 10;
+            ako(x > 1 && x > 2){
+                ispis("10!");
+            }
         """.trimIndent()
 
     val interpreter = Interpreter()
-    //interpreter.evaluateProgram(src)
+    interpreter.evaluateProgram(src)
 
     val envTest = Environment(variables = hashMapOf(
         "x" to Object(

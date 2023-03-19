@@ -296,4 +296,24 @@ class MemberExpressionsTest {
 
         assert(expectedResult == result)
     }
+
+    @Test
+    fun testArrayObjectProp() {
+        val src = """
+            var x = {
+                y: ["A", "B", "C"]
+            };
+            
+            x.y[0];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val expectedResult = Text(
+            value = "A"
+        )
+
+        val result = interpreter.evaluateProgram(src).last()
+
+        assert(expectedResult == result)
+    }
 }

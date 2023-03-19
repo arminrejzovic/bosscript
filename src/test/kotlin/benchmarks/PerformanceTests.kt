@@ -1,7 +1,6 @@
 package benchmarks
 
 import org.junit.jupiter.api.Test
-import udemy.Array
 import udemy.Interpreter
 
 class PerformanceTests {
@@ -39,9 +38,6 @@ class PerformanceTests {
             
             var n = fakt(169);
             ispis(n);
-            ispis(6969);
-            ispis(1.2);
-            ispis(1.04);
         """.trimIndent()
 
         val interpreter = Interpreter()
