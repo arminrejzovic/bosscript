@@ -12,6 +12,7 @@ import FunctionDeclaration
 import FunctionExpression
 import Identifier
 import IfStatement
+import LogicalExpression
 import MemberExpression
 import NodeType
 import NumericLiteral
@@ -240,8 +241,42 @@ class Interpreter {
                 return evaluateMemberExpression(node as MemberExpression, environment)
             }
 
+            NodeType.LogicalExpression -> {
+                return evaluateLogicalExpression(node as LogicalExpression, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
+            }
+        }
+    }
+
+    private fun evaluateLogicalExpression(expr: LogicalExpression, env: Environment): Bool {
+        val left = evaluate(expr.left, env)
+        val right = evaluate(expr.right, env)
+
+        if(left.value !is Boolean || right.value !is Boolean){
+            throw Exception("Type error: Logical expression operands must be booleans")
+        }
+
+        left as Bool
+        right as Bool
+
+        when(expr.operator){
+            "&&" -> {
+                return Bool(
+                    value = left.value && right.value
+                )
+            }
+
+            "||" -> {
+                return Bool(
+                    value = left.value || right.value
+                )
+            }
+
+            else -> {
+                throw Exception("Unrecognized logical operator")
             }
         }
     }

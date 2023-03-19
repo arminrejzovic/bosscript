@@ -12,6 +12,7 @@ import NumericLiteral
 import VariableDeclaration
 import VariableStatement
 import org.junit.jupiter.api.Test
+import udemy.Array
 import udemy.Bool
 import udemy.Interpreter
 import udemy.Number
@@ -185,6 +186,39 @@ class LogicalOperatorsTest {
 
         val expectedResult = Bool(
             value = true
+        )
+
+        assert(result.last() == expectedResult)
+    }
+
+    @Test
+    fun testComplexLogic() {
+        val src = """
+            funkcija test(x: broj,y: broj,z: broj){
+                ispis(x,y,z);
+                ako(y > 5 || (z > 10 && x < 3)){
+                    ispis("TRUE");
+                    vrati tacno;
+                }
+                inace {
+                    ispis("FALSE");
+                    vrati netacno;
+                }
+            }
+            
+            var a = test(3, 4, 7);
+            var b = test(2, 6, 11);
+            [a,b];
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        val result = interpreter.evaluateProgram(src)
+
+        val expectedResult = Array(
+            value = arrayListOf(
+                Bool(false),
+                Bool(true)
+            )
         )
 
         assert(result.last() == expectedResult)
