@@ -1,6 +1,7 @@
 package interpreter
 
 import java.util.Scanner
+import kotlin.random.Random
 
 class Environment(
     private val parent: Environment? = null,
@@ -103,6 +104,10 @@ class Environment(
             "unos",
             object : NativeFunkcija(name = "unos"){
                 override fun call(vararg args: RuntimeValue): Tekst {
+                    if(args.size == 1){
+                        val message = (args[0] as Tekst).value
+                        println(message)
+                    }
                     val scanner = Scanner(System.`in`)
                     val str = scanner.nextLine()
                     return Tekst(value = str)
@@ -117,6 +122,20 @@ class Environment(
                 override fun call(vararg args: RuntimeValue): Logicki {
                     val valueInQuestion = args[0]
                     return Logicki(value = valueInQuestion !is Null)
+                }
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
+            "nasumicni",
+            object : NativeFunkcija(name = "nasumicni"){
+                override fun call(vararg args: RuntimeValue): Broj {
+                    val until = if(args.size == 1) args[0] as Broj else Broj(value = 100.0)
+                    val untilVal = until.value
+                    return Broj(
+                        value = (Random.nextInt(until = untilVal.toInt())).toDouble()
+                    )
                 }
             },
             isConstant = true

@@ -118,7 +118,9 @@ data class ReturnValue(
 
 data class Niz(
     override val value: ArrayList<RuntimeValue>,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
+        "duzina" to Broj(value = value.size.toDouble())
+    )
 ) : RuntimeValue {
     override fun toString(): String {
         return value.toString()

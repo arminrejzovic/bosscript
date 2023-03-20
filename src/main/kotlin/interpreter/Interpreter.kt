@@ -645,7 +645,7 @@ class Interpreter {
     private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.targetObject, env)
         if(expr.isComputed){
-            when(val prop = evaluate(expr.property)){
+            when(val prop = evaluate(expr.property, env)){
                 is Tekst -> {
                     // obj["hello"];
                     return target.getProperty(prop.value)

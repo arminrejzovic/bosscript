@@ -5,39 +5,22 @@ import interpreter.Tekst
 
 fun main() {
     val src = """
-            funkcija m(){
-               var a = unos();
-                ispis(a);
-            }
-            m();
-            var x = 10;
-            ako(x > 1 && x > 2){
-                ispis("10!");
-            }
+          funkcija safet(){
+               var pridjevi = ["ljepotan", "grmalj", "smeće", "yeti", "smrad"];
+               var rand = nasumicni(pridjevi.duzina);
+               ispis("Safet je:", pridjevi[rand]);
+          }
+          
+           var run = tacno;
+          radi {
+                safet();
+                var prompt = unos("Zelite li prekinuti?");
+                ako(prompt == "da"){
+                    run = netacno;
+                }
+          } dok(run);  
         """.trimIndent()
 
     val interpreter = Interpreter()
     interpreter.evaluateProgram(src)
-
-    val envTest = Environment(variables = hashMapOf(
-        "x" to Objekat(
-            properties = hashMapOf(
-                "y" to Objekat(
-                    properties = hashMapOf(
-                        "z" to Tekst(
-                            value = "Hello world"
-                        )
-                    )
-                )
-            )
-        )
-    ))
-
-    val obj = envTest.getVariable("x")
-    obj as Objekat
-    val objY = obj.properties["y"]
-    objY as Objekat
-    objY.properties["z"] = Tekst("Привет мир!")
-
-    println(envTest.getVariable("x"))
 }
