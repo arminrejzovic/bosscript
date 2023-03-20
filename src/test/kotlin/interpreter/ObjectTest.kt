@@ -1,17 +1,17 @@
 package interpreter
 
-import BinaryExpression
-import BooleanLiteral
-import CallExpression
-import Identifier
-import NumericLiteral
-import ObjectLiteral
-import Property
-import StringLiteral
-import VariableDeclaration
-import VariableStatement
+import parser.BinaryExpression
+import parser.BooleanLiteral
+import parser.CallExpression
+import parser.Identifier
+import parser.NumericLiteral
+import parser.ObjectLiteral
+import parser.Parser
+import parser.Property
+import parser.StringLiteral
+import parser.VariableDeclaration
+import parser.VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.*
 
 class ObjectTest {
     @Test
@@ -26,7 +26,7 @@ class ObjectTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Object(
+            Objekat(
                 properties = hashMapOf()
             )
         )

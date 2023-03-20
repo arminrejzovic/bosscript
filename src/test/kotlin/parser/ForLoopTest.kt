@@ -1,13 +1,6 @@
 package parser
 
-import BinaryExpression
-import BlockStatement
-import CallExpression
-import ForStatement
-import Identifier
-import NumericLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class ForLoopTest {
     @Test

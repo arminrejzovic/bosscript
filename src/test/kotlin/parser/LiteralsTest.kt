@@ -1,10 +1,6 @@
 package parser
 
-import BooleanLiteral
-import NumericLiteral
-import StringLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class LiteralsTest {
     @Test

@@ -1,7 +1,7 @@
 package benchmarks
 
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
+import interpreter.Interpreter
 
 class PerformanceTests {
     @Test

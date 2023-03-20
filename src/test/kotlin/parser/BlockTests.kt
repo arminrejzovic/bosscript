@@ -1,11 +1,6 @@
 package parser
 
-import BinaryExpression
-import BlockStatement
-import NumericLiteral
-import StringLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class BlockTests {
     @Test
@@ -38,7 +33,7 @@ class BlockTests {
         val expectedResult = arrayListOf(
             BlockStatement(
                 body = arrayListOf(
-                    BinaryExpression(left=NumericLiteral(value=10.0), right=NumericLiteral(value=1.0), operator="+"),
+                    BinaryExpression(left= NumericLiteral(value=10.0), right= NumericLiteral(value=1.0), operator="+"),
                     StringLiteral(value="String")
                 )
             )
@@ -64,7 +59,7 @@ class BlockTests {
         val expectedResult = arrayListOf(
             BlockStatement(
                 body = arrayListOf(
-                    BinaryExpression(left=NumericLiteral(value=10.0), right=NumericLiteral(value=1.0), operator="+"),
+                    BinaryExpression(left= NumericLiteral(value=10.0), right= NumericLiteral(value=1.0), operator="+"),
                     StringLiteral(value="String"),
                     BlockStatement(
                         body = arrayListOf(

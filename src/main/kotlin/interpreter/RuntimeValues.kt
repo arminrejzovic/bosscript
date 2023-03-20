@@ -1,11 +1,10 @@
-package udemy
+package interpreter
 
-import BlockStatement
-import Environment
-import FunctionParameter
-import TypeAnnotation
 import errors.SyntaxError
 import isInteger
+import parser.BlockStatement
+import parser.FunctionParameter
+import parser.TypeAnnotation
 
 interface RuntimeValue {
     val value: Any?
@@ -13,7 +12,7 @@ interface RuntimeValue {
     fun getProperty(prop: String): RuntimeValue
 }
 
-data class Number(
+data class Broj(
     override var value: Double,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ) : RuntimeValue {
@@ -31,20 +30,20 @@ data class Number(
     }
 }
 
-data class Text(
+data class Tekst(
     override var value: String,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
-        "malaSlova" to object : NativeFunction(name = "malaSlova") {
+        "malaSlova" to object : NativeFunkcija(name = "malaSlova") {
             override fun call(vararg args: RuntimeValue): RuntimeValue {
                 if (args.isNotEmpty()) {
                     throw Exception("malaSlova accepts no arguments")
                 }
-                return Text(
+                return Tekst(
                     value = value.lowercase()
                 )
             }
         },
-        "duzina" to Number(value = value.length.toDouble())
+        "duzina" to Broj(value = value.length.toDouble())
     )
 ) : RuntimeValue {
     override fun toString(): String {
@@ -59,7 +58,7 @@ data class Text(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Text
+        other as Tekst
 
         if (value != other.value) return false
 
@@ -71,7 +70,7 @@ data class Text(
     }
 }
 
-data class Bool(
+data class Logicki(
     override val value: Boolean,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ) : RuntimeValue {
@@ -93,7 +92,7 @@ data class Null(
     }
 
     override fun getProperty(prop: String): RuntimeValue {
-        throw NullPointerException("Null has no properties")
+        throw NullPointerException("interpreter.Null has no properties")
     }
 }
 
@@ -103,8 +102,8 @@ data class ReturnValue(
 ) : RuntimeValue {
     init {
         /*
-         A ReturnValue is a wrapper that exists just so that return statements can be bubbled up to the top level
-         Its value can't be another ReturnValue (since you cant say return return x)
+         A interpreter.ReturnValue is a wrapper that exists just so that return statements can be bubbled up to the top level
+         Its value can't be another interpreter.ReturnValue (since you cant say return return x)
          This should never happen in reality, but let's have code handling it just in case
          */
         if (value is ReturnValue) {
@@ -113,11 +112,11 @@ data class ReturnValue(
     }
 
     override fun getProperty(prop: String): RuntimeValue {
-        throw Exception("ReturnValue members should never be accessed")
+        throw Exception("interpreter.ReturnValue members should never be accessed")
     }
 }
 
-data class Array(
+data class Niz(
     override val value: ArrayList<RuntimeValue>,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
 ) : RuntimeValue {
@@ -129,7 +128,7 @@ data class Array(
         return builtIns[prop] ?: throw Exception("$prop does not exist on type Array")
     }
 
-    fun getElement(index: Int): RuntimeValue{
+    fun getElement(index: Int): RuntimeValue {
         return value[index]
     }
 
@@ -138,7 +137,7 @@ data class Array(
     }
 }
 
-data class Object(
+data class Objekat(
     val properties: HashMap<String, RuntimeValue>,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
@@ -147,7 +146,7 @@ data class Object(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Object
+        other as Objekat
 
         if (properties != other.properties) return false
 
@@ -159,10 +158,10 @@ data class Object(
     }
 
     override fun getProperty(prop: String): RuntimeValue {
-        return (builtIns[prop] ?: properties[prop]) ?: throw Exception("Property $prop does not exist on object")
+        return (builtIns[prop] ?: properties[prop]) ?: throw Exception("parser.Property $prop does not exist on object")
     }
 
-    fun setProperty(prop: String, newValue: RuntimeValue): RuntimeValue{
+    fun setProperty(prop: String, newValue: RuntimeValue): RuntimeValue {
         properties[prop] = newValue
         return properties[prop]!!
     }
@@ -172,7 +171,7 @@ data class Object(
     }
 }
 
-data class Function(
+data class Funkcija(
     val name: String,
     val params: ArrayList<FunctionParameter>,
     val returnType: TypeAnnotation?,
@@ -185,7 +184,7 @@ data class Function(
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Function
+        other as Funkcija
 
         if (name != other.name) return false
         if (params != other.params) return false
@@ -219,7 +218,7 @@ data class Function(
     }
 }
 
-abstract class NativeFunction(
+abstract class NativeFunkcija(
     val name: String,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()

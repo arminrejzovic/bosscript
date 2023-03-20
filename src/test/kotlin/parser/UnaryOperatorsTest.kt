@@ -1,13 +1,6 @@
 package parser
 
-import BinaryExpression
-import Identifier
-import NumericLiteral
-import UnaryExpression
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class UnaryOperatorsTest {
 

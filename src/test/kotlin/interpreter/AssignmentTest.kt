@@ -1,17 +1,6 @@
 package interpreter
 
-import AssignmentExpression
-import BinaryExpression
-import Identifier
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.*
-import udemy.Array
-import udemy.Number
-import udemy.Object
-import java.util.StringJoiner
 
 class AssignmentTest {
     @Test
@@ -25,7 +14,7 @@ class AssignmentTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 61.0
         )
 
@@ -72,7 +61,7 @@ class AssignmentTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
 
@@ -99,10 +88,10 @@ class AssignmentTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Object(
+        val expectedResult = Objekat(
             properties = hashMapOf(
-                "x" to Number(value = 12.0),
-                "b" to Number(value = 3.0)
+                "x" to Broj(value = 12.0),
+                "b" to Broj(value = 3.0)
             )
         )
 
@@ -127,10 +116,10 @@ class AssignmentTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Object(
+        val expectedResult = Objekat(
             properties = hashMapOf(
-                "x" to Number(value = 2.0),
-                "b" to Number(value = 2.0)
+                "x" to Broj(value = 2.0),
+                "b" to Broj(value = 2.0)
             )
         )
 
@@ -148,13 +137,13 @@ class AssignmentTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Array(
+        val expectedResult = Niz(
             value = arrayListOf(
-                Number(value = 1.0),
-                Number(value = 99.0),
-                Number(value = 5.0),
-                Number(value = 7.0),
-                Number(value = 9.0),
+                Broj(value = 1.0),
+                Broj(value = 99.0),
+                Broj(value = 5.0),
+                Broj(value = 7.0),
+                Broj(value = 9.0),
             )
         )
 

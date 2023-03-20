@@ -1,7 +1,6 @@
 package interpreter
 
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
 
 class NativeFunctionTest {
     @Test
@@ -83,6 +82,25 @@ class NativeFunctionTest {
     fun testPrintMultiple(){
         val src = """
             ispis("Hello", "World", 1);
+        """.trimIndent()
+
+        val interpreter = Interpreter()
+        interpreter.evaluateProgram(src)
+    }
+
+    @Test
+    fun testExists(){
+        val src = """
+            funkcija test(a){
+                ako(a % 2 == 0){
+                    vrati a;
+                }
+                vrati nedefinisano;
+            }
+            var x = test(3);
+            var y = test(2);
+            
+            ispis([postoji(x),postoji(y)]);
         """.trimIndent()
 
         val interpreter = Interpreter()

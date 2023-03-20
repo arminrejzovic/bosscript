@@ -1,11 +1,6 @@
 package parser
 
-import BinaryExpression
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class VariableDeclarationTest {
     @Test

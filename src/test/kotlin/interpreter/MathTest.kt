@@ -1,12 +1,6 @@
 package interpreter
 
-import BinaryExpression
-import NumericLiteral
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
-import udemy.Text
 
 class MathTest {
     @Test
@@ -19,7 +13,7 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 18.0
             )
         )
@@ -37,7 +31,7 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 2.0
             )
         )
@@ -55,7 +49,7 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 80.0
             )
         )
@@ -73,7 +67,7 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 1.25
             )
         )
@@ -92,10 +86,10 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 58.0
             ),
-            Number(
+            Broj(
                 value = 50.0
             )
         )
@@ -113,7 +107,7 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 781250.0
             )
         )
@@ -131,7 +125,7 @@ class MathTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 1.0
             )
         )

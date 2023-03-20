@@ -1,45 +1,8 @@
-package udemy
+package parser
 
-import ArrayLiteral
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import BooleanLiteral
-import BreakStatement
-import CallExpression
-import DoWhileStatement
-import EmptyStatement
-import Expression
-import ForStatement
-import FunctionDeclaration
-import FunctionExpression
-import FunctionParameter
-import Identifier
-import IfStatement
-import LogicalExpression
-import MemberExpression
-import ModelDefinitionStatement
-import ModelProperty
-import NodeType
-import NullLiteral
-import NumericLiteral
-import ObjectLiteral
-import Program
-import Property
-import ReturnStatement
-import Statement
-import StringLiteral
-import Token
-import TokenType
-import TypeAnnotation
-import UnaryExpression
-import UnlessStatement
-import VariableDeclaration
-import VariableStatement
-import WhileStatement
-import tokenize
-import java.util.StringJoiner
-
+import lexer.Token
+import lexer.TokenType
+import lexer.tokenize
 
 class Parser {
     private var tokens: ArrayList<Token> = arrayListOf()
@@ -52,7 +15,7 @@ class Parser {
         return current().type != TokenType.EOF
     }
 
-    private fun current(): Token{
+    private fun current(): Token {
         return tokens[0]
     }
 
@@ -64,7 +27,7 @@ class Parser {
         return current().getLineCol()
     }
 
-    private fun checkValidAssignmentTarget(node: Expression): Expression{
+    private fun checkValidAssignmentTarget(node: Expression): Expression {
         if (node.kind == NodeType.Identifier || node.kind == NodeType.MemberExpression){
             return node
         }
@@ -74,7 +37,7 @@ class Parser {
     /**
      * Removes the first available token and throws Exception if it doesn't match the expected type.
      */
-    private fun expect(expectedType: TokenType, errorMessage: String): Token{
+    private fun expect(expectedType: TokenType, errorMessage: String): Token {
         val prev = tokens.removeAt(0)
         if(prev.type != expectedType){
             println("Expected ${expectedType.name}, got ${prev.type}")
@@ -109,19 +72,19 @@ class Parser {
     }
 
     /**
-     * Statement
+     * parser.Statement
      *      : ExpressionStatement
-     *      | BlockStatement
-     *      | EmptyStatement
-     *      | VariableStatement
-     *      | IfStatement
-     *      | UnlessStatement
-     *      | FunctionDeclaration
-     *      | ReturnStatement
-     *      | ModelDefinitionStatement
+     *      | parser.BlockStatement
+     *      | parser.EmptyStatement
+     *      | parser.VariableStatement
+     *      | parser.IfStatement
+     *      | parser.UnlessStatement
+     *      | parser.FunctionDeclaration
+     *      | parser.ReturnStatement
+     *      | parser.ModelDefinitionStatement
      *      ;
      */
-    private fun parseStatement(): Statement{
+    private fun parseStatement(): Statement {
         when(current().type){
             TokenType.OpenBrace -> {
                 return parseBlockStatement()
@@ -185,7 +148,7 @@ class Parser {
         )
     }
 
-    private fun parseModelProperty(): ModelProperty{
+    private fun parseModelProperty(): ModelProperty {
         val name = expect(TokenType.Identifier, "Model property name expected, got ${current().type}").value
 
         expect(TokenType.Colon, "Missing :")
@@ -201,13 +164,13 @@ class Parser {
         )
     }
 
-    private fun parseExpressionStatement(): Expression{
+    private fun parseExpressionStatement(): Expression {
         val expression = parseExpression()
         expect(TokenType.Semicolon, "Missing ;")
         return expression
     }
 
-    private fun parseIterationStatement(): Statement{
+    private fun parseIterationStatement(): Statement {
         when(current().type){
             TokenType.Za -> {
                 return parseForStatement()
@@ -225,11 +188,11 @@ class Parser {
     }
 
     /**
-     * WhileStatement
-     *      : "dok" "(" Expression ")" Statement
+     * parser.WhileStatement
+     *      : "dok" "(" parser.Expression ")" parser.Statement
      *      ;
      */
-    private fun parseWhileStatement(): WhileStatement{
+    private fun parseWhileStatement(): WhileStatement {
         expect(TokenType.Dok, "Expected 'dok'")
         expect(TokenType.OpenParen, "Expected '('")
         val condition = parseExpression()
@@ -251,7 +214,7 @@ class Parser {
         )
     }
 
-    private fun parseForStatement(): Statement{
+    private fun parseForStatement(): Statement {
         expect(TokenType.Za, "Expected 'za'")
         expect(TokenType.Svako, "Missing 'svako' following 'za'")
         expect(TokenType.OpenParen, "Expected '('")
@@ -267,9 +230,9 @@ class Parser {
         }
         expect(TokenType.CloseParen, "Expected ')'")
 
-        // For Statement body must be Block Statement
+        // For parser.Statement body must be Block parser.Statement
         // But shorthand syntax for single-line for loops is allowed: za svako(...) => ispis();
-        // Shorthand syntax is parsed as BlockStatement(body=<the single expression>)
+        // Shorthand syntax is parsed as parser.BlockStatement(body=<the single expression>)
         var body = BlockStatement(body = arrayListOf())
 
         if(current().type == TokenType.Arrow){
@@ -291,7 +254,7 @@ class Parser {
         )
     }
 
-    private fun parseDoWhileStatement(): DoWhileStatement{
+    private fun parseDoWhileStatement(): DoWhileStatement {
         expect(TokenType.Radi, "Expected 'radi'")
         val body = parseBlockStatement()
         expect(TokenType.Dok, "Expected 'dok' after 'radi'")
@@ -306,17 +269,17 @@ class Parser {
         )
     }
 
-    private fun parseBreakStatement(): BreakStatement{
+    private fun parseBreakStatement(): BreakStatement {
         expect(TokenType.Break, "Expected 'prekid'")
         return BreakStatement()
     }
 
     /**
-     * IfStatement
-     *      : "ako" "(" Expression ")" Statement
-     *      | "ako" "(" Expression ")" Statement "else" Statement
+     * parser.IfStatement
+     *      : "ako" "(" parser.Expression ")" parser.Statement
+     *      | "ako" "(" parser.Expression ")" parser.Statement "else" parser.Statement
      */
-    private fun parseIfStatement(): IfStatement{
+    private fun parseIfStatement(): IfStatement {
         expect(TokenType.Ako, "Expected 'ako'")
         expect(TokenType.OpenParen, "Expected '('")
         val condition = parseExpression()
@@ -341,12 +304,12 @@ class Parser {
     }
 
     /**
-     * UnlessStatement
-     *      : "osim" "ako" "(" Expression ")" Statement
-     *      | "osim" "ako" "(" Expression ")" Statement "else" Statement
+     * parser.UnlessStatement
+     *      : "osim" "ako" "(" parser.Expression ")" parser.Statement
+     *      | "osim" "ako" "(" parser.Expression ")" parser.Statement "else" parser.Statement
      *      ;
      */
-    private fun parseUnlessStatement(): UnlessStatement{
+    private fun parseUnlessStatement(): UnlessStatement {
         expect(TokenType.Osim, "Expected 'osim'")
         expect(TokenType.Ako, "Expected 'ako'")
         expect(TokenType.OpenParen, "Expected '('")
@@ -369,8 +332,8 @@ class Parser {
 
 
     /**
-     * FunctionDeclaration
-     *      : "funkcija" Identifier "(" [FormalParameterList] ")" BlockStatement
+     * parser.FunctionDeclaration
+     *      : "funkcija" parser.Identifier "(" [FormalParameterList] ")" parser.BlockStatement
      *      ;
      */
     private fun parseFunctionDeclaration(): FunctionDeclaration {
@@ -411,8 +374,8 @@ class Parser {
     }
 
     /**
-     * ReturnStatement
-     *      : "vrati" ("se" | [Expression]) ";"
+     * parser.ReturnStatement
+     *      : "vrati" ("se" | [parser.Expression]) ";"
      *      ;
      */
     private fun parseReturnStatement(): ReturnStatement {
@@ -434,8 +397,8 @@ class Parser {
 
     /**
      * FormalParameterList
-     *      : Identifier
-     *      | FormalParameterList "," Identifier
+     *      : parser.Identifier
+     *      | FormalParameterList "," parser.Identifier
      */
     private fun parseFormalParameterList(): ArrayList<FunctionParameter>{
         val params = arrayListOf<FunctionParameter>()
@@ -454,11 +417,11 @@ class Parser {
     }
 
     /**
-     * BlockStatement
+     * parser.BlockStatement
      *      : "{" [StatementList] "}"
      *      ;
      */
-    private fun parseBlockStatement(): BlockStatement{
+    private fun parseBlockStatement(): BlockStatement {
         expect(TokenType.OpenBrace, "Expected '{'")
         val body = arrayListOf<Statement>()
         while (current().type !== TokenType.CloseBrace){
@@ -469,22 +432,22 @@ class Parser {
     }
 
     /**
-     * EmptyStatement
+     * parser.EmptyStatement
      *      : ";"
      *      ;
      */
-    private fun parseEmptyStatement(): EmptyStatement{
+    private fun parseEmptyStatement(): EmptyStatement {
         expect(TokenType.Semicolon, "")
         return EmptyStatement()
     }
 
 
     /**
-     * VariableStatement
+     * parser.VariableStatement
      *      : "var" | "konst" VariableDeclarationList
      *      ;
      */
-    private fun parseVariableStatement(): VariableStatement{
+    private fun parseVariableStatement(): VariableStatement {
         val modifier = consume()
         if(modifier.value != "var" && modifier.value != "konst"){
             throw Exception("Unexpected token at [${getLineCol()}]")
@@ -497,8 +460,8 @@ class Parser {
 
     /**
      * VariableDeclarationList
-     *      : VariableDeclaration
-     *      | VariableDeclarationList "," VariableDeclaration
+     *      : parser.VariableDeclaration
+     *      | VariableDeclarationList "," parser.VariableDeclaration
      *      ;
      */
     private fun parseVariableDeclarationList(): ArrayList<VariableDeclaration>{
@@ -512,8 +475,8 @@ class Parser {
     }
 
     /**
-     * VariableDeclaration
-     *      : Identifier [VariableInitializer]
+     * parser.VariableDeclaration
+     *      : parser.Identifier [VariableInitializer]
      *      ;
      */
     private fun parseVariableDeclaration(): VariableDeclaration {
@@ -530,28 +493,28 @@ class Parser {
 
     /**
      * VariableInitializer:
-     *      : SimpleAssign AssignmentExpression
+     *      : SimpleAssign parser.AssignmentExpression
      *      ;
      */
-    private fun parseVariableInitializer(): Expression{
+    private fun parseVariableInitializer(): Expression {
         expect(TokenType.SimpleAssign, "Expected assignment operator")
         return parseExpression()
     }
 
     /**
-     * Expression:
-     *      : FunctionExpression
+     * parser.Expression:
+     *      : parser.FunctionExpression
      *      | AdditiveExpression
      *      ;
      */
-    private fun parseExpression(): Expression{
+    private fun parseExpression(): Expression {
         if(current().type == TokenType.Funkcija){
             return parseFunctionExpression()
         }
         return parseAssignmentExpression()
     }
 
-    private fun parseFunctionExpression(): FunctionExpression{
+    private fun parseFunctionExpression(): FunctionExpression {
         expect(TokenType.Funkcija, "Functions are declared using the funkcija keyword")
         expect(TokenType.OpenParen, "Expected (")
         var params: ArrayList<FunctionParameter> = arrayListOf()
@@ -586,12 +549,12 @@ class Parser {
     }
 
     /**
-     * AssignmentExpression:
+     * parser.AssignmentExpression:
      *      : LogicalOrExpression
      *      | LeftHandSideExpression AssignmentOperator LogicalOr
      *      ;
      */
-    private fun parseAssignmentExpression(): Expression{
+    private fun parseAssignmentExpression(): Expression {
         val left = parseLogicalOrExpression()
 
 
@@ -612,7 +575,7 @@ class Parser {
      *      | LogicalAndExpression "||" LogicalOrExpression
      *      ;
      */
-    private fun parseLogicalOrExpression(): Expression{
+    private fun parseLogicalOrExpression(): Expression {
         var left = parseLogicalAndExpression()
 
         while (current().type == TokenType.LogicalOr){
@@ -631,7 +594,7 @@ class Parser {
      *      | EqualityExpression "&&" LogicalAndExpression
      *      ;
      */
-    private fun parseLogicalAndExpression(): Expression{
+    private fun parseLogicalAndExpression(): Expression {
         var left = parseEqualityExpression()
 
         while (current().type == TokenType.LogicalAnd){
@@ -650,7 +613,7 @@ class Parser {
      *      | RelationalExpression EQUALITY_OPERATOR EqualityExpression
      *      ;
      */
-    private fun parseEqualityExpression(): Expression{
+    private fun parseEqualityExpression(): Expression {
         var left = parseRelationalExpression()
 
         while (current().type == TokenType.EqualityOperator){
@@ -669,7 +632,7 @@ class Parser {
      *      | AdditiveExpression RELATIONAL_OPERATOR RelationalExpression
      *      ;
      */
-    private fun parseRelationalExpression(): Expression{
+    private fun parseRelationalExpression(): Expression {
         var left = parseAdditiveExpression()
 
         while (current().type == TokenType.RelationalOperator){
@@ -693,8 +656,8 @@ class Parser {
 
     /**
      * CallMemberExpression
-     *      : MemberExpression
-     *      | CallExpression
+     *      : parser.MemberExpression
+     *      | parser.CallExpression
      *      ;
      */
     private fun parseCallMemberExpression(): Expression {
@@ -708,13 +671,13 @@ class Parser {
     }
 
     /**
-     * CallExpression
+     * parser.CallExpression
      *      : Callee Arguments
      *      ;
      *
      * Callee
-     *      : MemberExpression
-     *      | CallExpression
+     *      : parser.MemberExpression
+     *      | parser.CallExpression
      *      ;
      */
     private fun parseCallExpression(callee: Expression): CallExpression {
@@ -756,13 +719,13 @@ class Parser {
     }
 
     /**
-     * MemberExpression
+     * parser.MemberExpression
      *      : PrimaryExpression
-     *      | MemberExpression "." Identifier
-     *      | MemberExpression "[" Expression "]"
+     *      | parser.MemberExpression "." parser.Identifier
+     *      | parser.MemberExpression "[" parser.Expression "]"
      *      ;
      */
-    private fun parseMemberExpression(): Expression{
+    private fun parseMemberExpression(): Expression {
         var targetObject = parsePrimaryExpression()
 
         while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket){
@@ -792,23 +755,23 @@ class Parser {
     }
 
     /**
-     * Identifier
+     * parser.Identifier
      *      : IDENTIFIER
      *      ;
      */
 
-    private fun parseIdentifier(): Identifier{
-        val identifier = expect(TokenType.Identifier, "Identifier expected").value
+    private fun parseIdentifier(): Identifier {
+        val identifier = expect(TokenType.Identifier, "parser.Identifier expected").value
         return Identifier(symbol = identifier)
     }
 
     /**
-     * TypeAnnotation
-     *      : Identifier
-     *      | Identifier[]
+     * parser.TypeAnnotation
+     *      : parser.Identifier
+     *      | parser.Identifier[]
      *      ;
      */
-    private fun parseTypeAnnotation(): TypeAnnotation{
+    private fun parseTypeAnnotation(): TypeAnnotation {
         val typename = parseIdentifier()
         var isArray = false
         if(current().type == TokenType.OpenBracket){
@@ -826,7 +789,7 @@ class Parser {
         if(current().type == TokenType.SimpleAssign || current().type == TokenType.ComplexAssign){
             return consume().value
         }
-        throw Exception("Unexpected Token")
+        throw Exception("Unexpected lexer.Token")
     }
 
     /**
@@ -834,7 +797,7 @@ class Parser {
      *      : MultiplicativeExpression
      *      | AdditiveExpression ("*" | "/" | "%") MultiplicativeExpression
      */
-    private fun parseAdditiveExpression(): Expression{
+    private fun parseAdditiveExpression(): Expression {
         var left = parseMultiplicativeExpression()
 
         while (current().value == "+" || current().value == "-"){
@@ -852,7 +815,7 @@ class Parser {
      *      : ExponentiationExpression
      *      | MultiplicativeExpression ("*" | "/" | "%") ExponentiationExpression
      */
-    private fun parseMultiplicativeExpression(): Expression{
+    private fun parseMultiplicativeExpression(): Expression {
         var left = parseExponentiationExpression()
 
         while (current().value == "*" || current().value == "/" || current().value == "%"){
@@ -867,10 +830,10 @@ class Parser {
 
     /**
      * ExponentiationExpression
-     *      : UnaryExpression
-     *      | UnaryExpression "^" UnaryExpression
+     *      : parser.UnaryExpression
+     *      | parser.UnaryExpression "^" parser.UnaryExpression
      */
-    private fun parseExponentiationExpression(): Expression{
+    private fun parseExponentiationExpression(): Expression {
         var left = parseUnaryExpression()
 
         while (current().type == TokenType.Exponent){
@@ -884,13 +847,13 @@ class Parser {
     }
 
     /**
-     * UnaryExpression
+     * parser.UnaryExpression
      *      : LeftHandSideExpression
-     *      | "+"/"-" UnaryExpression
-     *      | "!" UnaryExpression
+     *      | "+"/"-" parser.UnaryExpression
+     *      | "!" parser.UnaryExpression
      *      ;
      */
-    private fun parseUnaryExpression(): Expression{
+    private fun parseUnaryExpression(): Expression {
         var operator: String? = null
         val validOperators = listOf("+", "-", "++", "--", "!")
 
@@ -912,12 +875,12 @@ class Parser {
      * PrimaryExpression
      *      : Literal
      *      | ParenthesizedExpression
-     *      | Identifier
+     *      | parser.Identifier
      *      | ThisExpression
      *      | NewExpression
      *      ;
      */
-    private fun parsePrimaryExpression(): Expression{
+    private fun parsePrimaryExpression(): Expression {
         when(current().type){
             TokenType.Number -> {
                 return parseNumericLiteral()
@@ -947,18 +910,18 @@ class Parser {
     }
 
     /**
-     * NumericLiteral
+     * parser.NumericLiteral
      *      : "+/-" 1*(1-9[_])[.1*(1-9[_])]
      */
-    private fun parseNumericLiteral(): NumericLiteral{
+    private fun parseNumericLiteral(): NumericLiteral {
         return NumericLiteral(value = consume().value.toDouble())
     }
 
     /**
-     * StringLiteral
+     * parser.StringLiteral
      *      : " [s+] "
      */
-    private fun parseStringLiteral(): StringLiteral{
+    private fun parseStringLiteral(): StringLiteral {
         consume() //opening double quote
         val str = expect(TokenType.String, "Unexpected token at [${getLineCol()}}]: String literal expected")
         expect(TokenType.DoubleQuote, "Expected closing double quote (\")")
@@ -966,7 +929,7 @@ class Parser {
     }
 
     /**
-     * BooleanLiteral
+     * parser.BooleanLiteral
      *      : "tacno"
      *      | "netacno"
      *      ;
@@ -984,7 +947,7 @@ class Parser {
 
     /**
      * ParenthesizedExpression
-     *      : "(" Expression ")"
+     *      : "(" parser.Expression ")"
      *      ;
      */
     private fun parseParenthesizedExpression(): Expression {
@@ -994,7 +957,7 @@ class Parser {
         return expression
     }
 
-    private fun parseArrayLiteral(): ArrayLiteral{
+    private fun parseArrayLiteral(): ArrayLiteral {
         val array = arrayListOf<Expression>()
         expect(TokenType.OpenBracket, "Missing [")
 
@@ -1016,7 +979,7 @@ class Parser {
         )
     }
 
-    private fun parseObjectLiteral(): ObjectLiteral{
+    private fun parseObjectLiteral(): ObjectLiteral {
         expect(TokenType.OpenBrace, "Missing {")
         val properties = arrayListOf<Property>()
 

@@ -1,12 +1,6 @@
 package interpreter
 
-import BinaryExpression
-import BlockStatement
-import NumericLiteral
-import StringLiteral
 import org.junit.jupiter.api.Test
-import udemy.*
-import udemy.Number
 
 class BlockTest {
     @Test
@@ -83,7 +77,7 @@ class BlockTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
 

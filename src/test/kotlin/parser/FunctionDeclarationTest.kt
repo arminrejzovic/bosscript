@@ -1,14 +1,6 @@
 package parser
 
-import BinaryExpression
-import BlockStatement
-import FunctionDeclaration
-import FunctionParameter
-import Identifier
-import ReturnStatement
-import TypeAnnotation
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class FunctionDeclarationTest {
     @Test

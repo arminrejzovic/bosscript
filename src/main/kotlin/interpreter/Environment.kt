@@ -1,3 +1,5 @@
+package interpreter
+
 import java.util.Scanner
 
 class Environment(
@@ -33,7 +35,7 @@ class Environment(
         return value
     }
 
-    private fun resolve(name: String): Environment{
+    private fun resolve(name: String): Environment {
         if(variables.containsKey(name)) {
             return this
         }
@@ -51,11 +53,11 @@ class Environment(
     }
 
     private fun createGlobalEnvironment(env: Environment){
-        env.declareVariable("pi", Number(3.14159), isConstant = true)
+        env.declareVariable("pi", Broj(3.14159), isConstant = true)
 
         env.declareVariable(
             "ispis",
-            object : NativeFunction(name = "ispis"){
+            object : NativeFunkcija(name = "ispis"){
                 override fun call(vararg args: RuntimeValue): Null {
                     args.forEach {
                         println(it)
@@ -68,7 +70,7 @@ class Environment(
 
         env.declareVariable(
             "upozorenje",
-            object : NativeFunction(name = "upozorenje"){
+            object : NativeFunkcija(name = "upozorenje"){
                 override fun call(vararg args: RuntimeValue): Null {
                     val reset = "\u001b[0m"
                     val yellow = "\u001b[33m"
@@ -83,7 +85,7 @@ class Environment(
 
         env.declareVariable(
             "greska",
-            object : NativeFunction(name = "greska"){
+            object : NativeFunkcija(name = "greska"){
                 override fun call(vararg args: RuntimeValue): Null {
                     val reset = "\u001b[0m"
                     val red = "\u001b[31m"
@@ -99,11 +101,11 @@ class Environment(
 
         env.declareVariable(
             "unos",
-            object : NativeFunction(name = "unos"){
-                override fun call(vararg args: RuntimeValue): Text {
+            object : NativeFunkcija(name = "unos"){
+                override fun call(vararg args: RuntimeValue): Tekst {
                     val scanner = Scanner(System.`in`)
                     val str = scanner.nextLine()
-                    return Text(value = str)
+                    return Tekst(value = str)
                 }
             },
             isConstant = true
@@ -111,10 +113,10 @@ class Environment(
 
         env.declareVariable(
             "postoji",
-            object : NativeFunction(name = "postoji"){
-                override fun call(vararg args: RuntimeValue): Bool {
+            object : NativeFunkcija(name = "postoji"){
+                override fun call(vararg args: RuntimeValue): Logicki {
                     val valueInQuestion = args[0]
-                    return Bool(value = valueInQuestion !is Null)
+                    return Logicki(value = valueInQuestion !is Null)
                 }
             },
             isConstant = true

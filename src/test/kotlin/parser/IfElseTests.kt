@@ -1,14 +1,6 @@
 package parser
 
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import Identifier
-import IfStatement
-import NumericLiteral
-import UnlessStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class IfElseTests {
     @Test
@@ -431,7 +423,7 @@ class IfElseTests {
         """.trimIndent()
 
         val parser = Parser()
-        val expectedException = "Identifier expected"
+        val expectedException = "parser.Identifier expected"
         var exception = ""
         try {
             val program = parser.parseProgram(src)

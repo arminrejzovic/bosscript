@@ -1,13 +1,6 @@
 package parser
 
-import AssignmentExpression
-import BinaryExpression
-import Identifier
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class AssignmentTest {
     @Test
@@ -25,11 +18,11 @@ class AssignmentTest {
                 declarations= arrayListOf(
                     VariableDeclaration(
                         identifier="x",
-                        value=BinaryExpression(
-                            left=NumericLiteral(value=10.0),
-                            right=BinaryExpression(
-                                left=NumericLiteral(value=5.0),
-                                right=NumericLiteral(value=8.0),
+                        value= BinaryExpression(
+                            left= NumericLiteral(value=10.0),
+                            right= BinaryExpression(
+                                left= NumericLiteral(value=5.0),
+                                right= NumericLiteral(value=8.0),
                                 operator="*"
                             ),
                             operator="+"

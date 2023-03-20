@@ -1,94 +1,10 @@
+package lexer
+
+import isAlpha
+import isIgnoredWhitespace
+import isNumeric
+import isValidVariableChar
 import kotlin.Exception
-
-enum class TokenType{
-    // Literals ---------------------------------
-    Number,
-    String,
-    Identifier,
-    // Symbols ----------------------------------
-    OpenParen,      // (
-    CloseParen,     // )
-    OpenBracket,    // [
-    CloseBracket,   // ]
-    OpenBrace,      // {
-    CloseBrace,     // }
-    Comma,          // ,
-    Dot,            // .
-    Colon,          // :
-    Semicolon,      // ;
-    SimpleAssign,   // =
-    DoubleQuote,    // "
-    Hashtag,        // #
-    Exponent,       // ^
-    LogicalAnd,     // &&
-    LogicalOr,      // ||
-    LogicalNot,     // !
-    // KEYWORDS ---------------------------------
-    //    Variables
-    Var,
-    Konst,
-    //    Models
-    Model,
-    //    Loops
-    Za,
-    Svako,
-    Od,
-    Do,
-    Korak,
-    Dok,
-    Radi,
-    //    Functions
-    Funkcija,
-    Arrow,  // =>
-    Vrati,
-    Se,
-    //    Package imports
-    Paket,
-    //    If-else
-    Ako,
-    Ili,
-    Inace,
-    Osim,
-    //    Special
-    Nedefinisano,
-    Tacno,
-    Netacno,
-    // OPERATORS --------------------------------
-    BinaryOperator,
-    RelationalOperator,
-    EqualityOperator,
-    // SPECIAL TOKENS ---------------------------
-    EOF,
-    ComplexAssign,
-    Break,
-    UnaryIncrement,
-    UnaryDecrement
-}
-
-data class Token(
-    val value: String,
-    val type: TokenType,
-    val line: Int,
-    val col: Int
-){
-    fun getLineCol() = "$line:$col"
-}
-
-fun String.isAlpha(): Boolean{
-    return (this.lowercase() != this.uppercase()) || this == "$" || this == "_"
-}
-
-fun String.isValidVariableChar(): Boolean{
-    return this.isAlpha() || this.isNumeric() || this == "$" || this == "_"
-}
-
-fun String.isNumeric(): Boolean{
-    return this.toDoubleOrNull() != null
-}
-
-fun String.isIgnoredWhitespace(): Boolean{
-    return this == " " || this == "\r" || this == "\t"
-}
 
 val keywords = mapOf(
     "var" to TokenType.Var,
@@ -277,7 +193,7 @@ fun tokenize(src: String): ArrayList<Token>{
                 while (sourceCode.isNotEmpty() && sourceCode[0].isValidVariableChar()){
                     identifier += sourceCode.removeAt(0)
                 }
-                // Check for reserved keywords
+                // Check for reserved lexer.getKeywords
                 val reserved = keywords[identifier]
                 if (reserved != null){
                     tokens.add(Token(identifier, reserved, line, col))

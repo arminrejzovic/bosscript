@@ -1,14 +1,6 @@
 package parser
 
-import BinaryExpression
-import BlockStatement
-import BreakStatement
-import ForStatement
-import Identifier
-import IfStatement
-import NumericLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class BreakTest {
     @Test

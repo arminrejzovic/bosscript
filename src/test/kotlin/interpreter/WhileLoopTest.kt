@@ -1,21 +1,6 @@
 package interpreter
 
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import DoWhileStatement
-import Identifier
-import LogicalExpression
-import NullLiteral
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
-import WhileStatement
 import org.junit.jupiter.api.Test
-import udemy.Array
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
 
 class WhileLoopTest {
     @Test
@@ -32,7 +17,7 @@ class WhileLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
         assert(result.last() == expectedResult)
@@ -53,7 +38,7 @@ class WhileLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
         assert(result.last() == expectedResult)
@@ -73,7 +58,7 @@ class WhileLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
         assert(result.last() == expectedResult)
@@ -91,7 +76,7 @@ class WhileLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
         assert(result.last() == expectedResult)
@@ -109,7 +94,7 @@ class WhileLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
         assert(result.last() == expectedResult)

@@ -1,11 +1,6 @@
 package interpreter
 
-import BooleanLiteral
-import NumericLiteral
-import StringLiteral
 import org.junit.jupiter.api.Test
-import udemy.*
-import udemy.Number
 
 class LiteralsTest {
     @Test
@@ -18,7 +13,7 @@ class LiteralsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Text(
+            Tekst(
                 value = "Test"
             )
         )
@@ -36,7 +31,7 @@ class LiteralsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 6969.0
             )
         )
@@ -54,7 +49,7 @@ class LiteralsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = true
             )
         )

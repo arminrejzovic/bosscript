@@ -1,22 +1,6 @@
 package interpreter
 
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import BooleanLiteral
-import Identifier
-import IfStatement
-import LogicalExpression
-import NullLiteral
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Array
-import udemy.Bool
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
 
 class LogicalOperatorsTest {
     @Test
@@ -29,7 +13,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = true
             )
         )
@@ -46,7 +30,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = false
             )
         )
@@ -63,7 +47,7 @@ class LogicalOperatorsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Bool(
+        val expectedResult = Logicki(
             value = false
         )
 
@@ -80,7 +64,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = false
             )
         )
@@ -97,7 +81,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = false
             )
         )
@@ -114,7 +98,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = true
             )
         )
@@ -131,7 +115,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = true
             )
         )
@@ -148,7 +132,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = false
             )
         )
@@ -165,7 +149,7 @@ class LogicalOperatorsTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Bool(
+            Logicki(
                 value = true
             )
         )
@@ -184,7 +168,7 @@ class LogicalOperatorsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Bool(
+        val expectedResult = Logicki(
             value = true
         )
 
@@ -215,10 +199,10 @@ class LogicalOperatorsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Array(
+        val expectedResult = Niz(
             value = arrayListOf(
-                Bool(false),
-                Bool(true)
+                Logicki(false),
+                Logicki(true)
             )
         )
 

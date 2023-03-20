@@ -1,24 +1,20 @@
 package interpreter
 
-import ArrayLiteral
-import AssignmentExpression
-import BooleanLiteral
-import Identifier
-import NumericLiteral
-import StringLiteral
-import VariableDeclaration
-import VariableStatement
+import parser.ArrayLiteral
+import parser.AssignmentExpression
+import parser.BooleanLiteral
+import parser.Identifier
+import parser.NumericLiteral
+import parser.StringLiteral
+import parser.VariableDeclaration
+import parser.VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Array
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
-import udemy.Text
+import parser.Parser
 
 class ArrayTest {
 
     @Test
-    fun testEmptyArray(){
+    fun testEmptyArray() {
         val src = """
             [];
         """.trimIndent()
@@ -27,7 +23,7 @@ class ArrayTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Array(
+            Niz(
                 value = arrayListOf()
             )
         )
@@ -36,7 +32,7 @@ class ArrayTest {
     }
 
     @Test
-    fun testSimpleArray(){
+    fun testSimpleArray() {
         val src = """
             [1,2,3];
         """.trimIndent()
@@ -45,15 +41,15 @@ class ArrayTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Array(
+            Niz(
                 value = arrayListOf(
-                    Number(
+                    Broj(
                         value = 1.0
                     ),
-                    Number(
+                    Broj(
                         value = 2.0
                     ),
-                    Number(
+                    Broj(
                         value = 3.0
                     ),
                 )
@@ -64,7 +60,7 @@ class ArrayTest {
     }
 
     @Test
-    fun testMixedTypeArray(){
+    fun testMixedTypeArray() {
         val src = """
             [1,2,"3"];
         """.trimIndent()
@@ -85,7 +81,7 @@ class ArrayTest {
     }
 
     @Test
-    fun testArrayAssignedToVar(){
+    fun testArrayAssignedToVar() {
         val src = """
             var x = [1,2,"3"];
         """.trimIndent()
@@ -114,7 +110,7 @@ class ArrayTest {
     }
 
     @Test
-    fun testArrayReassignedToVar(){
+    fun testArrayReassignedToVar() {
         val src = """
             x = [1,netacno,3];
         """.trimIndent()

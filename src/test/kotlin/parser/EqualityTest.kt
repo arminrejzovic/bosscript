@@ -1,15 +1,6 @@
 package parser
 
-import BinaryExpression
-import BooleanLiteral
-import Identifier
-import NullLiteral
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import tokenize
-import udemy.Parser
 
 class EqualityTest {
     @Test

@@ -32,7 +32,7 @@
 Comments start with <code>//</code> and are single-line only. Examples:
 
 <pre>
-<span class="comment">// Funkcija koja pretvara slike u base64 format</span>
+<span class="comment">// interpreter.Funkcija koja pretvara slike u base64 format</span>
 <span class="keyword">funkcija</span> base64(slika: tekst): tekst{
     ...
 }
@@ -71,7 +71,7 @@ Bosscript also has arrays, which are typed as follows: `type[]`.
 
 ### Variables
 
-Variables in Bosscript can be declared with two keywords, namely `var` and `konst`. Variables declared with `var` are mutable,
+Variables in Bosscript can be declared with two lexer.getKeywords, namely `var` and `konst`. Variables declared with `var` are mutable,
 while variables declared with `konst` are constant.
 
 <pre>
@@ -179,12 +179,12 @@ Returns are specified with the `vrati` keyword. A function can have any number o
     }
 }
     
-<span class="comment">// Funkcija bez povratnog tipa</span>
+<span class="comment">// interpreter.Funkcija bez povratnog tipa</span>
 <span class="keyword">funkcija</span> ispisiPozdrav(ime: tekst){
     <span class="builtin">ispis</span>(<span class="string">"Zdravo "</span> + ime)
 }
 
-<span class="comment">// Funkcija bez povratnog tipa sa parametrom bez tipa</span>
+<span class="comment">// interpreter.Funkcija bez povratnog tipa sa parametrom bez tipa</span>
 <span class="keyword">funkcija</span> uradiNesto(varijabla){
     ...
 }
@@ -231,8 +231,8 @@ za svako(var x od 0 do 10){
     ispis(x)
 }
 ```
-The example above shows how you would print 10 numbers in Bosscript. The for loop starts with the keywords `za svako`, followed by parentheses.
-The loop variable is declared with `var`. The bounds of the loop are defined using the keywords `od` - which represents
+The example above shows how you would print 10 numbers in Bosscript. The for loop starts with the lexer.getKeywords `za svako`, followed by parentheses.
+The loop variable is declared with `var`. The bounds of the loop are defined using the lexer.getKeywords `od` - which represents
 the starting point of the loop, and `do` - which represents the ending point of the loop. 
 
 Bosscript can infer the step based on the provided start and end points:

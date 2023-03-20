@@ -1,9 +1,6 @@
 package interpreter
 
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
-import udemy.Number
-import udemy.Text
 
 class MemberExpressionsTest {
     @Test
@@ -16,7 +13,7 @@ class MemberExpressionsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 3.0
         )
 
@@ -35,7 +32,7 @@ class MemberExpressionsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 3.0
         )
 
@@ -55,7 +52,7 @@ class MemberExpressionsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Text(
+        val expectedResult = Tekst(
             value = "str"
         )
 
@@ -110,7 +107,7 @@ class MemberExpressionsTest {
 
         val interpreter = Interpreter()
         var error = ""
-        val expectedError = "Null has no properties"
+        val expectedError = "interpreter.Null has no properties"
 
         try {
             interpreter.evaluateProgram(src)
@@ -166,7 +163,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
 
@@ -187,7 +184,7 @@ class MemberExpressionsTest {
 
         val interpreter = Interpreter()
         var error = ""
-        val expectedError = "Property c does not exist on object"
+        val expectedError = "parser.Property c does not exist on object"
         try {
             interpreter.evaluateProgram(src)
         } catch (e: Exception){
@@ -209,7 +206,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 99.0
         )
 
@@ -230,7 +227,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 99.0
         )
 
@@ -247,7 +244,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 3.0
         )
 
@@ -266,7 +263,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 99.0
         )
 
@@ -288,7 +285,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Text(
+        val expectedResult = Tekst(
             value = "D"
         )
 
@@ -308,7 +305,7 @@ class MemberExpressionsTest {
         """.trimIndent()
 
         val interpreter = Interpreter()
-        val expectedResult = Text(
+        val expectedResult = Tekst(
             value = "A"
         )
 

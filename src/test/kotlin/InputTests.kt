@@ -1,6 +1,7 @@
-import udemy.Interpreter
-import udemy.Object
-import udemy.Text
+import interpreter.Environment
+import interpreter.Interpreter
+import interpreter.Objekat
+import interpreter.Tekst
 
 fun main() {
     val src = """
@@ -19,11 +20,11 @@ fun main() {
     interpreter.evaluateProgram(src)
 
     val envTest = Environment(variables = hashMapOf(
-        "x" to Object(
+        "x" to Objekat(
             properties = hashMapOf(
-                "y" to Object(
+                "y" to Objekat(
                     properties = hashMapOf(
-                        "z" to Text(
+                        "z" to Tekst(
                             value = "Hello world"
                         )
                     )
@@ -33,10 +34,10 @@ fun main() {
     ))
 
     val obj = envTest.getVariable("x")
-    obj as Object
+    obj as Objekat
     val objY = obj.properties["y"]
-    objY as Object
-    objY.properties["z"] = Text("Привет мир!")
+    objY as Objekat
+    objY.properties["z"] = Tekst("Привет мир!")
 
     println(envTest.getVariable("x"))
 }

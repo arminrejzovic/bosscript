@@ -1,37 +1,4 @@
-enum class NodeType {
-    Program,
-    Block,
-    VariableDeclaration,
-    Identifier,
-    BinaryExpression,
-    AssignmentExpression,
-    MemberExpression,
-    CallExpression,
-    NumericLiteral,
-    StringLiteral,
-    Object,
-    Property,
-    EmptyStatement,
-    VariableStatement,
-    IfStatement,
-    UnlessStatement,
-    BooleanLiteral,
-    NullLiteral,
-    LogicalExpression,
-    UnaryExpression,
-    WhileStatement,
-    DoWhileStatement,
-    ForStatement,
-    FunctionDeclaration,
-    ReturnStatement,
-    ModelDefinition,
-    ModelPropertyDefinition,
-    TypeAnnotation,
-    FunctionParameter,
-    ArrayLiteral,
-    FunctionExpression,
-    BreakStatement,
-}
+package parser
 
 interface Statement {
     val kind: NodeType
@@ -76,7 +43,7 @@ data class FunctionParameter(
     val identifier: Identifier,
     val type: TypeAnnotation?,
     override val kind: NodeType = NodeType.FunctionParameter
-):Statement
+): Statement
 
 data class ReturnStatement(
     val argument: Expression?,
@@ -148,7 +115,7 @@ data class LogicalExpression(
 data class VariableDeclaration(
     val identifier: String,
     val value: Expression?
-): Statement{
+): Statement {
     override val kind: NodeType
         get() = NodeType.VariableDeclaration
 }

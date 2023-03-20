@@ -1,9 +1,6 @@
 package parser
 
-import BinaryExpression
-import NumericLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class MathTest {
     @Test
@@ -16,7 +13,7 @@ class MathTest {
         val program = parser.parseProgram(src)
 
         val expectedResult = arrayListOf(
-            BinaryExpression(left=NumericLiteral(value=10.0), right=NumericLiteral(value=8.0), operator="+")
+            BinaryExpression(left= NumericLiteral(value=10.0), right= NumericLiteral(value=8.0), operator="+")
         )
         assert(program.body == expectedResult)
     }
@@ -31,7 +28,7 @@ class MathTest {
         val program = parser.parseProgram(src)
 
         val expectedResult = arrayListOf(
-            BinaryExpression(left=NumericLiteral(value=10.0), right=NumericLiteral(value=8.0), operator="-")
+            BinaryExpression(left= NumericLiteral(value=10.0), right= NumericLiteral(value=8.0), operator="-")
         )
         assert(program.body == expectedResult)
     }
@@ -46,7 +43,7 @@ class MathTest {
         val program = parser.parseProgram(src)
 
         val expectedResult = arrayListOf(
-            BinaryExpression(left=NumericLiteral(value=10.0), right=NumericLiteral(value=8.0), operator="*")
+            BinaryExpression(left= NumericLiteral(value=10.0), right= NumericLiteral(value=8.0), operator="*")
         )
         assert(program.body == expectedResult)
     }
@@ -61,7 +58,7 @@ class MathTest {
         val program = parser.parseProgram(src)
 
         val expectedResult = arrayListOf(
-            BinaryExpression(left=NumericLiteral(value=10.0), right=NumericLiteral(value=8.0), operator="/")
+            BinaryExpression(left= NumericLiteral(value=10.0), right= NumericLiteral(value=8.0), operator="/")
         )
         assert(program.body == expectedResult)
     }
@@ -78,19 +75,19 @@ class MathTest {
 
         val expectedResult = arrayListOf(
             BinaryExpression(
-                left=BinaryExpression(
-                    left=NumericLiteral(value=10.0),
-                    right=NumericLiteral(value=5.0),
+                left= BinaryExpression(
+                    left= NumericLiteral(value=10.0),
+                    right= NumericLiteral(value=5.0),
                     operator="*"
                 ),
-                right=NumericLiteral(value=8.0),
+                right= NumericLiteral(value=8.0),
                 operator="+"
             ),
             BinaryExpression(
-                left=NumericLiteral(value=10.0),
-                right=BinaryExpression(
-                    left=NumericLiteral(value=5.0),
-                    right=NumericLiteral(value=8.0),
+                left= NumericLiteral(value=10.0),
+                right= BinaryExpression(
+                    left= NumericLiteral(value=5.0),
+                    right= NumericLiteral(value=8.0),
                     operator="*"
                 ),
                 operator="+"
@@ -112,10 +109,10 @@ class MathTest {
 
         val expectedResult = arrayListOf(
             BinaryExpression(
-                left=NumericLiteral(value=10.0),
-                right=BinaryExpression(
-                    left=NumericLiteral(value=5.0),
-                    right=BinaryExpression(
+                left= NumericLiteral(value=10.0),
+                right= BinaryExpression(
+                    left= NumericLiteral(value=5.0),
+                    right= BinaryExpression(
                         left = NumericLiteral(
                             value = 10.0
                         ),

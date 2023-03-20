@@ -1,19 +1,6 @@
 package parser
 
-import BlockStatement
-import CallExpression
-import FunctionDeclaration
-import FunctionExpression
-import FunctionParameter
-import Identifier
-import ObjectLiteral
-import Property
-import ReturnStatement
-import TypeAnnotation
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class LambdaFunctionTest {
     @Test

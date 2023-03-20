@@ -1,13 +1,7 @@
 package parser
 
-import BlockStatement
-import Identifier
-import ModelDefinitionStatement
-import ModelProperty
-import TypeAnnotation
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import udemy.Parser
 
 class ModelTest {
     @Test

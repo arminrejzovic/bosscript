@@ -1,16 +1,6 @@
 package interpreter
 
-import BinaryExpression
-import Identifier
-import NumericLiteral
-import UnaryExpression
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Array
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
 
 class UnaryOperatorsTest {
 
@@ -26,7 +16,7 @@ class UnaryOperatorsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = -20.0
         )
 
@@ -44,7 +34,7 @@ class UnaryOperatorsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 5.2
         )
 
@@ -62,7 +52,7 @@ class UnaryOperatorsTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 5.2
         )
 

@@ -1,12 +1,6 @@
 package parser
 
-import BooleanLiteral
-import CallExpression
-import Identifier
-import MemberExpression
-import NumericLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class FunctionCallTest {
     @Test

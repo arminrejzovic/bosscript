@@ -1,15 +1,6 @@
 package parser
 
-import ArrayLiteral
-import AssignmentExpression
-import BooleanLiteral
-import Identifier
-import NumericLiteral
-import StringLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class ArrayTest {
 

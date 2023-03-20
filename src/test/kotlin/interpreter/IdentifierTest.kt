@@ -1,9 +1,6 @@
 package interpreter
 
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
-import udemy.Number
-import udemy.Text
 
 class IdentifierTest {
     @Test
@@ -17,7 +14,7 @@ class IdentifierTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 10.0
             )
         )

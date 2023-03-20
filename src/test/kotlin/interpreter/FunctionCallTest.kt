@@ -1,19 +1,6 @@
 package interpreter
 
-import BinaryExpression
-import BlockStatement
-import BooleanLiteral
-import CallExpression
-import FunctionParameter
-import Identifier
-import MemberExpression
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.*
-import udemy.Function
-import udemy.Number
 
 class FunctionCallTest {
     @Test
@@ -48,7 +35,7 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 10.0
         )
 
@@ -86,9 +73,9 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
-                value = 10.0
-            )
+        val expectedResult = Broj(
+            value = 10.0
+        )
 
         assert(result.last() == expectedResult)
     }
@@ -189,7 +176,7 @@ class FunctionCallTest {
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
-        assert(result.last() == Number(value = 5.0))
+        assert(result.last() == Broj(value = 5.0))
     }
 
     @Test
@@ -210,7 +197,7 @@ class FunctionCallTest {
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
-        assert(result.last() == Number(value = 5.0))
+        assert(result.last() == Broj(value = 5.0))
     }
 
     @Test

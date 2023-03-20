@@ -1,18 +1,6 @@
 package parser
 
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import BooleanLiteral
-import Identifier
-import IfStatement
-import LogicalExpression
-import NullLiteral
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class LogicalOperatorsTest {
     @Test
@@ -160,7 +148,7 @@ class LogicalOperatorsTest {
 
         val expectedResult = arrayListOf(
             IfStatement(
-                condition=LogicalExpression(
+                condition= LogicalExpression(
                     left = BinaryExpression(
                         left = Identifier(
                             symbol = "y"

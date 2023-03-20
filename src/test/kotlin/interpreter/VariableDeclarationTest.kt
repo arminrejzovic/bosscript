@@ -1,17 +1,6 @@
 package interpreter
 
-import BinaryExpression
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Array
-import udemy.Interpreter
-import udemy.Null
-import udemy.Number
-import udemy.Object
-import udemy.Parser
-import udemy.Text
 
 class VariableDeclarationTest {
     @Test
@@ -26,7 +15,7 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Number(
+            Broj(
                 value = 3.14
             )
         )
@@ -65,8 +54,8 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Number(value = 10.0),
-            Number(value = 5.0)
+            Broj(value = 10.0),
+            Broj(value = 5.0)
         )
 
         assert(result == expectedResult)
@@ -104,7 +93,7 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Number(
+            Broj(
                 value = 3.14
             )
         )
@@ -124,7 +113,7 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Number(
+            Broj(
                 value = 50.0
             )
         )
@@ -143,15 +132,15 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Array(
+            Niz(
                 value = arrayListOf(
-                    Number(
+                    Broj(
                         value = 10.0
                     ),
-                    Number(
+                    Broj(
                         value = 5.0
                     ),
-                    Number(
+                    Broj(
                         value = 8.0
                     ),
                 )
@@ -172,15 +161,15 @@ class VariableDeclarationTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Object(
+            Objekat(
                 properties = hashMapOf(
-                    "a" to Number(
+                    "a" to Broj(
                         value = 10.0
                     ),
-                    "b" to Number(
+                    "b" to Broj(
                         value = 5.0
                     ),
-                    "c" to Number(
+                    "c" to Broj(
                         value = 8.0
                     ),
                 )

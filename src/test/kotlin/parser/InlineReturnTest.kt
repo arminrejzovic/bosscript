@@ -1,20 +1,6 @@
 package parser
 
-import BinaryExpression
-import BlockStatement
-import CallExpression
-import FunctionDeclaration
-import FunctionExpression
-import FunctionParameter
-import Identifier
-import NumericLiteral
-import ReturnStatement
-import StringLiteral
-import TypeAnnotation
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class InlineReturnTest {
     @Test

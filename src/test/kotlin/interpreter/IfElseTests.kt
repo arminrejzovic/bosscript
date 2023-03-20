@@ -1,16 +1,14 @@
 package interpreter
 
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import Identifier
-import IfStatement
-import NumericLiteral
-import UnlessStatement
+import parser.AssignmentExpression
+import parser.BinaryExpression
+import parser.BlockStatement
+import parser.Identifier
+import parser.IfStatement
+import parser.NumericLiteral
+import parser.UnlessStatement
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
+import parser.Parser
 
 class IfElseTests {
     @Test
@@ -27,7 +25,7 @@ class IfElseTests {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 22.0
             )
         )
@@ -51,7 +49,7 @@ class IfElseTests {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 10.0
             )
         )
@@ -109,7 +107,7 @@ class IfElseTests {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 3.0
             )
         )
@@ -139,7 +137,7 @@ class IfElseTests {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(
+        val expectedResult = Broj(
             value = 20.0
         )
 
@@ -216,7 +214,7 @@ class IfElseTests {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Number(
+            Broj(
                 value = 1.0
             )
         )

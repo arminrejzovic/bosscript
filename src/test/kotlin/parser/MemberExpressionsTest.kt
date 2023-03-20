@@ -1,11 +1,6 @@
 package parser
 
-import AssignmentExpression
-import Identifier
-import MemberExpression
-import NumericLiteral
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class MemberExpressionsTest {
     @Test

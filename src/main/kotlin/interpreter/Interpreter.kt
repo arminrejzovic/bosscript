@@ -1,33 +1,9 @@
-package udemy
+package interpreter
 
-import ArrayLiteral
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import BooleanLiteral
-import CallExpression
-import DoWhileStatement
-import Environment
-import ForStatement
-import FunctionDeclaration
-import FunctionExpression
-import Identifier
-import IfStatement
-import LogicalExpression
-import MemberExpression
-import NodeType
-import NumericLiteral
-import ObjectLiteral
-import ReturnStatement
-import Statement
-import StringLiteral
-import UnaryExpression
-import UnlessStatement
-import VariableDeclaration
-import VariableStatement
-import WhileStatement
+import parser.Parser
 import errors.SyntaxError
 import isInteger
+import parser.*
 import kotlin.math.pow
 
 class Interpreter {
@@ -43,18 +19,18 @@ class Interpreter {
         return result
     }
 
-    private fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue{
+    private fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue {
         when(node.kind){
             // ---------------------------------------------------------------------------------------------------------
             // Literals
             NodeType.NumericLiteral -> {
-                return Number(value = (node as NumericLiteral).value)
+                return Broj(value = (node as NumericLiteral).value)
             }
             NodeType.StringLiteral -> {
-                return Text(value = (node as StringLiteral).value)
+                return Tekst(value = (node as StringLiteral).value)
             }
             NodeType.BooleanLiteral -> {
-                return Bool(value = (node as BooleanLiteral).value)
+                return Logicki(value = (node as BooleanLiteral).value)
             }
             NodeType.NullLiteral -> {
                 return Null()
@@ -64,13 +40,13 @@ class Interpreter {
                 val values = arrayNode.arr.map {
                     evaluate(it, environment)
                 }
-                return Array(
+                return Niz(
                     value = values as ArrayList<RuntimeValue>
                 )
             }
             NodeType.Object -> {
                 val objNode = node as ObjectLiteral
-                val obj = Object(properties = hashMapOf())
+                val obj = Objekat(properties = hashMapOf())
                 objNode.properties.forEach {
                     obj.properties[it.key] = evaluate(it.value, environment)
                 }
@@ -88,7 +64,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Number(
+                        return Broj(
                             value = left.value as Double + right.value as Double
                         )
                     }
@@ -97,7 +73,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Number(
+                        return Broj(
                             value = left.value as Double - right.value as Double
                         )
                     }
@@ -106,7 +82,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Number(
+                        return Broj(
                             value = left.value as Double * right.value as Double
                         )
                     }
@@ -115,7 +91,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Number(
+                        return Broj(
                             value = left.value as Double / right.value as Double
                         )
                     }
@@ -124,7 +100,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Number(
+                        return Broj(
                             value = left.value as Double % right.value as Double
                         )
                     }
@@ -133,8 +109,8 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Number(
-                            value =  (left.value as Double).pow(right.value as Double)
+                        return Broj(
+                            value = (left.value as Double).pow(right.value as Double)
                         )
                     }
                     "<" -> {
@@ -142,7 +118,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Bool(
+                        return Logicki(
                             value = (left.value as Double) < (right.value as Double)
                         )
                     }
@@ -152,7 +128,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Bool(
+                        return Logicki(
                             value = (left.value as Double) <= (right.value as Double)
                         )
                     }
@@ -162,7 +138,7 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Bool(
+                        return Logicki(
                             value = (left.value as Double) > (right.value as Double)
                         )
                     }
@@ -172,19 +148,19 @@ class Interpreter {
                             throw Exception("Type error: Operator '+' is not defined for provided operands")
                         }
 
-                        return Bool(
+                        return Logicki(
                             value = (left.value as Double) >= (right.value as Double)
                         )
                     }
 
                     "==" -> {
-                        return Bool(
+                        return Logicki(
                             value = left.value == right.value
                         )
                     }
 
                     "!=" -> {
-                        return Bool(
+                        return Logicki(
                             value = left.value != right.value
                         )
                     }
@@ -273,42 +249,42 @@ class Interpreter {
 
         when(expr.operator){
             "+" -> {
-                if(arg is Text){
-                    return Number(
+                if(arg is Tekst){
+                    return Broj(
                         value = arg.value.toDouble()
                     )
                 }
-                if(arg is Number){
+                if(arg is Broj){
                     return arg
                 }
                 throw Exception("Type error: Unary + is not defined for ${arg.javaClass.simpleName}")
             }
             "-" -> {
-                if(arg is Text){
-                    return Number(
+                if(arg is Tekst){
+                    return Broj(
                         value = -(arg.value.toDouble())
                     )
                 }
-                if(arg is Number){
-                    return Number(
+                if(arg is Broj){
+                    return Broj(
                         value = -arg.value
                     )
                 }
                 throw Exception("Type error: Unary - is not defined for ${arg.javaClass.simpleName}")
             }
             "++" -> {
-                if(arg is Number){
+                if(arg is Broj){
                     arg.value++
-                    return Number(
+                    return Broj(
                         value = arg.value + 1
                     )
                 }
                 throw Exception("Type error: Increment operator is not defined for ${arg.javaClass.simpleName}")
             }
             "--" -> {
-                if(arg is Number){
+                if(arg is Broj){
                     arg.value--
-                    return Number(
+                    return Broj(
                         value = arg.value - 1
                     )
                 }
@@ -320,7 +296,7 @@ class Interpreter {
         }
     }
 
-    private fun evaluateLogicalExpression(expr: LogicalExpression, env: Environment): Bool {
+    private fun evaluateLogicalExpression(expr: LogicalExpression, env: Environment): Logicki {
         val left = evaluate(expr.left, env)
         val right = evaluate(expr.right, env)
 
@@ -328,18 +304,18 @@ class Interpreter {
             throw Exception("Type error: Logical expression operands must be booleans")
         }
 
-        left as Bool
-        right as Bool
+        left as Logicki
+        right as Logicki
 
         when(expr.operator){
             "&&" -> {
-                return Bool(
+                return Logicki(
                     value = left.value && right.value
                 )
             }
 
             "||" -> {
-                return Bool(
+                return Logicki(
                     value = left.value || right.value
                 )
             }
@@ -366,7 +342,7 @@ class Interpreter {
         env.declareVariable(declaration.identifier, value, isConstant)
     }
 
-    private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue{
+    private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue {
         if (expr.assignee.kind != NodeType.Identifier && expr.assignee.kind != NodeType.MemberExpression){
             throw Exception("Invalid assignment target: ${expr.assignee}")
         }
@@ -385,7 +361,7 @@ class Interpreter {
     private fun evaluateRemainderAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.assignee, env)
         val addedValue = evaluate(expr.value, env)
-        if (target is Number && addedValue is Number){
+        if (target is Broj && addedValue is Broj){
             target.value %= addedValue.value
             return target
         }
@@ -395,7 +371,7 @@ class Interpreter {
     private fun evaluateDivisionAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.assignee, env)
         val addedValue = evaluate(expr.value, env)
-        if (target is Number && addedValue is Number){
+        if (target is Broj && addedValue is Broj){
             target.value /= addedValue.value
             return target
         }
@@ -405,7 +381,7 @@ class Interpreter {
     private fun evaluateTimesAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.assignee, env)
         val addedValue = evaluate(expr.value, env)
-        if (target is Number && addedValue is Number){
+        if (target is Broj && addedValue is Broj){
             target.value *= addedValue.value
             return target
         }
@@ -418,7 +394,7 @@ class Interpreter {
     private fun evaluateMinusAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.assignee, env)
         val addedValue = evaluate(expr.value, env)
-        if (target is Number && addedValue is Number){
+        if (target is Broj && addedValue is Broj){
             target.value -= addedValue.value
             return target
         }
@@ -431,18 +407,18 @@ class Interpreter {
     private fun evaluatePlusAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.assignee, env)
         val addedValue = evaluate(expr.value, env)
-        if (target is Number && addedValue is Number){
+        if (target is Broj && addedValue is Broj){
             target.value += addedValue.value
             return target
         }
-        if(target is Text && addedValue is Text){
+        if(target is Tekst && addedValue is Tekst){
             target.value += addedValue
             return target
         }
         throw Exception("Type error: Operator '+=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
     }
 
-    private fun evaluateSimpleAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue{
+    private fun evaluateSimpleAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
         if(expr.assignee is Identifier){
             return env.assignVariable(expr.assignee.symbol, evaluate(expr.value, env))
         }
@@ -451,7 +427,7 @@ class Interpreter {
             val target = evaluate(expr.assignee.targetObject, env)
             val newValue = evaluate(expr.value, env)
 
-            if(target is Object){
+            if(target is Objekat){
                 if(expr.assignee.property is Identifier){
                     // a.b.c = 10;
                     return target.setProperty(expr.assignee.property.symbol, newValue)
@@ -460,18 +436,18 @@ class Interpreter {
                     // Computed value
                     // a.b["c"] = 10;
                     val prop = evaluate(expr.assignee.property, env)
-                    if(prop is Text){
+                    if(prop is Tekst){
                         return target.setProperty(prop.value, evaluate(expr.value, env))
                     }
-                    if(prop is Number){
+                    if(prop is Broj){
                         throw Exception("${target.javaClass.simpleName} is not indexable")
                     }
                 }
             }
 
-            if(target is Array){
+            if(target is Niz){
                 val prop = evaluate(expr.assignee.property, env)
-                if(prop is Number){
+                if(prop is Broj){
                     target.set(index = prop.value.toInt(), newValue)
                     return Null()
                 }
@@ -480,7 +456,7 @@ class Interpreter {
         throw Exception("Invalid assignment operation ")
     }
 
-    private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue{
+    private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue {
         val blockEnv = Environment(parent = env)
         var result: RuntimeValue = Null()
         for (stmt in block.body){
@@ -494,8 +470,8 @@ class Interpreter {
         return result
     }
 
-    private fun evaluateFunctionDeclaration(declaration: FunctionDeclaration, env: Environment): Function{
-        val fn = Function(
+    private fun evaluateFunctionDeclaration(declaration: FunctionDeclaration, env: Environment): Funkcija {
+        val fn = Funkcija(
             name = declaration.name.symbol,
             params = declaration.params,
             returnType = declaration.returnType,
@@ -508,8 +484,8 @@ class Interpreter {
         return fn
     }
 
-    private fun evaluateFunctionExpression(expr: FunctionExpression, env: Environment): Function {
-        return Function(
+    private fun evaluateFunctionExpression(expr: FunctionExpression, env: Environment): Funkcija {
+        return Funkcija(
             name = "",
             params = expr.params,
             returnType = expr.returnType,
@@ -518,9 +494,9 @@ class Interpreter {
         )
     }
 
-    private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue{
+    private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue {
         when (val fn = evaluate(call.callee, env)) {
-            is Function -> {
+            is Funkcija -> {
                 val activationRecord = hashMapOf<String, RuntimeValue>()
                 fn.params.forEachIndexed{index, param ->
                     activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
@@ -530,7 +506,7 @@ class Interpreter {
                 return if(functionResult is ReturnValue) functionResult.value else functionResult
             }
 
-            is NativeFunction -> {
+            is NativeFunkcija -> {
                 val args = arrayListOf<RuntimeValue>()
                 call.args.forEach {
                     args.add(evaluate(it, env))
@@ -544,7 +520,7 @@ class Interpreter {
         }
     }
 
-    private fun evaluateIfStatement(stmt: IfStatement, env: Environment): RuntimeValue{
+    private fun evaluateIfStatement(stmt: IfStatement, env: Environment): RuntimeValue {
         val condition = evaluate(stmt.condition, env)
         if(condition.value !is Boolean){
             throw Exception("Type Error: Condition is not a boolean")
@@ -562,7 +538,7 @@ class Interpreter {
         return result
     }
 
-    private fun evaluateUnlessStatement(stmt: UnlessStatement, env: Environment): RuntimeValue{
+    private fun evaluateUnlessStatement(stmt: UnlessStatement, env: Environment): RuntimeValue {
         val condition = evaluate(stmt.condition, env)
         if(condition.value !is Boolean){
             throw Exception("Type Error: Condition is not a boolean")
@@ -619,7 +595,7 @@ class Interpreter {
                     return iterationResult
                 }
                 i += step
-                loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
+                loopEnv.assignVariable(stmt.counter.symbol, Broj(value = i))
             }
         }
         else{
@@ -631,7 +607,7 @@ class Interpreter {
                     return iterationResult
                 }
                 i -= step
-                loopEnv.assignVariable(stmt.counter.symbol, Number(value = i))
+                loopEnv.assignVariable(stmt.counter.symbol, Broj(value = i))
             }
         }
         return null
@@ -658,7 +634,7 @@ class Interpreter {
         return null
     }
 
-    private fun evaluateReturnStatement(stmt: ReturnStatement, env: Environment): ReturnValue{
+    private fun evaluateReturnStatement(stmt: ReturnStatement, env: Environment): ReturnValue {
         if(stmt.argument == null){
             // void return
             return ReturnValue(value = Null())
@@ -666,21 +642,21 @@ class Interpreter {
         return ReturnValue(value = evaluate(stmt.argument, env))
     }
 
-    private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue{
+    private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.targetObject, env)
         if(expr.isComputed){
             when(val prop = evaluate(expr.property)){
-                is Text -> {
+                is Tekst -> {
                     // obj["hello"];
                     return target.getProperty(prop.value)
                 }
-                is Number -> {
+                is Broj -> {
                     // obj[1];
                     if(!prop.value.isInteger()){
                         throw Exception("Index must be an integer")
                     }
 
-                    if (target is Array){
+                    if (target is Niz){
                         return target.getElement(prop.value.toInt())
                     }
                     else{

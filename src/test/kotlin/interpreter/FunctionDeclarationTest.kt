@@ -1,17 +1,14 @@
 package interpreter
 
-import BinaryExpression
-import BlockStatement
-import FunctionDeclaration
-import FunctionParameter
-import Identifier
-import ReturnStatement
-import TypeAnnotation
+import parser.BinaryExpression
+import parser.BlockStatement
+import parser.FunctionDeclaration
+import parser.FunctionParameter
+import parser.Identifier
+import parser.ReturnStatement
+import parser.TypeAnnotation
 import org.junit.jupiter.api.Test
-import udemy.Function
-import udemy.Interpreter
-import udemy.Number
-import udemy.Parser
+import parser.Parser
 
 class FunctionDeclarationTest {
     @Test
@@ -26,7 +23,7 @@ class FunctionDeclarationTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Function(
+            Funkcija(
                 name = "xf",
                 params = arrayListOf(),
                 returnType = null,
@@ -52,7 +49,7 @@ class FunctionDeclarationTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Function(
+            Funkcija(
                 name = "xf",
                 params = arrayListOf(
                     FunctionParameter(
@@ -83,7 +80,7 @@ class FunctionDeclarationTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Function(
+            Funkcija(
                 name = "xf",
                 params = arrayListOf(
                     FunctionParameter(
@@ -120,7 +117,7 @@ class FunctionDeclarationTest {
         val result = interpreter.evaluateProgram(src)
 
         val expectedResult = arrayListOf(
-            Function(
+            Funkcija(
                 name = "xf",
                 params = arrayListOf(
                     FunctionParameter(

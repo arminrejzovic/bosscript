@@ -1,9 +1,6 @@
 package interpreter
 
 import org.junit.jupiter.api.Test
-import udemy.Interpreter
-import udemy.Null
-import udemy.Number
 
 class ForLoopTest {
     @Test
@@ -19,7 +16,7 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(value = 15.0)
+        val expectedResult = Broj(value = 15.0)
 
         assert(result.last() == expectedResult)
     }
@@ -37,7 +34,7 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(value = 15.0)
+        val expectedResult = Broj(value = 15.0)
 
         assert(result.last() == expectedResult)
     }
@@ -55,7 +52,7 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Number(value = 22.0)
+        val expectedResult = Broj(value = 22.0)
 
         assert(result.last() == expectedResult)
     }

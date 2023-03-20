@@ -1,20 +1,11 @@
 package interpreter
 
-import BlockStatement
-import CallExpression
-import FunctionDeclaration
-import FunctionExpression
-import FunctionParameter
-import Identifier
-import ObjectLiteral
-import Property
-import ReturnStatement
-import TypeAnnotation
-import VariableDeclaration
-import VariableStatement
+import parser.BlockStatement
+import parser.FunctionParameter
+import parser.Identifier
+import parser.ReturnStatement
+import parser.TypeAnnotation
 import org.junit.jupiter.api.Test
-import udemy.*
-import udemy.Function
 
 class LambdaFunctionTest {
     @Test
@@ -29,7 +20,7 @@ class LambdaFunctionTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Function(
+            Funkcija(
                 name = "",
                 params = arrayListOf(),
                 returnType = null,
@@ -57,7 +48,7 @@ class LambdaFunctionTest {
 
         val expectedResult = arrayListOf(
             Null(),
-            Function(
+            Funkcija(
                 name = "",
                 params = arrayListOf(
                     FunctionParameter(
@@ -102,7 +93,7 @@ class LambdaFunctionTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Text(
+        val expectedResult = Tekst(
             value = "onClick called"
         )
 

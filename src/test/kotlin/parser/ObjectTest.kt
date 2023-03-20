@@ -1,17 +1,6 @@
 package parser
 
-import BinaryExpression
-import BooleanLiteral
-import CallExpression
-import Identifier
-import NumericLiteral
-import ObjectLiteral
-import Property
-import StringLiteral
-import VariableDeclaration
-import VariableStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class ObjectTest {
     @Test

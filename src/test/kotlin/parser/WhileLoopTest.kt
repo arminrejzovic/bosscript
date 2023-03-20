@@ -1,18 +1,6 @@
 package parser
 
-import AssignmentExpression
-import BinaryExpression
-import BlockStatement
-import DoWhileStatement
-import Identifier
-import LogicalExpression
-import NullLiteral
-import NumericLiteral
-import VariableDeclaration
-import VariableStatement
-import WhileStatement
 import org.junit.jupiter.api.Test
-import udemy.Parser
 
 class WhileLoopTest {
     @Test
