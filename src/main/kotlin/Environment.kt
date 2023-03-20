@@ -1,5 +1,3 @@
-import udemy.*
-import udemy.Number
 import java.util.Scanner
 
 class Environment(
@@ -14,7 +12,7 @@ class Environment(
         }
     }
 
-    fun declareVariable(name: String, value: RuntimeValue, isConstant: Boolean = false): RuntimeValue{
+    fun declareVariable(name: String, value: RuntimeValue, isConstant: Boolean = false): RuntimeValue {
         if(variables.containsKey(name)){
             throw Exception("Error: $name has already been defined")
         }
@@ -26,7 +24,7 @@ class Environment(
         return value
     }
 
-    fun assignVariable(name: String, value: RuntimeValue): RuntimeValue{
+    fun assignVariable(name: String, value: RuntimeValue): RuntimeValue {
         val env = resolve(name)
         if(env.constants.contains(name)){
             throw Exception("Constants cannot be reassigned")
@@ -46,7 +44,7 @@ class Environment(
         return parent.resolve(name)
     }
 
-    fun getVariable(name: String): RuntimeValue{
+    fun getVariable(name: String): RuntimeValue {
         val env = resolve(name)
         // We already know name is not null, so we can assert
         return env.variables[name]!!
@@ -106,6 +104,17 @@ class Environment(
                     val scanner = Scanner(System.`in`)
                     val str = scanner.nextLine()
                     return Text(value = str)
+                }
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
+            "postoji",
+            object : NativeFunction(name = "postoji"){
+                override fun call(vararg args: RuntimeValue): Bool {
+                    val valueInQuestion = args[0]
+                    return Bool(value = valueInQuestion !is Null)
                 }
             },
             isConstant = true
