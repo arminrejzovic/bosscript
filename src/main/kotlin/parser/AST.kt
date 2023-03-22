@@ -138,6 +138,12 @@ data class TypeAnnotation(
     override val kind: NodeType = NodeType.TypeAnnotation
 ): Statement
 
+data class ImportStatement(
+    val packageName: String,
+    val imports: ArrayList<Identifier>?,
+    override val kind: NodeType = NodeType.ImportStatement
+): Statement
+
 interface Expression : Statement
 
 data class BinaryExpression(

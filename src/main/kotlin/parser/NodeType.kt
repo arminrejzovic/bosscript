@@ -33,4 +33,5 @@ enum class NodeType {
     ArrayLiteral,
     FunctionExpression,
     BreakStatement,
+    ImportStatement
 }

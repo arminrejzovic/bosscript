@@ -74,14 +74,15 @@ class Parser {
     /**
      * parser.Statement
      *      : ExpressionStatement
-     *      | parser.BlockStatement
-     *      | parser.EmptyStatement
-     *      | parser.VariableStatement
-     *      | parser.IfStatement
-     *      | parser.UnlessStatement
-     *      | parser.FunctionDeclaration
-     *      | parser.ReturnStatement
-     *      | parser.ModelDefinitionStatement
+     *      | BlockStatement
+     *      | EmptyStatement
+     *      | VariableStatement
+     *      | IfStatement
+     *      | UnlessStatement
+     *      | FunctionDeclaration
+     *      | ReturnStatement
+     *      | ModelDefinitionStatement
+     *      | ImportStatement
      *      ;
      */
     private fun parseStatement(): Statement {
@@ -116,6 +117,9 @@ class Parser {
             TokenType.Model -> {
                 return parseModelDefinitionStatement()
             }
+            TokenType.Paket -> {
+                return parseImportStatement()
+            }
             TokenType.Svako -> {
                 throw Exception("You are probably missing 'za' before 'svako'")
             }
@@ -126,6 +130,32 @@ class Parser {
                 return parseExpressionStatement()
             }
         }
+    }
+
+    private fun parseImportStatement(): Statement {
+        expect(TokenType.Paket, "Expected 'paket' at this point")
+        val packageName = parseStringLiteral()
+        val imports = arrayListOf<Identifier>()
+        if(current().type == TokenType.Semicolon){
+            // Full package import
+            consume(/*semicolon*/)
+            return ImportStatement(
+                packageName = packageName.value,
+                imports = null
+            )
+        }
+        expect(TokenType.OpenBrace, "Missing {")
+
+        do {
+            imports.add(parseIdentifier())
+        } while (current().type != TokenType.CloseBrace && current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
+
+        expect(TokenType.CloseBrace, "Missing }")
+        expect(TokenType.Semicolon, "Missing ;")
+        return ImportStatement(
+            packageName = packageName.value,
+            imports = imports
+        )
     }
 
     private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
