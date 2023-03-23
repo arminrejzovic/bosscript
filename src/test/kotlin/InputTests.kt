@@ -1,7 +1,4 @@
-import interpreter.Environment
 import interpreter.Interpreter
-import interpreter.Objekat
-import interpreter.Tekst
 
 fun main() {
     val src = """

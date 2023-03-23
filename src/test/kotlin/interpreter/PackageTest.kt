@@ -10,127 +10,91 @@ import parser.VariableDeclaration
 import parser.VariableStatement
 import org.junit.jupiter.api.Test
 import parser.Parser
+import kotlin.math.E
+import kotlin.math.PI
 
-class ArrayTest {
+class PackageTest {
 
     @Test
-    fun testEmptyArray() {
+    fun testMathPackageImport() {
         val src = """
-            [];
+            paket "matematika";
+            
+            pi;
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Niz(
-                value = arrayListOf()
-            )
+        val expectedResult = Broj(
+            value = PI
         )
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 
     @Test
-    fun testSimpleArray() {
+    fun testMathPackagePartialImport() {
         val src = """
-            [1,2,3];
+            paket "matematika" {pi, e};
+            
+            [pi, e];
         """.trimIndent()
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Niz(
-                value = arrayListOf(
-                    Broj(
-                        value = 1.0
-                    ),
-                    Broj(
-                        value = 2.0
-                    ),
-                    Broj(
-                        value = 3.0
-                    ),
+        val expectedResult = Niz(
+            value = arrayListOf(
+                Broj(
+                    value = PI
+                ),
+                Broj(
+                    value = E
                 )
             )
         )
 
-        assert(result == expectedResult)
+        assert(result.last() == expectedResult)
     }
 
     @Test
-    fun testMixedTypeArray() {
+    fun testMathPackagePartialImportOnNotImported() {
         val src = """
-            [1,2,"3"];
+            paket "matematika" {pi, e};
+            
+            ispis(arcsin);
         """.trimIndent()
 
-        val parser = Parser()
-        val program = parser.parseProgram(src)
+        var error = ""
+        val expectedError = "arcsin does not exist"
 
-        val expectedResult = arrayListOf(
-            ArrayLiteral(
-                arr = arrayListOf(
-                    NumericLiteral(value = 1.0),
-                    NumericLiteral(value = 2.0),
-                    StringLiteral(value = "3")
-                )
-            )
-        )
-        assert(program.body == expectedResult)
+        try{
+            val interpreter = Interpreter()
+            interpreter.evaluateProgram(src)
+        }
+        catch (e: Exception){
+            error = e.message ?: ""
+        }
+
+
+        assert(error == expectedError)
     }
 
     @Test
-    fun testArrayAssignedToVar() {
+    fun testUserDefinedImport() {
         val src = """
-            var x = [1,2,"3"];
+            paket "test.boss";
+            
+            ispis("ӡΔϸɖ□о с□нѣm!");
         """.trimIndent()
 
-        val parser = Parser()
-        val program = parser.parseProgram(src)
-
-        val expectedResult = arrayListOf(
-            VariableStatement(
-                declarations = arrayListOf(
-                    VariableDeclaration(
-                        identifier = "x",
-                        value = ArrayLiteral(
-                            arr = arrayListOf(
-                                NumericLiteral(value = 1.0),
-                                NumericLiteral(value = 2.0),
-                                StringLiteral(value = "3")
-                            )
-                        )
-                    )
-                ),
-                isConstant = false
-            )
-        )
-        assert(program.body == expectedResult)
-    }
-
-    @Test
-    fun testArrayReassignedToVar() {
-        val src = """
-            x = [1,netacno,3];
-        """.trimIndent()
-
-        val parser = Parser()
-        val program = parser.parseProgram(src)
-
-        val expectedResult = arrayListOf(
-            AssignmentExpression(
-                assignee = Identifier(symbol = "x"),
-                value = ArrayLiteral(
-                    arr = arrayListOf(
-                        NumericLiteral(value = 1.0),
-                        BooleanLiteral(value = false),
-                        NumericLiteral(value = 3.0)
-                    )
-                ),
-                assignmentOperator = "="
-            )
-        )
-        assert(program.body == expectedResult)
+        try{
+            val interpreter = Interpreter()
+            interpreter.evaluateProgram(src)
+        }
+        catch (e: Exception){
+            println(e.message)
+        }
     }
 }

@@ -157,6 +157,7 @@ val math = Environment(
 
                 val num = args[0] as Broj
 
+                // e^num
                 return Broj(
                     value = exp(num.value)
                 )

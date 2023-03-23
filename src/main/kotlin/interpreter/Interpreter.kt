@@ -236,10 +236,39 @@ class Interpreter {
                 return evaluateLogicalExpression(node as LogicalExpression, environment)
             }
 
+            NodeType.ImportStatement -> {
+                return evaluateImportStatement(node as ImportStatement, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
             }
         }
+    }
+
+    private fun evaluateImportStatement(stmt: ImportStatement, env: Environment): RuntimeValue{
+        val stdlibPackage = stdlib[stmt.packageName]
+        if(stdlibPackage != null){
+            return evaluateImportStdlibPackage(stdlibPackage, env, stmt.imports)
+        }
+        println(System.getProperty("user.dir"))
+
+        return Null()
+    }
+
+    private fun evaluateImportStdlibPackage(target: Environment, env: Environment, imports: ArrayList<Identifier>?): RuntimeValue {
+        if(imports == null){
+            // Full import
+            env.importEnv(target)
+        }
+        else{
+            imports.forEach {
+                val packageElement = target.getVariable(it.symbol)
+                env.declareVariable(it.symbol, packageElement)
+            }
+        }
+
+        return Null()
     }
 
     private fun evaluateUnaryExpression(expr: UnaryExpression, env: Environment): RuntimeValue {
@@ -664,7 +693,7 @@ class Interpreter {
                     }
                 }
                 else -> {
-                    throw Exception("Type ${prop.javaClass} cannot be used as an index type")
+                    throw Exception("Type ${prop.javaClass.simpleName} cannot be used as an index type")
                 }
             }
         }

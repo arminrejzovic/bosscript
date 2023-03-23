@@ -53,9 +53,12 @@ class Environment(
         return env.variables[name]!!
     }
 
-    private fun createGlobalEnvironment(env: Environment){
-        env.declareVariable("pi", Broj(3.14159), isConstant = true)
+    fun importEnv(env: Environment){
+        variables.putAll(env.variables)
+        constants.addAll(env.constants)
+    }
 
+    private fun createGlobalEnvironment(env: Environment){
         env.declareVariable(
             "ispis",
             object : NativeFunkcija(name = "ispis"){
