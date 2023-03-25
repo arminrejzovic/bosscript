@@ -1,0 +1,5 @@
+var port = 6969;
+
+funkcija ispisiPort(){
+    ispis(port);
+}

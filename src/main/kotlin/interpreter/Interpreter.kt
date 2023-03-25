@@ -4,6 +4,7 @@ import parser.Parser
 import errors.SyntaxError
 import isInteger
 import parser.*
+import java.io.File
 import kotlin.math.pow
 
 class Interpreter {
@@ -246,12 +247,29 @@ class Interpreter {
         }
     }
 
+    private fun evaluatePackage(src: String, env: Environment){
+        val program = parser.parseProgram(src)
+        program.body.forEach {
+            evaluate(it, env)
+        }
+    }
+
     private fun evaluateImportStatement(stmt: ImportStatement, env: Environment): RuntimeValue{
         val stdlibPackage = stdlib[stmt.packageName]
         if(stdlibPackage != null){
             return evaluateImportStdlibPackage(stdlibPackage, env, stmt.imports)
         }
-        println(System.getProperty("user.dir"))
+        else{
+            val currentDir = System.getProperty("user.dir")
+            val package_ = File(currentDir, stmt.packageName)
+            if(package_.exists()){
+                evaluatePackage(package_.readText(), globalEnv)
+            }
+            else{
+                throw Exception("Package ${stmt.packageName} does not exist")
+            }
+        }
+
 
         return Null()
     }

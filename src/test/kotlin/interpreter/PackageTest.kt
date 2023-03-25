@@ -84,9 +84,9 @@ class PackageTest {
     @Test
     fun testUserDefinedImport() {
         val src = """
-            paket "test.boss";
+            paket "./src/main/boss/test.boss";
             
-            ispis("ӡΔϸɖ□о с□нѣm!");
+            ispisiPort();
         """.trimIndent()
 
         try{
