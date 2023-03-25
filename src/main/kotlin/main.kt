@@ -12,7 +12,8 @@ fun main(args: Array<String>) {
         } else {
             throw Exception("No such file found: $filename")
         }
-    } else {
+    }
+    else {
         throw Exception("No file to evaluate")
     }
 }

@@ -61,13 +61,18 @@ class Interpreter {
                 val right = evaluate(binExpNode.right, environment)
                 when(binExpNode.operator){
                     "+" -> {
-                        if(left.value !is Double || right.value !is Double){
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
+                        if(left.value is Double && right.value is Double){
+                            return Broj(
+                                value = left.value as Double + right.value as Double
+                            )
+                        }
+                        if(left.value is String && right.value is String){
+                            return Tekst(
+                                value = left.value as String + right.value as String
+                            )
                         }
 
-                        return Broj(
-                            value = left.value as Double + right.value as Double
-                        )
+                        throw Exception("Type error: Operator '+' is not defined for ${left.javaClass.simpleName} and ${right.javaClass.simpleName}")
                     }
                     "-" -> {
                         if(left.value !is Double || right.value !is Double){
@@ -292,8 +297,6 @@ class Interpreter {
     private fun evaluateUnaryExpression(expr: UnaryExpression, env: Environment): RuntimeValue {
         val arg = evaluate(expr.argument, env)
 
-        // TODO handle ++ and -- (Should modify operand)
-
         when(expr.operator){
             "+" -> {
                 if(arg is Tekst){
@@ -337,6 +340,16 @@ class Interpreter {
                 }
                 throw Exception("Type error: Decrement operator is not defined for ${arg.javaClass.simpleName}")
             }
+
+            "!" -> {
+                if(arg is Logicki){
+                    return Logicki(
+                        value = !arg.value
+                    )
+                }
+                throw Exception("Type error: Decrement operator is not defined for ${arg.javaClass.simpleName}")
+            }
+
             else -> {
                 throw Exception("Unexpected unary operator found: ${expr.operator}")
             }

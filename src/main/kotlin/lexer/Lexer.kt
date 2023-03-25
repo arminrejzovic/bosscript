@@ -158,7 +158,20 @@ fun tokenize(src: String): ArrayList<Token>{
                 tokens.add(Token(sourceCode.removeAt(0), TokenType.DoubleQuote, line, col++))
                 var string = ""
                 while (sourceCode.isNotEmpty() && sourceCode[0] != "\""){
-                    string += sourceCode.removeAt(0)
+                    if(sourceCode[0] == "\\" && sourceCode.size > 1){
+                        when(sourceCode[1]){
+                            "n" -> string += "\n"
+                            "t"-> string += "\t"
+                            "r" -> string += "\r"
+                            "\\" -> string += "\\"
+                            "\"" -> string += "\""
+                        }
+                        sourceCode.removeAt(0)
+                        sourceCode.removeAt(0)
+                    }
+                    else{
+                        string += sourceCode.removeAt(0)
+                    }
                 }
                 // Add the string value
                 tokens.add(Token(string, TokenType.String, line, col))
