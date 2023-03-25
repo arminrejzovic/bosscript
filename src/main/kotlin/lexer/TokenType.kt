@@ -18,7 +18,6 @@ enum class TokenType{
     Semicolon,      // ;
     SimpleAssign,   // =
     DoubleQuote,    // "
-    Hashtag,        // #
     Exponent,       // ^
     LogicalAnd,     // &&
     LogicalOr,      // ||
@@ -39,7 +38,7 @@ enum class TokenType{
     Radi,
     //    Functions
     Funkcija,
-    Arrow,  // =>
+    Arrow,          // =>
     Vrati,
     Se,
     //    Package imports
