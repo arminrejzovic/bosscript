@@ -347,7 +347,9 @@ class Interpreter {
                         value = !arg.value
                     )
                 }
-                throw Exception("Type error: Decrement operator is not defined for ${arg.javaClass.simpleName}")
+                return Logicki(
+                    value = arg is Null
+                )
             }
 
             else -> {
