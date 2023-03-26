@@ -2,7 +2,8 @@ package interpreter
 
 import parser.Parser
 import errors.SyntaxError
-import isInteger
+import interpreter.values.*
+import isInt
 import parser.*
 import java.io.File
 import kotlin.math.pow
@@ -259,7 +260,7 @@ class Interpreter {
         }
     }
 
-    private fun evaluateImportStatement(stmt: ImportStatement, env: Environment): RuntimeValue{
+    private fun evaluateImportStatement(stmt: ImportStatement, env: Environment): RuntimeValue {
         val stdlibPackage = stdlib[stmt.packageName]
         if(stdlibPackage != null){
             return evaluateImportStdlibPackage(stdlibPackage, env, stmt.imports)
@@ -714,7 +715,7 @@ class Interpreter {
                 }
                 is Broj -> {
                     // obj[1];
-                    if(!prop.value.isInteger()){
+                    if(!prop.value.isInt()){
                         throw Exception("Index must be an integer")
                     }
 

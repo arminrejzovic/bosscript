@@ -1,6 +1,7 @@
 package interpreter.packages
 
 import interpreter.*
+import interpreter.values.*
 import java.io.File
 
 val IO = Environment(

@@ -1,4 +1,4 @@
-fun Double.isInteger(): Boolean {
+fun Double.isInt(): Boolean {
     return this % 1 == 0.0
 }
 

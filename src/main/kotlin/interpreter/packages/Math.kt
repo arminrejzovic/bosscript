@@ -1,9 +1,7 @@
 package interpreter.packages
 
-import interpreter.Broj
 import interpreter.Environment
-import interpreter.NativeFunkcija
-import interpreter.RuntimeValue
+import interpreter.values.*
 import kotlin.math.*
 
 @OptIn(ExperimentalStdlibApi::class)
