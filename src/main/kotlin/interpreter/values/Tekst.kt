@@ -42,8 +42,14 @@ data class Tekst(
                 if (args.isNotEmpty()) {
                     throw Exception("logicki accepts no arguments")
                 }
+
+                val boolValue = when(value.lowercase()){
+                    "tacno" -> true
+                    "netacno" -> false
+                    else -> throw Exception("$value is not a boolean")
+                }
                 return Logicki(
-                    value = value.toBooleanStrict()
+                    value = boolValue
                 )
             }
         },
