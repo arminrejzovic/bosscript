@@ -263,36 +263,46 @@ class Interpreter {
     private fun evaluateImportStatement(stmt: ImportStatement, env: Environment): RuntimeValue {
         val stdlibPackage = stdlib[stmt.packageName]
         if(stdlibPackage != null){
-            return evaluateImportStdlibPackage(stdlibPackage, env, stmt.imports)
+            evaluateImportStdlibPackage(stdlibPackage, env, stmt.imports)
         }
         else{
-            val currentDir = System.getProperty("user.dir")
-            val package_ = File(currentDir, stmt.packageName)
-            if(package_.exists()){
-                evaluatePackage(package_.readText(), globalEnv)
-            }
-            else{
-                throw Exception("Package ${stmt.packageName} does not exist")
-            }
+            evaluateImportUserPackage(stmt.packageName, stmt.imports, env)
         }
-
 
         return Null()
     }
 
-    private fun evaluateImportStdlibPackage(target: Environment, env: Environment, imports: ArrayList<Identifier>?): RuntimeValue {
+    private fun evaluateImportUserPackage(packageName: String, imports: ArrayList<Identifier>?, env: Environment) {
+        val pckg = File(packageName)
+        if (!pckg.exists()) {
+            throw Exception("Package $packageName does not exist")
+        }
+
+        val tempEnv = Environment()
+        evaluatePackage(pckg.readText(), tempEnv)
+        if (imports == null) {
+            // Full import
+            env.importEnv(tempEnv)
+        }
+        else {
+            imports.forEach {
+                val packageElement = tempEnv.getVariable(it.symbol)
+                env.declareVariable(it.symbol, packageElement)
+            }
+        }
+    }
+
+    private fun evaluateImportStdlibPackage(target: Environment, env: Environment, imports: ArrayList<Identifier>?) {
         if(imports == null){
             // Full import
             env.importEnv(target)
         }
-        else{
+        else {
             imports.forEach {
                 val packageElement = target.getVariable(it.symbol)
                 env.declareVariable(it.symbol, packageElement)
             }
         }
-
-        return Null()
     }
 
     private fun evaluateUnaryExpression(expr: UnaryExpression, env: Environment): RuntimeValue {

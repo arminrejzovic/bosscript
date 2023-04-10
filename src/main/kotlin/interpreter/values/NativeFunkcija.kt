@@ -1,7 +1,7 @@
 package interpreter.values
 
-// TODO try moving away from anonymous classes and objects to passing a function pointer
-// Refer to: https://stackoverflow.com/a/68495651/13683311
+// TODO refactor NativeFunkcija to be regular class with instance method call(args: Array),
+//  it's basically the same thing and we get rid of the overhead of building anonymous classes
 abstract class NativeFunkcija(
     val name: String,
     override val value: Any? = null,
