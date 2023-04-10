@@ -65,8 +65,9 @@ class Environment(
             object : NativeFunkcija(name = "ispis"){
                 override fun call(vararg args: RuntimeValue): Null {
                     args.forEach {
-                        println(it)
+                        print(it)
                     }
+                    println()
                     return Null()
                 }
             },
