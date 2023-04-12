@@ -6,6 +6,7 @@ abstract class NativeFunkcija(
     val name: String,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override val typename: String = "funkcija"
 ) : RuntimeValue {
     abstract fun call(vararg args: RuntimeValue): RuntimeValue
     override fun toString(): String {

@@ -2,7 +2,8 @@ package interpreter.values
 
 data class Null(
     override val value: Nothing? = null,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override val typename: String = "nedefinisano"
 ) : RuntimeValue {
     override fun toString(): String {
         return "nedefinisano"

@@ -13,6 +13,7 @@ data class Funkcija(
     val parentEnv: Environment?, // closure
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override val typename: String = "funkcija"
 ) : RuntimeValue {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

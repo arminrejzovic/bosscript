@@ -1,6 +1,7 @@
 package interpreter.values
 data class Tekst(
     override var value: String,
+    override val typename: String = "tekst",
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
         "malimSlovima" to object : NativeFunkcija(name = "malimSlovima") {
             override fun call(vararg args: RuntimeValue): Tekst {

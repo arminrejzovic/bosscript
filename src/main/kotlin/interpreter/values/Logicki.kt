@@ -2,7 +2,8 @@ package interpreter.values
 
 data class Logicki(
     override val value: Boolean,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override val typename: String = "logicki"
 ) : RuntimeValue {
     override fun toString(): String {
         return if (value) "tacno" else "netacno"

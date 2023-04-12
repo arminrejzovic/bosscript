@@ -4,7 +4,8 @@ import isInt
 
 data class Broj(
     override var value: Double,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override val typename: String = "broj"
 ) : RuntimeValue {
 
     override fun getProperty(prop: String): RuntimeValue {

@@ -3,7 +3,8 @@ package interpreter.values
 data class Objekat(
     val properties: HashMap<String, RuntimeValue>,
     override val value: Any? = null,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf()
+    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override var typename: String = "objekat"
 ) : RuntimeValue {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

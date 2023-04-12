@@ -5,6 +5,7 @@ import errors.SyntaxError
 data class ReturnValue(
     override val value: RuntimeValue,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
+    override val typename: String = "povrat"
 ) : RuntimeValue {
     init {
         /*
