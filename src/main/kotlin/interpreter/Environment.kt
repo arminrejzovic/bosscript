@@ -1,13 +1,15 @@
 package interpreter
 
 import interpreter.values.*
+import parser.ModelDefinitionStatement
 import java.util.Scanner
 import kotlin.random.Random
 
 class Environment(
     private val parent: Environment? = null,
     private val variables: HashMap<String, RuntimeValue> = HashMap(),
-    private val constants: MutableSet<String> = mutableSetOf()
+    private val constants: MutableSet<String> = mutableSetOf(),
+    private val modelDefinitions: HashMap<String, Model> = HashMap()
 ){
 
     init {
@@ -57,6 +59,14 @@ class Environment(
     fun importEnv(env: Environment){
         variables.putAll(env.variables)
         constants.addAll(env.constants)
+    }
+
+    fun addModelDefinition(modelDefinition: ModelDefinitionStatement){
+        modelDefinitions[modelDefinition.name.symbol] = Model(name = modelDefinition.name.symbol, properties = modelDefinition.properties)
+    }
+
+    fun resolveModelDefinition(name: String): Model?{
+        return modelDefinitions[name]
     }
 
     private fun createGlobalEnvironment(env: Environment){

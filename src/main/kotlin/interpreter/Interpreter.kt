@@ -211,6 +211,10 @@ class Interpreter {
                 return evaluateReturnStatement(node as ReturnStatement, environment)
             }
 
+            NodeType.BreakStatement -> {
+                return evaluateBreakStatement(node as BreakStatement, environment)
+            }
+
             NodeType.IfStatement -> {
                 return evaluateIfStatement(node as IfStatement, environment)
             }
@@ -245,6 +249,10 @@ class Interpreter {
 
             NodeType.ImportStatement -> {
                 return evaluateImportStatement(node as ImportStatement, environment)
+            }
+
+            NodeType.ModelDefinition -> {
+                return evaluateModelDefinition(node as ModelDefinitionStatement, environment)
             }
 
             else -> {
@@ -400,7 +408,8 @@ class Interpreter {
     }
 
     private fun evaluateIdentifier(identifier: Identifier, environment: Environment): RuntimeValue {
-        return environment.getVariable(identifier.symbol)
+        val model = environment.resolveModelDefinition(identifier.symbol)
+        return model ?: environment.getVariable(identifier.symbol)
     }
 
     private fun evaluateVariableStatement(stmt: VariableStatement, env: Environment){
@@ -533,9 +542,9 @@ class Interpreter {
         val blockEnv = Environment(parent = env)
         var result: RuntimeValue = Null()
         for (stmt in block.body){
-            if(result !is ReturnValue){
+            if(result !is ReturnValue && result !is BreakValue){
                 val stmtResult = evaluate(stmt, blockEnv)
-                if(stmtResult is ReturnValue){
+                if(stmtResult is ReturnValue || stmtResult is BreakValue){
                     result = stmtResult
                 }
             }
@@ -585,6 +594,15 @@ class Interpreter {
                     args.add(evaluate(it, env))
                 }
                 return fn.call(*(args.toTypedArray()))
+            }
+
+            is Model -> {
+                val args = arrayListOf<RuntimeValue>()
+                call.args.forEach {
+                    args.add(evaluate(it, env))
+                }
+
+                return fn.constructor(args)
             }
 
             else -> {
@@ -667,6 +685,9 @@ class Interpreter {
                 if(iterationResult is ReturnValue){
                     return iterationResult
                 }
+                if(iterationResult is BreakValue){
+                    return null
+                }
                 i += step
                 loopEnv.assignVariable(stmt.counter.symbol, Broj(value = i))
             }
@@ -678,6 +699,9 @@ class Interpreter {
                 val iterationResult = evaluate(stmt.body, loopEnv)
                 if(iterationResult is ReturnValue){
                     return iterationResult
+                }
+                if(iterationResult is BreakValue){
+                    return null
                 }
                 i -= step
                 loopEnv.assignVariable(stmt.counter.symbol, Broj(value = i))
@@ -692,6 +716,9 @@ class Interpreter {
             if(iterationResult is ReturnValue){
                 return iterationResult
             }
+            if(iterationResult is BreakValue){
+                return null
+            }
         }
         return null
     }
@@ -701,6 +728,9 @@ class Interpreter {
             val iterationResult = evaluate(stmt.body, env)
             if(iterationResult is ReturnValue){
                 return iterationResult
+            }
+            if(iterationResult is BreakValue){
+                return null
             }
         } while (evaluate(stmt.condition, env).value == true)
 
@@ -713,6 +743,10 @@ class Interpreter {
             return ReturnValue(value = Null())
         }
         return ReturnValue(value = evaluate(stmt.argument, env))
+    }
+
+    private fun evaluateBreakStatement(stmt: BreakStatement, env: Environment): BreakValue {
+        return BreakValue()
     }
 
     private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue {
@@ -745,6 +779,11 @@ class Interpreter {
             val propertyName = expr.property as Identifier
             return target.getProperty(propertyName.symbol)
         }
+    }
+
+    private fun evaluateModelDefinition(modelDefinition: ModelDefinitionStatement, env: Environment): RuntimeValue{
+        env.addModelDefinition(modelDefinition)
+        return Null()
     }
 }
 
