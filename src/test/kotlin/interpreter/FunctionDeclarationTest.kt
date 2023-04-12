@@ -7,8 +7,9 @@ import parser.FunctionParameter
 import parser.Identifier
 import parser.ReturnStatement
 import parser.TypeAnnotation
-import org.junit.jupiter.api.Test
 import parser.Parser
+import org.junit.jupiter.api.Test
+import interpreter.values.*
 
 class FunctionDeclarationTest {
     @Test

@@ -1,17 +1,9 @@
 package interpreter
 
-import parser.ArrayLiteral
-import parser.AssignmentExpression
-import parser.BooleanLiteral
-import parser.Identifier
-import parser.NumericLiteral
-import parser.StringLiteral
-import parser.VariableDeclaration
-import parser.VariableStatement
 import org.junit.jupiter.api.Test
-import parser.Parser
 import kotlin.math.E
 import kotlin.math.PI
+import interpreter.values.*
 
 class PackageTest {
 

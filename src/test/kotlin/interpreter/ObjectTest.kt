@@ -12,6 +12,7 @@ import parser.StringLiteral
 import parser.VariableDeclaration
 import parser.VariableStatement
 import org.junit.jupiter.api.Test
+import interpreter.values.*
 
 class ObjectTest {
     @Test

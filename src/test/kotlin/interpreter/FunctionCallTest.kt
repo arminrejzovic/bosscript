@@ -1,7 +1,7 @@
 package interpreter
 
 import org.junit.jupiter.api.Test
-
+import interpreter.values.*
 class FunctionCallTest {
     @Test
     fun testFunctionUntypedParam() {

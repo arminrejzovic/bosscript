@@ -1,6 +1,6 @@
 package interpreter.stdlib
 
-import interpreter.Broj
+import interpreter.values.Broj
 import interpreter.Interpreter
 import org.junit.jupiter.api.Test
 import kotlin.math.PI

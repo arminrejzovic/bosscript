@@ -6,6 +6,7 @@ import parser.Identifier
 import parser.ReturnStatement
 import parser.TypeAnnotation
 import org.junit.jupiter.api.Test
+import interpreter.values.*
 
 class LambdaFunctionTest {
     @Test
