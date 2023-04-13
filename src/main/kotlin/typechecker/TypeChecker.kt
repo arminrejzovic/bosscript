@@ -5,10 +5,6 @@ import interpreter.values.*
 import parser.TypeAnnotation
 
 class TypeChecker(private val env: Environment) {
-    private fun expectArrayType(expectedType: TypeAnnotation, providedValue: RuntimeValue) {
-        TODO("Not yet implemented")
-    }
-
     fun expect(expectedType: TypeAnnotation, providedValue: RuntimeValue) {
         when(providedValue){
             is Tekst, is Broj, is Funkcija, is Logicki, is Null -> {
