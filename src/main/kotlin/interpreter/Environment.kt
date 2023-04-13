@@ -65,8 +65,20 @@ class Environment(
         modelDefinitions[modelDefinition.name.symbol] = Model(name = modelDefinition.name.symbol, properties = modelDefinition.properties)
     }
 
+    private fun resolveModelDefinitionEnv(name: String): Environment?{
+        if(modelDefinitions.containsKey(name)) {
+            return this
+        }
+        if(parent == null) {
+            return null
+        }
+
+        return parent.resolve(name)
+    }
+
     fun resolveModelDefinition(name: String): Model?{
-        return modelDefinitions[name]
+        val env = resolveModelDefinitionEnv(name) ?: return null
+        return env.modelDefinitions[name]!!
     }
 
     private fun createGlobalEnvironment(env: Environment){

@@ -1,7 +1,8 @@
 package interpreter.values
 
+import interpreter.Environment
 import parser.ModelProperty
-import type_checker.TypeChecker
+import typechecker.TypeChecker
 
 data class Model(
     val name: String,
@@ -14,22 +15,19 @@ data class Model(
         throw Exception("Model has no properties of itself")
     }
 
-    fun constructor(args: ArrayList<RuntimeValue>): Objekat{
-        if(args.size != properties.size){
+    fun constructor(args: ArrayList<RuntimeValue>, env: Environment): Objekat{
+        if(args.size < properties.size){
             throw Exception("Type Error: Missing properties")
         }
 
-        val typeChecker = TypeChecker()
+        if(args.size > properties.size){
+            throw Exception("Type Error:  properties")
+        }
+
+        val typeChecker = TypeChecker(env)
 
         for ((i, prop) in properties.withIndex()){
-            if(prop.type.isArrayType){
-                if(!typeChecker.isExpectedArrayType(prop.type.typeName, args[i])){
-                    throw Exception("Type error")
-                }
-            }
-            if(!typeChecker.isExpectedPrimitiveType(prop.type.typeName, args[i])){
-                throw Exception("Type error")
-            }
+            typeChecker.expect(expectedType=prop.type, providedValue=args[i])
         }
 
         return Objekat(

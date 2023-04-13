@@ -602,7 +602,7 @@ class Interpreter {
                     args.add(evaluate(it, env))
                 }
 
-                return fn.constructor(args)
+                return fn.constructor(args, env)
             }
 
             else -> {
