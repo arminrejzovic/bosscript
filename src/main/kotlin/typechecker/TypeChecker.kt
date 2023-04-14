@@ -20,15 +20,15 @@ class TypeChecker(private val env: Environment) {
                 if(expectedType.typeName != "objekat"){
                     val modelDefinition = env.resolveModelDefinition(expectedType.typeName) ?: throw Exception("Cannot resolve typename ${expectedType.typeName}")
 
-                    val sortedProps = providedValue.properties.toSortedMap()
+                    val expectedKeys = modelDefinition.properties.mapTo(HashSet()) { it.name }
 
-                    val sortedExpectedProps = modelDefinition.properties.sortedWith(compareBy { it.name })
+                    providedValue.properties.keys.forEach {
+                        if(it !in expectedKeys) throw Exception("${modelDefinition.name} has no property $it")
+                    }
 
-                    var i = 0
-                    sortedProps.forEach { (name, value) ->
-                        if(name != sortedExpectedProps[i].name) throw Exception("${modelDefinition.name} has no property $name")
-                        expect(sortedExpectedProps[i].type, value)
-                        i++
+                    modelDefinition.properties.forEach {
+                        val prop = providedValue.properties[it.name] ?: throw Exception("Missing property ${it.name}")
+                        expect(it.type, prop)
                     }
                 }
             }
