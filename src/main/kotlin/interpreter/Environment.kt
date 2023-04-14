@@ -66,19 +66,19 @@ class Environment(
     }
 
     private fun resolveModelDefinitionEnv(name: String): Environment?{
-        if(modelDefinitions.containsKey(name)) {
+        if(modelDefinitions[name] != null) {
             return this
         }
         if(parent == null) {
             return null
         }
 
-        return parent.resolve(name)
+        return parent.resolveModelDefinitionEnv(name)
     }
 
     fun resolveModelDefinition(name: String): Model?{
         val env = resolveModelDefinitionEnv(name) ?: return null
-        return env.modelDefinitions[name]!!
+        return env.modelDefinitions[name]
     }
 
     private fun createGlobalEnvironment(env: Environment){
