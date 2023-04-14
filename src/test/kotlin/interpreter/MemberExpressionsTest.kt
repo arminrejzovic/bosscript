@@ -47,7 +47,7 @@ class MemberExpressionsTest {
             var x = {
                 a: "STR"
             };
-            x.a.malaSlova();
+            x.a.malimSlovima();
         """.trimIndent()
 
         val interpreter = Interpreter()
@@ -108,7 +108,7 @@ class MemberExpressionsTest {
 
         val interpreter = Interpreter()
         var error = ""
-        val expectedError = "interpreter.Null has no properties"
+        val expectedError = "Null has no properties"
 
         try {
             interpreter.evaluateProgram(src)
@@ -185,7 +185,7 @@ class MemberExpressionsTest {
 
         val interpreter = Interpreter()
         var error = ""
-        val expectedError = "parser.Property c does not exist on object"
+        val expectedError = "Property c does not exist on object"
         try {
             interpreter.evaluateProgram(src)
         } catch (e: Exception){
