@@ -5,6 +5,7 @@ import errors.SyntaxError
 import interpreter.values.*
 import isInt
 import parser.*
+import typechecker.TypeChecker
 import java.io.File
 import kotlin.math.pow
 
@@ -580,11 +581,26 @@ class Interpreter {
         when (val fn = evaluate(call.callee, env)) {
             is Funkcija -> {
                 val activationRecord = hashMapOf<String, RuntimeValue>()
+                val typeChecker = TypeChecker(env)
+
                 fn.params.forEachIndexed{index, param ->
-                    activationRecord[param.identifier.symbol] = evaluate(call.args[index], env)
+                    val providedParam = evaluate(call.args[index], env)
+                    if(param.type != null){
+                        typeChecker.expect(param.type, providedParam)
+                    }
+                    activationRecord[param.identifier.symbol] = providedParam
                 }
+
                 val functionEnv = Environment(parent = env, variables = activationRecord)
                 val functionResult = evaluateBlockStatement(fn.body, functionEnv)
+
+                if(fn.returnType != null){
+                    when(functionResult){
+                        is ReturnValue -> typeChecker.expect(fn.returnType, functionResult.value)
+                        else -> typeChecker.expect(fn.returnType, functionResult)
+                    }
+                }
+
                 return if(functionResult is ReturnValue) functionResult.value else functionResult
             }
 
