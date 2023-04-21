@@ -22,7 +22,7 @@ class Interpreter {
         return result
     }
 
-    private fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue {
+    fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue {
         when(node.kind){
             // ---------------------------------------------------------------------------------------------------------
             // Literals
@@ -539,7 +539,7 @@ class Interpreter {
         throw Exception("Invalid assignment operation ")
     }
 
-    private fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue {
+    fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue {
         val blockEnv = Environment(parent = env)
         var result: RuntimeValue = Null()
         for (stmt in block.body){
@@ -610,6 +610,14 @@ class Interpreter {
                     args.add(evaluate(it, env))
                 }
                 return fn.call(*(args.toTypedArray()))
+            }
+
+            is ContextualNativeFunction -> {
+                val args = arrayListOf<RuntimeValue>()
+                call.args.forEach {
+                    args.add(evaluate(it, env))
+                }
+                return fn.call(args, this)
             }
 
             is Model -> {
