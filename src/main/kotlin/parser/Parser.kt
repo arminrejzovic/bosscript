@@ -183,10 +183,7 @@ class Parser {
 
         expect(TokenType.Colon, "Missing :")
         val type = parseTypeAnnotation()
-
-        if(current().type != TokenType.CloseBrace){
-            expect(TokenType.Comma, "Expected , or }")
-        }
+        expect(TokenType.Semicolon, "Expected ;")
 
         return ModelProperty(
             name = name,
