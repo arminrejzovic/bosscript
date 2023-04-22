@@ -1,3 +1,6 @@
+import interpreter.values.Niz
+import interpreter.values.RuntimeValue
+
 fun Double.isInt(): Boolean {
     return this % 1 == 0.0
 }
@@ -16,4 +19,15 @@ fun String.isNumeric(): Boolean{
 
 fun String.isIgnoredWhitespace(): Boolean{
     return this == " " || this == "\r" || this == "\t"
+}
+
+fun ArrayList<RuntimeValue>.flatten(): ArrayList<RuntimeValue> {
+    val flattenedList = arrayListOf<RuntimeValue>()
+    for (element in this) {
+        when (element) {
+            is Niz -> flattenedList.addAll(element.value.flatten())
+            else -> flattenedList.add(element)
+        }
+    }
+    return flattenedList
 }
