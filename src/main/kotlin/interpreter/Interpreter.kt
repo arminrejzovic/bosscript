@@ -790,9 +790,13 @@ class Interpreter {
                     if (target is Niz){
                         return target.getElement(prop.value.toInt())
                     }
-                    else{
-                        throw Exception("${target.javaClass.simpleName} is not indexable")
+                    else if(target is Tekst){
+                        return Tekst(
+                            value = "${target.value[prop.value.toInt()]}"
+                        )
                     }
+
+                    throw Exception("${target.javaClass.simpleName} is not indexable")
                 }
                 else -> {
                     throw Exception("Type ${prop.javaClass.simpleName} cannot be used as an index type")
