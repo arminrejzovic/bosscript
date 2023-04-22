@@ -22,7 +22,7 @@ data class Objekat(
     }
 
     override fun getProperty(prop: String): RuntimeValue {
-        return (builtIns[prop] ?: properties[prop]) ?: throw Exception("Property $prop does not exist on object")
+        return (builtIns[prop] ?: properties[prop]) ?: throw Exception("Property $prop does not exist on object $this")
     }
 
     fun setProperty(prop: String, newValue: RuntimeValue): RuntimeValue {
