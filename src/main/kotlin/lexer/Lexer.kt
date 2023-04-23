@@ -25,9 +25,12 @@ val keywords = mapOf(
     "ili" to TokenType.Ili,
     "osim" to TokenType.Osim,
     "inace" to TokenType.Inace,
+    "inače" to TokenType.Inace,
     "nedefinisano" to TokenType.Nedefinisano,
     "tacno" to TokenType.Tacno,
+    "tačno" to TokenType.Tacno,
     "netacno" to TokenType.Netacno,
+    "netačno" to TokenType.Netacno,
     "model" to TokenType.Model,
     "tip" to TokenType.Tip
 )
