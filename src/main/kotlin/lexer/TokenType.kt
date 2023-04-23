@@ -62,5 +62,6 @@ enum class TokenType{
     Break,
     UnaryIncrement,
     UnaryDecrement,
-    Tip
+    Tip,
+    This
 }

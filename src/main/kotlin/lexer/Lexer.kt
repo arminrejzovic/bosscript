@@ -133,6 +133,9 @@ fun tokenize(src: String): ArrayList<Token>{
         else if(sourceCode[0] == "."){
             tokens.add(Token(sourceCode.removeAt(0), TokenType.Dot, line, col++))
         }
+        else if(sourceCode[0] == "@"){
+            tokens.add(Token(sourceCode.removeAt(0), TokenType.This, line, col++))
+        }
         else if(sourceCode[0] == "<" || sourceCode[0] == ">"){
             if(sourceCode.size > 1 && sourceCode[1] == "="){
                 tokens.add(Token(value = "${sourceCode.removeAt(0)}${sourceCode.removeAt(0)}", TokenType.RelationalOperator, line, col))

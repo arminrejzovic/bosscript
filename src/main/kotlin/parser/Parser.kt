@@ -72,7 +72,7 @@ class Parser {
     }
 
     /**
-     * parser.Statement
+     * Statement
      *      : ExpressionStatement
      *      | BlockStatement
      *      | EmptyStatement
@@ -222,8 +222,8 @@ class Parser {
     }
 
     /**
-     * parser.WhileStatement
-     *      : "dok" "(" parser.Expression ")" parser.Statement
+     * WhileStatement
+     *      : "dok" "(" Expression ")" Statement
      *      ;
      */
     private fun parseWhileStatement(): WhileStatement {
@@ -264,9 +264,9 @@ class Parser {
         }
         expect(TokenType.CloseParen, "Expected ')'")
 
-        // For parser.Statement body must be Block parser.Statement
+        // For Statement body must be Block Statement
         // But shorthand syntax for single-line for loops is allowed: za svako(...) => ispis();
-        // Shorthand syntax is parsed as parser.BlockStatement(body=<the single expression>)
+        // Shorthand syntax is parsed as BlockStatement(body=<the single expression>)
         var body = BlockStatement(body = arrayListOf())
 
         if(current().type == TokenType.Arrow){
@@ -309,9 +309,9 @@ class Parser {
     }
 
     /**
-     * parser.IfStatement
-     *      : "ako" "(" parser.Expression ")" parser.Statement
-     *      | "ako" "(" parser.Expression ")" parser.Statement "else" parser.Statement
+     * IfStatement
+     *      : "ako" "(" Expression ")" Statement
+     *      | "ako" "(" Expression ")" Statement "else" Statement
      */
     private fun parseIfStatement(): IfStatement {
         expect(TokenType.Ako, "Expected 'ako'")
@@ -338,9 +338,9 @@ class Parser {
     }
 
     /**
-     * parser.UnlessStatement
-     *      : "osim" "ako" "(" parser.Expression ")" parser.Statement
-     *      | "osim" "ako" "(" parser.Expression ")" parser.Statement "else" parser.Statement
+     * UnlessStatement
+     *      : "osim" "ako" "(" Expression ")" Statement
+     *      | "osim" "ako" "(" Expression ")" Statement "else" Statement
      *      ;
      */
     private fun parseUnlessStatement(): UnlessStatement {
@@ -366,8 +366,8 @@ class Parser {
 
 
     /**
-     * parser.FunctionDeclaration
-     *      : "funkcija" parser.Identifier "(" [FormalParameterList] ")" parser.BlockStatement
+     * FunctionDeclaration
+     *      : "funkcija" Identifier "(" [FormalParameterList] ")" BlockStatement
      *      ;
      */
     private fun parseFunctionDeclaration(): FunctionDeclaration {
@@ -408,8 +408,8 @@ class Parser {
     }
 
     /**
-     * parser.ReturnStatement
-     *      : "vrati" ("se" | [parser.Expression]) ";"
+     * ReturnStatement
+     *      : "vrati" ("se" | [Expression]) ";"
      *      ;
      */
     private fun parseReturnStatement(): ReturnStatement {
@@ -431,8 +431,8 @@ class Parser {
 
     /**
      * FormalParameterList
-     *      : parser.Identifier
-     *      | FormalParameterList "," parser.Identifier
+     *      : Identifier
+     *      | FormalParameterList "," Identifier
      */
     private fun parseFormalParameterList(): ArrayList<FunctionParameter>{
         val params = arrayListOf<FunctionParameter>()
@@ -451,7 +451,7 @@ class Parser {
     }
 
     /**
-     * parser.BlockStatement
+     * BlockStatement
      *      : "{" [StatementList] "}"
      *      ;
      */
@@ -466,7 +466,7 @@ class Parser {
     }
 
     /**
-     * parser.EmptyStatement
+     * EmptyStatement
      *      : ";"
      *      ;
      */
@@ -477,7 +477,7 @@ class Parser {
 
 
     /**
-     * parser.VariableStatement
+     * VariableStatement
      *      : "var" | "konst" VariableDeclarationList
      *      ;
      */
@@ -494,8 +494,8 @@ class Parser {
 
     /**
      * VariableDeclarationList
-     *      : parser.VariableDeclaration
-     *      | VariableDeclarationList "," parser.VariableDeclaration
+     *      : VariableDeclaration
+     *      | VariableDeclarationList "," VariableDeclaration
      *      ;
      */
     private fun parseVariableDeclarationList(): ArrayList<VariableDeclaration>{
@@ -509,8 +509,8 @@ class Parser {
     }
 
     /**
-     * parser.VariableDeclaration
-     *      : parser.Identifier [VariableInitializer]
+     * VariableDeclaration
+     *      : Identifier [VariableInitializer]
      *      ;
      */
     private fun parseVariableDeclaration(): VariableDeclaration {
@@ -527,7 +527,7 @@ class Parser {
 
     /**
      * VariableInitializer:
-     *      : SimpleAssign parser.AssignmentExpression
+     *      : SimpleAssign AssignmentExpression
      *      ;
      */
     private fun parseVariableInitializer(): Expression {
@@ -536,8 +536,8 @@ class Parser {
     }
 
     /**
-     * parser.Expression:
-     *      : parser.FunctionExpression
+     * Expression:
+     *      : FunctionExpression
      *      | AdditiveExpression
      *      ;
      */
@@ -583,7 +583,7 @@ class Parser {
     }
 
     /**
-     * parser.AssignmentExpression:
+     * AssignmentExpression:
      *      : LogicalOrExpression
      *      | LeftHandSideExpression AssignmentOperator LogicalOr
      *      ;
@@ -690,8 +690,8 @@ class Parser {
 
     /**
      * CallMemberExpression
-     *      : parser.MemberExpression
-     *      | parser.CallExpression
+     *      : MemberExpression
+     *      | CallExpression
      *      ;
      */
     private fun parseCallMemberExpression(): Expression {
@@ -705,13 +705,13 @@ class Parser {
     }
 
     /**
-     * parser.CallExpression
+     * CallExpression
      *      : Callee Arguments
      *      ;
      *
      * Callee
-     *      : parser.MemberExpression
-     *      | parser.CallExpression
+     *      : MemberExpression
+     *      | CallExpression
      *      ;
      */
     private fun parseCallExpression(callee: Expression): CallExpression {
@@ -753,14 +753,18 @@ class Parser {
     }
 
     /**
-     * parser.MemberExpression
+     * MemberExpression
      *      : PrimaryExpression
-     *      | parser.MemberExpression "." parser.Identifier
-     *      | parser.MemberExpression "[" parser.Expression "]"
+     *      | MemberExpression "." Identifier
+     *      | MemberExpression "[" Expression "]"
      *      ;
      */
     private fun parseMemberExpression(): Expression {
         var targetObject = parsePrimaryExpression()
+
+        if(targetObject is Identifier && targetObject.symbol == "@" && current().type == TokenType.Identifier || current().type == TokenType.OpenBracket){
+            tokens.add(0, Token(".", TokenType.Dot, current().line, current().col))
+        }
 
         while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket){
             if(current().type == TokenType.Dot){
@@ -789,20 +793,25 @@ class Parser {
     }
 
     /**
-     * parser.Identifier
+     * Identifier
      *      : IDENTIFIER
      *      ;
      */
 
     private fun parseIdentifier(): Identifier {
-        val identifier = expect(TokenType.Identifier, "parser.Identifier expected").value
+        if(current().type == TokenType.This){
+            consume(/* @ */)
+            return Identifier(symbol = "@")
+        }
+
+        val identifier = expect(TokenType.Identifier, "Identifier expected").value
         return Identifier(symbol = identifier)
     }
 
     /**
-     * parser.TypeAnnotation
-     *      : parser.Identifier
-     *      | parser.Identifier[]
+     * TypeAnnotation
+     *      : Identifier
+     *      | Identifier[]
      *      ;
      */
     private fun parseTypeAnnotation(): TypeAnnotation {
@@ -864,8 +873,8 @@ class Parser {
 
     /**
      * ExponentiationExpression
-     *      : parser.UnaryExpression
-     *      | parser.UnaryExpression "^" parser.UnaryExpression
+     *      : UnaryExpression
+     *      | UnaryExpression "^" UnaryExpression
      */
     private fun parseExponentiationExpression(): Expression {
         var left = parseUnaryExpression()
@@ -881,10 +890,10 @@ class Parser {
     }
 
     /**
-     * parser.UnaryExpression
+     * UnaryExpression
      *      : LeftHandSideExpression
-     *      | "+"/"-" parser.UnaryExpression
-     *      | "!" parser.UnaryExpression
+     *      | "+"/"-" UnaryExpression
+     *      | "!" UnaryExpression
      *      ;
      */
     private fun parseUnaryExpression(): Expression {
@@ -909,7 +918,7 @@ class Parser {
      * PrimaryExpression
      *      : Literal
      *      | ParenthesizedExpression
-     *      | parser.Identifier
+     *      | Identifier
      *      | ThisExpression
      *      | NewExpression
      *      ;
@@ -944,7 +953,7 @@ class Parser {
     }
 
     /**
-     * parser.NumericLiteral
+     * NumericLiteral
      *      : "+/-" 1*(1-9[_])[.1*(1-9[_])]
      */
     private fun parseNumericLiteral(): NumericLiteral {
@@ -952,7 +961,7 @@ class Parser {
     }
 
     /**
-     * parser.StringLiteral
+     * StringLiteral
      *      : " [s+] "
      */
     private fun parseStringLiteral(): StringLiteral {
@@ -963,7 +972,7 @@ class Parser {
     }
 
     /**
-     * parser.BooleanLiteral
+     * BooleanLiteral
      *      : "tacno"
      *      | "netacno"
      *      ;
@@ -981,7 +990,7 @@ class Parser {
 
     /**
      * ParenthesizedExpression
-     *      : "(" parser.Expression ")"
+     *      : "(" Expression ")"
      *      ;
      */
     private fun parseParenthesizedExpression(): Expression {

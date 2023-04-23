@@ -12,6 +12,7 @@ import kotlin.math.pow
 class Interpreter {
     private val globalEnv = Environment()
     private val parser = Parser()
+    private var `this`: RuntimeValue = Null()
 
     fun evaluateProgram(src: String): ArrayList<RuntimeValue>{
         val program = parser.parseProgram(src)
@@ -50,9 +51,11 @@ class Interpreter {
             NodeType.Object -> {
                 val objNode = node as ObjectLiteral
                 val obj = Objekat(properties = hashMapOf())
+                `this` = obj
                 objNode.properties.forEach {
                     obj.properties[it.key] = evaluate(it.value, environment)
                 }
+                `this` = Null()
                 return obj
             }
             // ---------------------------------------------------------------------------------------------------------
@@ -511,6 +514,7 @@ class Interpreter {
             val newValue = evaluate(expr.value, env)
 
             if(target is Objekat){
+                `this` = target
                 if(expr.assignee.property is Identifier){
                     // a.b.c = 10;
                     return target.setProperty(expr.assignee.property.symbol, newValue)
@@ -580,7 +584,7 @@ class Interpreter {
     private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue {
         when (val fn = evaluate(call.callee, env)) {
             is Funkcija -> {
-                val activationRecord = hashMapOf<String, RuntimeValue>()
+                val activationRecord = hashMapOf<String, RuntimeValue>("@" to `this`)
                 val typeChecker = TypeChecker(env)
 
                 fn.params.forEachIndexed{index, param ->
@@ -775,6 +779,7 @@ class Interpreter {
 
     private fun evaluateMemberExpression(expr: MemberExpression, env: Environment): RuntimeValue {
         val target = evaluate(expr.targetObject, env)
+        `this` = target
         if(expr.isComputed){
             when(val prop = evaluate(expr.property, env)){
                 is Tekst -> {
