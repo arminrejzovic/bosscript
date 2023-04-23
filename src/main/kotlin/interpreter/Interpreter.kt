@@ -252,8 +252,8 @@ class Interpreter {
                 return evaluateImportStatement(node as ImportStatement, environment)
             }
 
-            NodeType.ModelDefinition -> {
-                return evaluateModelDefinition(node as ModelDefinitionStatement, environment)
+            NodeType.TypeDefinition -> {
+                return evaluateModelDefinition(node as TipDefinitionStatement, environment)
             }
 
             else -> {
@@ -409,8 +409,8 @@ class Interpreter {
     }
 
     private fun evaluateIdentifier(identifier: Identifier, environment: Environment): RuntimeValue {
-        val model = environment.resolveModelDefinition(identifier.symbol)
-        return model ?: environment.getVariable(identifier.symbol)
+        val typeDefinition = environment.resolveTypeDefinition(identifier.symbol)
+        return typeDefinition ?: environment.getVariable(identifier.symbol)
     }
 
     private fun evaluateVariableStatement(stmt: VariableStatement, env: Environment){
@@ -620,7 +620,7 @@ class Interpreter {
                 return fn.call(args, this)
             }
 
-            is Model -> {
+            is Tip -> {
                 val args = arrayListOf<RuntimeValue>()
                 call.args.forEach {
                     args.add(evaluate(it, env))
@@ -809,7 +809,7 @@ class Interpreter {
         }
     }
 
-    private fun evaluateModelDefinition(modelDefinition: ModelDefinitionStatement, env: Environment): RuntimeValue{
+    private fun evaluateModelDefinition(modelDefinition: TipDefinitionStatement, env: Environment): RuntimeValue{
         env.addModelDefinition(modelDefinition)
         return Null()
     }

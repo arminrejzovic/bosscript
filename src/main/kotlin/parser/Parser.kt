@@ -114,8 +114,8 @@ class Parser {
             TokenType.Vrati -> {
                 return parseReturnStatement()
             }
-            TokenType.Model -> {
-                return parseModelDefinitionStatement()
+            TokenType.Tip -> {
+                return parseTypeDefinitionStatement()
             }
             TokenType.Paket -> {
                 return parseImportStatement()
@@ -158,34 +158,34 @@ class Parser {
         )
     }
 
-    private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
-        expect(TokenType.Model, "A model is defined using the model keyword")
+    private fun parseTypeDefinitionStatement(): TipDefinitionStatement {
+        expect(TokenType.Tip, "A type is defined using the tip keyword")
         val name = parseIdentifier()
-        expect(TokenType.OpenBrace, "A model definition is surrounded with braces")
-        val properties = arrayListOf<ModelProperty>()
+        expect(TokenType.OpenBrace, "A type definition is surrounded with braces")
+        val properties = arrayListOf<TypeProperty>()
         while (current().type != TokenType.EOF && current().type != TokenType.CloseBrace){
-            properties.add(parseModelProperty())
+            properties.add(parseTypeProperty())
         }
         expect(TokenType.CloseBrace, "Missing }")
 
         if(properties.isEmpty()){
-            warning("Model '${name.symbol}' is empty")
+            warning("Type '${name.symbol}' is empty")
         }
 
-        return ModelDefinitionStatement(
+        return TipDefinitionStatement(
             name = name,
             properties = properties
         )
     }
 
-    private fun parseModelProperty(): ModelProperty {
-        val name = expect(TokenType.Identifier, "Model property name expected, got ${current().type}").value
+    private fun parseTypeProperty(): TypeProperty {
+        val name = expect(TokenType.Identifier, "Type property name expected, got ${current().type}").value
 
         expect(TokenType.Colon, "Missing :")
         val type = parseTypeAnnotation()
         expect(TokenType.Semicolon, "Expected ;")
 
-        return ModelProperty(
+        return TypeProperty(
             name = name,
             type = type
         )

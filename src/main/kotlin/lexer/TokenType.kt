@@ -61,5 +61,6 @@ enum class TokenType{
     ComplexAssign,
     Break,
     UnaryIncrement,
-    UnaryDecrement
+    UnaryDecrement,
+    Tip
 }

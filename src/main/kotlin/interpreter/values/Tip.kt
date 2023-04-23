@@ -1,18 +1,18 @@
 package interpreter.values
 
 import interpreter.Environment
-import parser.ModelProperty
+import parser.TypeProperty
 import typechecker.TypeChecker
 
-data class Model(
+data class Tip(
     val name: String,
-    val properties: ArrayList<ModelProperty>,
+    val properties: ArrayList<TypeProperty>,
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-    override val typename: String = "Model"
+    override val typename: String = "Tip"
 ) : RuntimeValue {
     override fun getProperty(prop: String): RuntimeValue {
-        throw Exception("Model has no properties of itself")
+        throw Exception("Tip has no properties of itself")
     }
 
     fun constructor(args: ArrayList<RuntimeValue>, env: Environment): Objekat{

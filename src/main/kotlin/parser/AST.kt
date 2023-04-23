@@ -13,11 +13,9 @@ data class BreakStatement(
 ) : Statement
 
 data class Program(
-    val body: ArrayList<Statement>
-) : Statement {
-    override val kind: NodeType
-        get() = NodeType.Program
-}
+    val body: ArrayList<Statement>,
+    override val kind: NodeType = NodeType.Program
+) : Statement
 
 data class BlockStatement(
     val body: ArrayList<Statement>,
@@ -114,22 +112,20 @@ data class LogicalExpression(
 
 data class VariableDeclaration(
     val identifier: String,
-    val value: Expression?
-): Statement {
-    override val kind: NodeType
-        get() = NodeType.VariableDeclaration
-}
-
-data class ModelDefinitionStatement(
-    val name: Identifier,
-    val properties: ArrayList<ModelProperty>,
-    override val kind: NodeType = NodeType.ModelDefinition
+    val value: Expression?,
+    override val kind: NodeType = NodeType.VariableDeclaration
 ): Statement
 
-data class ModelProperty(
+data class TipDefinitionStatement(
+    val name: Identifier,
+    val properties: ArrayList<TypeProperty>,
+    override val kind: NodeType = NodeType.TypeDefinition
+): Statement
+
+data class TypeProperty(
     val name: String,
     val type: TypeAnnotation,
-    override val kind: NodeType = NodeType.ModelPropertyDefinition
+    override val kind: NodeType = NodeType.TypePropertyDefinition
 ): Statement
 
 data class TypeAnnotation(
@@ -161,18 +157,14 @@ data class UnaryExpression(
 
 
 data class Identifier(
-    val symbol: String
-) : Expression {
-    override val kind: NodeType
-        get() = NodeType.Identifier
-}
+    val symbol: String,
+    override val kind: NodeType = NodeType.Identifier
+) : Expression
 
 data class NumericLiteral(
-    val value: Double
-) : Expression {
-    override val kind: NodeType
-        get() = NodeType.NumericLiteral
-}
+    val value: Double,
+    override val kind: NodeType =  NodeType.NumericLiteral
+) : Expression
 
 data class StringLiteral(
     val value: String,

@@ -3,11 +3,11 @@ package parser
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-class ModelTest {
+class TipTest {
     @Test
     fun testModelDefinition(){
         val src = """
-            model Korisnik{
+            tip Korisnik{
                 ime: tekst,
                 prezime: tekst,
                 godiste: broj,
@@ -20,40 +20,40 @@ class ModelTest {
         val program = parser.parseProgram(src)
 
         val expectedResult = arrayListOf(
-            ModelDefinitionStatement(
+            TipDefinitionStatement(
                 name = Identifier(
                     symbol = "Korisnik"
                 ),
                 properties = arrayListOf(
-                    ModelProperty(
+                    TypeProperty(
                         name = "ime",
                         type = TypeAnnotation(
                             typeName = "tekst",
                             isArrayType = false
                         )
                     ),
-                    ModelProperty(
+                    TypeProperty(
                         name = "prezime",
                         type = TypeAnnotation(
                             typeName = "tekst",
                             isArrayType = false
                         )
                     ),
-                    ModelProperty(
+                    TypeProperty(
                         name = "godiste",
                         type = TypeAnnotation(
                             typeName = "broj",
                             isArrayType = false
                         )
                     ),
-                    ModelProperty(
+                    TypeProperty(
                         name = "lista",
                         type = TypeAnnotation(
                             typeName = "tekst",
                             isArrayType = true
                         )
                     ),
-                    ModelProperty(
+                    TypeProperty(
                         name = "ucenik",
                         type = TypeAnnotation(
                             typeName = "logicki",
@@ -69,14 +69,14 @@ class ModelTest {
     @Test
     fun testEmptyModelDefinition(){
         val src = """
-            model Korisnik{}
+            tip Korisnik{}
         """.trimIndent()
 
         val parser = Parser()
         val program = parser.parseProgram(src)
 
         val expectedResult = arrayListOf(
-            ModelDefinitionStatement(
+            TipDefinitionStatement(
                 name = Identifier(
                     symbol = "Korisnik"
                 ),
@@ -89,7 +89,7 @@ class ModelTest {
     @Test
     fun testMissingCommaInModelDefinition(){
         val src = """
-            model Korisnik{
+            tip Korisnik{
                 ime: tekst
                 prezime: tekst
             }
@@ -110,7 +110,7 @@ class ModelTest {
     @Test
     fun testMissingTypeInModelDefinition(){
         val src = """
-            model Korisnik{
+            tip Korisnik{
                 ime: tekst,
                 prezime
             }

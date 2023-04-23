@@ -1,7 +1,7 @@
 package interpreter
 
 import interpreter.values.*
-import parser.ModelDefinitionStatement
+import parser.TipDefinitionStatement
 import java.util.Scanner
 import kotlin.random.Random
 
@@ -9,7 +9,7 @@ class Environment(
     private val parent: Environment? = null,
     private val variables: HashMap<String, RuntimeValue> = HashMap(),
     private val constants: MutableSet<String> = mutableSetOf(),
-    private val modelDefinitions: HashMap<String, Model> = HashMap()
+    private val typeDefinitions: HashMap<String, Tip> = HashMap()
 ){
 
     init {
@@ -61,24 +61,24 @@ class Environment(
         constants.addAll(env.constants)
     }
 
-    fun addModelDefinition(modelDefinition: ModelDefinitionStatement){
-        modelDefinitions[modelDefinition.name.symbol] = Model(name = modelDefinition.name.symbol, properties = modelDefinition.properties)
+    fun addModelDefinition(modelDefinition: TipDefinitionStatement){
+        typeDefinitions[modelDefinition.name.symbol] = Tip(name = modelDefinition.name.symbol, properties = modelDefinition.properties)
     }
 
-    private fun resolveModelDefinitionEnv(name: String): Environment?{
-        if(modelDefinitions[name] != null) {
+    private fun resolveTypeDefinitionEnv(name: String): Environment?{
+        if(typeDefinitions[name] != null) {
             return this
         }
         if(parent == null) {
             return null
         }
 
-        return parent.resolveModelDefinitionEnv(name)
+        return parent.resolveTypeDefinitionEnv(name)
     }
 
-    fun resolveModelDefinition(name: String): Model?{
-        val env = resolveModelDefinitionEnv(name) ?: return null
-        return env.modelDefinitions[name]
+    fun resolveTypeDefinition(name: String): Tip?{
+        val env = resolveTypeDefinitionEnv(name) ?: return null
+        return env.typeDefinitions[name]
     }
 
     private fun createGlobalEnvironment(env: Environment){

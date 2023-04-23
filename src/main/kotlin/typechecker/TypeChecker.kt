@@ -18,7 +18,7 @@ class TypeChecker(private val env: Environment) {
             is Objekat -> {
                 if(expectedType.isArrayType) throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
                 if(expectedType.typeName != "objekat"){
-                    val modelDefinition = env.resolveModelDefinition(expectedType.typeName) ?: throw Exception("Cannot resolve typename ${expectedType.typeName}")
+                    val modelDefinition = env.resolveTypeDefinition(expectedType.typeName) ?: throw Exception("Cannot resolve typename ${expectedType.typeName}")
 
                     val expectedKeys = modelDefinition.properties.mapTo(HashSet()) { it.name }
 

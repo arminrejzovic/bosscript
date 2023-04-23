@@ -28,7 +28,8 @@ val keywords = mapOf(
     "nedefinisano" to TokenType.Nedefinisano,
     "tacno" to TokenType.Tacno,
     "netacno" to TokenType.Netacno,
-    "model" to TokenType.Model
+    "model" to TokenType.Model,
+    "tip" to TokenType.Tip
 )
 
 fun tokenize(src: String): ArrayList<Token>{
