@@ -253,7 +253,7 @@ class Interpreter {
             }
 
             NodeType.TypeDefinition -> {
-                return evaluateModelDefinition(node as TipDefinitionStatement, environment)
+                return evaluateTypeDefinition(node as TipDefinitionStatement, environment)
             }
 
             else -> {
@@ -809,7 +809,11 @@ class Interpreter {
         }
     }
 
-    private fun evaluateModelDefinition(modelDefinition: TipDefinitionStatement, env: Environment): RuntimeValue{
+    private fun evaluateTypeDefinition(modelDefinition: TipDefinitionStatement, env: Environment): RuntimeValue{
+        if(modelDefinition.parentType != null){
+            val parent = evaluateIdentifier(modelDefinition.parentType, env) as Tip
+            modelDefinition.properties.addAll(0, parent.properties)
+        }
         env.addModelDefinition(modelDefinition)
         return Null()
     }

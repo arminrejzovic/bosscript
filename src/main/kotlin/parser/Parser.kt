@@ -161,6 +161,12 @@ class Parser {
     private fun parseTypeDefinitionStatement(): TipDefinitionStatement {
         expect(TokenType.Tip, "A type is defined using the tip keyword")
         val name = parseIdentifier()
+        var parentType: Identifier? = null
+        if(current().value == "<"){
+            // Inheritance
+            consume(/* < */)
+            parentType = parseIdentifier()
+        }
         expect(TokenType.OpenBrace, "A type definition is surrounded with braces")
         val properties = arrayListOf<TypeProperty>()
         while (current().type != TokenType.EOF && current().type != TokenType.CloseBrace){
@@ -174,6 +180,7 @@ class Parser {
 
         return TipDefinitionStatement(
             name = name,
+            parentType = parentType,
             properties = properties
         )
     }

@@ -118,6 +118,7 @@ data class VariableDeclaration(
 
 data class TipDefinitionStatement(
     val name: Identifier,
+    val parentType: Identifier?,
     val properties: ArrayList<TypeProperty>,
     override val kind: NodeType = NodeType.TypeDefinition
 ): Statement
