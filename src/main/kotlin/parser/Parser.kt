@@ -83,6 +83,7 @@ class Parser {
      *      | ReturnStatement
      *      | ModelDefinitionStatement
      *      | ImportStatement
+     *      | TryCatchStatement
      *      ;
      */
     private fun parseStatement(): Statement {
@@ -120,6 +121,9 @@ class Parser {
             TokenType.Paket -> {
                 return parseImportStatement()
             }
+            TokenType.Try -> {
+                return parseTryCatchStatement()
+            }
             TokenType.Svako -> {
                 throw Exception("You are probably missing 'za' before 'svako'")
             }
@@ -130,6 +134,23 @@ class Parser {
                 return parseExpressionStatement()
             }
         }
+    }
+
+    private fun parseTryCatchStatement(): Statement {
+        expect(TokenType.Try, "Expected 'try'")
+        val tryBlock = parseBlockStatement()
+        expect(TokenType.Catch, "Expecting 'catch' block")
+        val catchBlock = parseBlockStatement()
+        var finallyBlock: BlockStatement? = null
+        if(current().type == TokenType.Finally){
+            consume(/* finally */)
+            finallyBlock = parseBlockStatement()
+        }
+        return TryCatchStatement(
+            tryBlock = tryBlock,
+            catchBlock = catchBlock,
+            finallyBlock = finallyBlock
+        )
     }
 
     private fun parseImportStatement(): Statement {

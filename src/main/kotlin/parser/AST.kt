@@ -22,6 +22,13 @@ data class BlockStatement(
     override val kind: NodeType = NodeType.Block
 ) : Statement
 
+data class TryCatchStatement(
+    val tryBlock: BlockStatement,
+    val catchBlock: BlockStatement,
+    val finallyBlock: BlockStatement?,
+    override val kind: NodeType = NodeType.TryCatch
+): Statement
+
 data class FunctionDeclaration(
     val name: Identifier,
     val params: ArrayList<FunctionParameter>,

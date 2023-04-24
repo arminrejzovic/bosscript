@@ -259,10 +259,30 @@ class Interpreter {
                 return evaluateTypeDefinition(node as TipDefinitionStatement, environment)
             }
 
+            NodeType.TryCatch -> {
+                return evaluateTryCatch(node as TryCatchStatement, environment)
+            }
+
             else -> {
                 throw SyntaxError("Unexpected token, $node")
             }
         }
+    }
+
+    private fun evaluateTryCatch(stmt: TryCatchStatement, env: Environment): RuntimeValue {
+        var result: RuntimeValue = Null()
+        try {
+            result = evaluate(stmt.tryBlock, env)
+        }
+        catch (e: Exception){
+            env.declareVariable("g", Tekst("${e.message}"), true)
+            result = evaluate(stmt.catchBlock, env)
+        }
+        if (stmt.finallyBlock != null){
+            result = evaluate(stmt.finallyBlock, env)
+        }
+
+        return result
     }
 
     private fun evaluatePackage(src: String, env: Environment){

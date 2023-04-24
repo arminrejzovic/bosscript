@@ -31,8 +31,13 @@ val keywords = mapOf(
     "tačno" to TokenType.Tacno,
     "netacno" to TokenType.Netacno,
     "netačno" to TokenType.Netacno,
+    "probaj" to TokenType.Try,
+    "spasi" to TokenType.Catch,
+    "konacno" to TokenType.Finally,
+    "konačno" to TokenType.Finally,
+    "tip" to TokenType.Tip,
     "model" to TokenType.Model,
-    "tip" to TokenType.Tip
+    "privatna" to TokenType.Private
 )
 
 fun tokenize(src: String): ArrayList<Token>{

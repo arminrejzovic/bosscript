@@ -63,5 +63,11 @@ enum class TokenType{
     UnaryIncrement,
     UnaryDecrement,
     Tip,
-    This
+    This,
+    Private,
+    Public,
+    Static,
+    Try,
+    Catch,
+    Finally
 }

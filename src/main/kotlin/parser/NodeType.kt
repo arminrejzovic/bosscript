@@ -33,5 +33,6 @@ enum class NodeType {
     ArrayLiteral,
     FunctionExpression,
     BreakStatement,
-    ImportStatement
+    ImportStatement,
+    TryCatch
 }
