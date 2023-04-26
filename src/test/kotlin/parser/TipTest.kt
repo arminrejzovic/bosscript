@@ -24,6 +24,7 @@ class TipTest {
                 name = Identifier(
                     symbol = "Korisnik"
                 ),
+                parentType = null,
                 properties = arrayListOf(
                     TypeProperty(
                         name = "ime",
@@ -80,6 +81,7 @@ class TipTest {
                 name = Identifier(
                     symbol = "Korisnik"
                 ),
+                parentType = null,
                 properties = arrayListOf()
             )
         )

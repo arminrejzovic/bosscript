@@ -130,6 +130,31 @@ data class TipDefinitionStatement(
     override val kind: NodeType = NodeType.TypeDefinition
 ): Statement
 
+data class ModelDefinitionStatement(
+    val className: Identifier,
+    val parentClassName: Identifier?,
+    val privateBlock: ModelBlock?,
+    val publicBlock: ModelBlock?,
+    override val kind: NodeType = NodeType.ModelDefinition
+): Statement
+
+data class ModelBlock(
+    private val body: ArrayList<Statement> = arrayListOf(),
+    override val kind: NodeType = NodeType.ModelBlock
+): Statement{
+    fun getBody(): ArrayList<Statement>{
+        return body
+    }
+
+    fun addStatement(stmt: Statement){
+        if(stmt is VariableStatement || stmt is FunctionDeclaration){
+            body.add(stmt)
+            return
+        }
+        throw Exception("Expected member declaration")
+    }
+}
+
 data class TypeProperty(
     val name: String,
     val type: TypeAnnotation,

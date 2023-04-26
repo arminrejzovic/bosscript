@@ -34,5 +34,7 @@ enum class NodeType {
     FunctionExpression,
     BreakStatement,
     ImportStatement,
-    TryCatch
+    TryCatch,
+    ModelDefinition,
+    ModelBlock
 }

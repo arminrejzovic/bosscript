@@ -118,6 +118,9 @@ class Parser {
             TokenType.Tip -> {
                 return parseTypeDefinitionStatement()
             }
+            TokenType.Model -> {
+                return parseModelDefinitionStatement()
+            }
             TokenType.Paket -> {
                 return parseImportStatement()
             }
@@ -134,6 +137,58 @@ class Parser {
                 return parseExpressionStatement()
             }
         }
+    }
+
+    private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
+        expect(TokenType.Model, "Expected 'model'")
+        val classname = parseIdentifier()
+        var parentClassName: Identifier? = null
+        var privateBlock: ModelBlock? = null
+        var publicBlock: ModelBlock? = null
+
+        if(current().value == "<"){
+            consume(/* < */)
+            parentClassName = parseIdentifier()
+        }
+
+        expect(TokenType.OpenBrace, "Expected '{'")
+
+        if(current().type != TokenType.Private && current().type != TokenType.Public){
+            throw Exception("Expecting private or public block")
+        }
+
+        if(current().type == TokenType.Private){
+            consume(/* privatno */)
+            privateBlock = parseModelBlock()
+        }
+
+        if(current().type != TokenType.Public){
+            throw Exception("Expecting private or public block")
+        }
+
+        if(current().type == TokenType.Public){
+            consume(/* javno */)
+            publicBlock = parseModelBlock()
+        }
+
+        expect(TokenType.CloseBrace, "Expected '}'")
+
+        return ModelDefinitionStatement(
+            className = classname,
+            parentClassName = parentClassName,
+            privateBlock = privateBlock,
+            publicBlock = publicBlock
+        )
+    }
+
+    private fun parseModelBlock(): ModelBlock {
+        expect(TokenType.OpenBrace, "Expected '{'")
+        val modelBlock = ModelBlock()
+        while (current().type !== TokenType.CloseBrace){
+            modelBlock.addStatement(parseStatement())
+        }
+        expect(TokenType.CloseBrace, "Expected '}'")
+        return modelBlock
     }
 
     private fun parseTryCatchStatement(): Statement {
