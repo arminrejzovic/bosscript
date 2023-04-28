@@ -6,7 +6,11 @@ class ModelDefinitionTest {
     @Test
     fun testEmptyModelDefinition() {
         val src = """
-            model Korisnik{}
+            model Korisnik{
+                konstruktor(){
+                    @x = 10;
+                }
+            }
         """.trimIndent()
 
         val parser = Parser()
@@ -19,7 +23,25 @@ class ModelDefinitionTest {
                 ),
                 parentClassName = null,
                 privateBlock = null,
-                publicBlock = null
+                publicBlock = null,
+                constructor = FunctionDeclaration(
+                    name = Identifier("konstruktor"),
+                    params = arrayListOf(),
+                    body = BlockStatement(
+                        body = arrayListOf(
+                            AssignmentExpression(
+                                assignee = MemberExpression(
+                                    isComputed = false,
+                                    targetObject = Identifier("@"),
+                                    property = Identifier("x"),
+                                ),
+                                value = NumericLiteral(10.0),
+                                assignmentOperator = "="
+                            )
+                        )
+                    ),
+                    returnType = null
+                )
             )
         println(program.body.last())
         assert(program.body.last() == expectedResult)
@@ -31,6 +53,9 @@ class ModelDefinitionTest {
             model Korisnik{
                 javno {
                     var x = 10;
+                }
+                konstruktor(){
+                    @x = 20;
                 }
             }
         """.trimIndent()
@@ -58,6 +83,24 @@ class ModelDefinitionTest {
                             )
                         )
                     )
+                ),
+                constructor = FunctionDeclaration(
+                    name = Identifier("konstruktor"),
+                    params = arrayListOf(),
+                    body = BlockStatement(
+                        body = arrayListOf(
+                            AssignmentExpression(
+                                assignee = MemberExpression(
+                                    isComputed = false,
+                                    targetObject = Identifier("@"),
+                                    property = Identifier("x"),
+                                ),
+                                value = NumericLiteral(20.0),
+                                assignmentOperator = "="
+                            )
+                        )
+                    ),
+                    returnType = null
                 )
             )
         println(program.body.last())
@@ -70,6 +113,9 @@ class ModelDefinitionTest {
             model Korisnik{
                 privatno {
                     var x = 10;
+                }
+                konstruktor(){
+                    @x = 1;
                 }
             }
         """.trimIndent()
@@ -97,6 +143,24 @@ class ModelDefinitionTest {
                             )
                         )
                     )
+                ),
+                constructor = FunctionDeclaration(
+                    name = Identifier("konstruktor"),
+                    params = arrayListOf(),
+                    body = BlockStatement(
+                        body = arrayListOf(
+                            AssignmentExpression(
+                                assignee = MemberExpression(
+                                    isComputed = false,
+                                    targetObject = Identifier("@"),
+                                    property = Identifier("x"),
+                                ),
+                                value = NumericLiteral(1.0),
+                                assignmentOperator = "="
+                            )
+                        )
+                    ),
+                    returnType = null
                 )
             )
         println(program.body.last())
@@ -109,6 +173,9 @@ class ModelDefinitionTest {
             model Korisnik{
                 privatno {
                     var x = 10;
+                }
+                konstruktor(){
+                    @x = 10;
                 }
                 javno {
                    var z = "Z"; 
@@ -152,6 +219,24 @@ class ModelDefinitionTest {
                             )
                         )
                     )
+                ),
+                constructor = FunctionDeclaration(
+                    name = Identifier("konstruktor"),
+                    params = arrayListOf(),
+                    body = BlockStatement(
+                        body = arrayListOf(
+                            AssignmentExpression(
+                                assignee = MemberExpression(
+                                    isComputed = false,
+                                    targetObject = Identifier("@"),
+                                    property = Identifier("x"),
+                                ),
+                                value = NumericLiteral(10.0),
+                                assignmentOperator = "="
+                            )
+                        )
+                    ),
+                    returnType = null
                 )
             )
         println(program.body.last())
@@ -165,6 +250,7 @@ class ModelDefinitionTest {
                 privatno {
                     var x = 10;
                 }
+                konstruktor(){}
                 javno {
                    var z = "Z"; 
                 }
@@ -209,6 +295,12 @@ class ModelDefinitionTest {
                             )
                         )
                     )
+                ),
+                constructor = FunctionDeclaration(
+                    name = Identifier("konstruktor"),
+                    params = arrayListOf(),
+                    body = BlockStatement(body = arrayListOf()),
+                    returnType = null
                 )
             )
         println(program.body.last())
@@ -251,7 +343,7 @@ class ModelDefinitionTest {
         """.trimIndent()
 
         val parser = Parser()
-        val expectedError = "Expecting private or public block"
+        val expectedError = "Expecting private or public block, or constructor"
         var error = ""
         try {
             parser.parseProgram(src)

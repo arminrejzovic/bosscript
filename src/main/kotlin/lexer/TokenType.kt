@@ -69,5 +69,6 @@ enum class TokenType{
     Static,
     Try,
     Catch,
-    Finally
+    Finally,
+    Constructor
 }

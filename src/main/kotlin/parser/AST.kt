@@ -133,6 +133,7 @@ data class TipDefinitionStatement(
 data class ModelDefinitionStatement(
     val className: Identifier,
     val parentClassName: Identifier?,
+    val constructor: FunctionDeclaration,
     val privateBlock: ModelBlock?,
     val publicBlock: ModelBlock?,
     override val kind: NodeType = NodeType.ModelDefinition

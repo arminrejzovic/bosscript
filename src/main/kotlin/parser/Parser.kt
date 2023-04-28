@@ -11,7 +11,7 @@ class Parser {
 
     // Utility methods
 
-    private fun notEOF(): Boolean{
+    private fun notEOF(): Boolean {
         return current().type != TokenType.EOF
     }
 
@@ -23,12 +23,12 @@ class Parser {
         return tokens.removeAt(0)
     }
 
-    private fun getLineCol(): String{
+    private fun getLineCol(): String {
         return current().getLineCol()
     }
 
     private fun checkValidAssignmentTarget(node: Expression): Expression {
-        if (node.kind == NodeType.Identifier || node.kind == NodeType.MemberExpression){
+        if (node.kind == NodeType.Identifier || node.kind == NodeType.MemberExpression) {
             return node
         }
         throw Exception("Invalid assignment target")
@@ -39,14 +39,14 @@ class Parser {
      */
     private fun expect(expectedType: TokenType, errorMessage: String): Token {
         val prev = tokens.removeAt(0)
-        if(prev.type != expectedType){
+        if (prev.type != expectedType) {
             println("Expected ${expectedType.name}, got ${prev.type}")
             throw Exception(errorMessage)
         }
         return prev
     }
 
-    private fun warning(message: String){
+    private fun warning(message: String) {
         val reset = "\u001b[0m"
         val yellow = "\u001b[33m"
 
@@ -62,9 +62,9 @@ class Parser {
         return Program(parseStatementList())
     }
 
-    private fun parseStatementList(): ArrayList<Statement>{
+    private fun parseStatementList(): ArrayList<Statement> {
         val statementList = arrayListOf<Statement>()
-        while (notEOF()){
+        while (notEOF()) {
             statementList.add(parseStatement())
         }
 
@@ -87,52 +87,67 @@ class Parser {
      *      ;
      */
     private fun parseStatement(): Statement {
-        when(current().type){
+        when (current().type) {
             TokenType.OpenBrace -> {
                 return parseBlockStatement()
             }
+
             TokenType.Semicolon -> {
                 return parseEmptyStatement()
             }
+
             TokenType.Var, TokenType.Konst -> {
                 return parseVariableStatement()
             }
+
             TokenType.Ako -> {
                 return parseIfStatement()
             }
+
             TokenType.Osim -> {
                 return parseUnlessStatement()
             }
+
             TokenType.Dok, TokenType.Za, TokenType.Radi -> {
                 return parseIterationStatement()
             }
+
             TokenType.Break -> {
                 return parseBreakStatement()
             }
+
             TokenType.Funkcija -> {
                 return parseFunctionDeclaration()
             }
+
             TokenType.Vrati -> {
                 return parseReturnStatement()
             }
+
             TokenType.Tip -> {
                 return parseTypeDefinitionStatement()
             }
+
             TokenType.Model -> {
                 return parseModelDefinitionStatement()
             }
+
             TokenType.Paket -> {
                 return parseImportStatement()
             }
+
             TokenType.Try -> {
                 return parseTryCatchStatement()
             }
+
             TokenType.Svako -> {
                 throw Exception("You are probably missing 'za' before 'svako'")
             }
+
             TokenType.Ili -> {
                 throw Exception("'ili' block must follow an 'ako' block")
             }
+
             else -> {
                 return parseExpressionStatement()
             }
@@ -145,37 +160,61 @@ class Parser {
         var parentClassName: Identifier? = null
         var privateBlock: ModelBlock? = null
         var publicBlock: ModelBlock? = null
+        var constructor: FunctionDeclaration? = null
 
-        if(current().value == "<"){
+        if (current().value == "<") {
             consume(/* < */)
             parentClassName = parseIdentifier()
         }
 
         expect(TokenType.OpenBrace, "Expected '{'")
 
-        if(current().type != TokenType.Private && current().type != TokenType.Public){
-            throw Exception("Expecting private or public block")
-        }
+        while(current().type != TokenType.CloseBrace){
+            if(current().type == TokenType.Constructor){
+                consume(/* konstruktor */)
+                expect(TokenType.OpenParen, "Expected (")
 
-        if(current().type == TokenType.Private){
-            consume(/* privatno */)
-            privateBlock = parseModelBlock()
-        }
+                var params: ArrayList<FunctionParameter> = arrayListOf()
 
-        if(current().type != TokenType.Public){
-            throw Exception("Expecting private or public block")
-        }
+                if (current().type != TokenType.CloseParen) {
+                    params = parseFormalParameterList()
+                }
 
-        if(current().type == TokenType.Public){
-            consume(/* javno */)
-            publicBlock = parseModelBlock()
+                expect(TokenType.CloseParen, "Missing ')'")
+
+                val functionBody: BlockStatement = parseBlockStatement()
+
+
+                constructor = FunctionDeclaration(
+                    name = Identifier("konstruktor"),
+                    params = params,
+                    returnType = null,
+                    body = functionBody
+                )
+            }
+            else if (current().type == TokenType.Private) {
+                consume(/* privatno */)
+                privateBlock = parseModelBlock()
+            }
+            else if (current().type == TokenType.Public) {
+                consume(/* javno */)
+                publicBlock = parseModelBlock()
+            }
+            else {
+                throw Exception("Expecting private or public block, or constructor")
+            }
         }
 
         expect(TokenType.CloseBrace, "Expected '}'")
 
+        if(constructor == null){
+            throw Exception("Model $classname has no constructor")
+        }
+
         return ModelDefinitionStatement(
             className = classname,
             parentClassName = parentClassName,
+            constructor = constructor,
             privateBlock = privateBlock,
             publicBlock = publicBlock
         )
@@ -184,7 +223,7 @@ class Parser {
     private fun parseModelBlock(): ModelBlock {
         expect(TokenType.OpenBrace, "Expected '{'")
         val modelBlock = ModelBlock()
-        while (current().type !== TokenType.CloseBrace){
+        while (current().type !== TokenType.CloseBrace) {
             modelBlock.addStatement(parseStatement())
         }
         expect(TokenType.CloseBrace, "Expected '}'")
@@ -197,7 +236,7 @@ class Parser {
         expect(TokenType.Catch, "Expecting 'catch' block")
         val catchBlock = parseBlockStatement()
         var finallyBlock: BlockStatement? = null
-        if(current().type == TokenType.Finally){
+        if (current().type == TokenType.Finally) {
             consume(/* finally */)
             finallyBlock = parseBlockStatement()
         }
@@ -212,7 +251,7 @@ class Parser {
         expect(TokenType.Paket, "Expected 'paket' at this point")
         val packageName = parseStringLiteral()
         val imports = arrayListOf<Identifier>()
-        if(current().type == TokenType.Semicolon){
+        if (current().type == TokenType.Semicolon) {
             // Full package import
             consume(/*semicolon*/)
             return ImportStatement(
@@ -224,7 +263,11 @@ class Parser {
 
         do {
             imports.add(parseIdentifier())
-        } while (current().type != TokenType.CloseBrace && current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
+        } while (current().type != TokenType.CloseBrace && current().type == TokenType.Comma && expect(
+                TokenType.Comma,
+                "Missing ','"
+            ) != null
+        )
 
         expect(TokenType.CloseBrace, "Missing }")
         expect(TokenType.Semicolon, "Missing ;")
@@ -238,19 +281,19 @@ class Parser {
         expect(TokenType.Tip, "A type is defined using the tip keyword")
         val name = parseIdentifier()
         var parentType: Identifier? = null
-        if(current().value == "<"){
+        if (current().value == "<") {
             // Inheritance
             consume(/* < */)
             parentType = parseIdentifier()
         }
         expect(TokenType.OpenBrace, "A type definition is surrounded with braces")
         val properties = arrayListOf<TypeProperty>()
-        while (current().type != TokenType.EOF && current().type != TokenType.CloseBrace){
+        while (current().type != TokenType.EOF && current().type != TokenType.CloseBrace) {
             properties.add(parseTypeProperty())
         }
         expect(TokenType.CloseBrace, "Missing }")
 
-        if(properties.isEmpty()){
+        if (properties.isEmpty()) {
             warning("Type '${name.symbol}' is empty")
         }
 
@@ -281,16 +324,19 @@ class Parser {
     }
 
     private fun parseIterationStatement(): Statement {
-        when(current().type){
+        when (current().type) {
             TokenType.Za -> {
                 return parseForStatement()
             }
+
             TokenType.Dok -> {
                 return parseWhileStatement()
             }
+
             TokenType.Radi -> {
                 return parseDoWhileStatement()
             }
+
             else -> {
                 throw Exception("Unexpected token found")
             }
@@ -310,11 +356,11 @@ class Parser {
 
         // Same rules like in for-loop (shorthand and full loop)
         var body = BlockStatement(body = arrayListOf())
-        if(current().type == TokenType.Arrow){
+        if (current().type == TokenType.Arrow) {
             // Shorthand syntax
             consume(/*Arrow*/)
             body.body.add(parseStatement())
-        } else{
+        } else {
             body = parseBlockStatement()
         }
 
@@ -334,7 +380,7 @@ class Parser {
         expect(TokenType.Do, "Expected ending condition for loop, missing keyword 'do'")
         val endCondition = parseExpression()
         var step: Expression? = null
-        if(current().type == TokenType.Korak){
+        if (current().type == TokenType.Korak) {
             consume(/*korak*/)
             step = parseExpression()
         }
@@ -345,12 +391,11 @@ class Parser {
         // Shorthand syntax is parsed as BlockStatement(body=<the single expression>)
         var body = BlockStatement(body = arrayListOf())
 
-        if(current().type == TokenType.Arrow){
+        if (current().type == TokenType.Arrow) {
             // Shorthand syntax
             consume(/*Arrow*/)
             body.body.add(parseStatement())
-        }
-        else{
+        } else {
             // Regular loop
             body = parseBlockStatement()
         }
@@ -397,18 +442,17 @@ class Parser {
         val consequent = parseStatement()
 
         var alternate: Statement? = null
-        if(current().type == TokenType.Ili){
+        if (current().type == TokenType.Ili) {
             consume()
             alternate = parseIfStatement()
-        }
-        else if(current().type == TokenType.Inace){
+        } else if (current().type == TokenType.Inace) {
             consume()
             alternate = parseStatement()
         }
 
         return IfStatement(
-            condition=condition,
-            consequent=consequent,
+            condition = condition,
+            consequent = consequent,
             alternate = alternate
         )
     }
@@ -428,14 +472,14 @@ class Parser {
         val consequent = parseStatement()
 
         var alternate: Statement? = null
-        if(current().type == TokenType.Inace){
+        if (current().type == TokenType.Inace) {
             consume()
             alternate = parseStatement()
         }
 
         return UnlessStatement(
-            condition=condition,
-            consequent=consequent,
+            condition = condition,
+            consequent = consequent,
             alternate = alternate
         )
     }
@@ -453,24 +497,24 @@ class Parser {
 
         var params: ArrayList<FunctionParameter> = arrayListOf()
 
-        if(current().type != TokenType.CloseParen){
+        if (current().type != TokenType.CloseParen) {
             params = parseFormalParameterList()
         }
 
         expect(TokenType.CloseParen, "Missing ')'")
         var returnType: TypeAnnotation? = null
 
-        if(current().type == TokenType.Colon){
+        if (current().type == TokenType.Colon) {
             // Non-void return function
             consume()
             returnType = parseTypeAnnotation()
         }
 
-        val functionBody: BlockStatement = if(current().type == TokenType.Arrow){
+        val functionBody: BlockStatement = if (current().type == TokenType.Arrow) {
             // Inline function
             consume(/*The arrow*/)
             BlockStatement(body = arrayListOf(ReturnStatement(argument = parseExpression())))
-        } else{
+        } else {
             // Normal function
             parseBlockStatement()
         }
@@ -492,9 +536,9 @@ class Parser {
         expect(TokenType.Vrati, "Missing return statement")
         var argument: Expression? = null
 
-        if(current().type != TokenType.Se){
+        if (current().type != TokenType.Se) {
             argument = parseExpression()
-        } else{
+        } else {
             expect(TokenType.Se, "Void returns require keyword 'se'")
         }
 
@@ -510,13 +554,13 @@ class Parser {
      *      : Identifier
      *      | FormalParameterList "," Identifier
      */
-    private fun parseFormalParameterList(): ArrayList<FunctionParameter>{
+    private fun parseFormalParameterList(): ArrayList<FunctionParameter> {
         val params = arrayListOf<FunctionParameter>()
 
         do {
             val typename = parseIdentifier()
             var typeAnnotation: TypeAnnotation? = null
-            if(current().type == TokenType.Colon){
+            if (current().type == TokenType.Colon) {
                 consume()
                 typeAnnotation = parseTypeAnnotation()
             }
@@ -534,7 +578,7 @@ class Parser {
     private fun parseBlockStatement(): BlockStatement {
         expect(TokenType.OpenBrace, "Expected '{'")
         val body = arrayListOf<Statement>()
-        while (current().type !== TokenType.CloseBrace){
+        while (current().type !== TokenType.CloseBrace) {
             body.add(parseStatement())
         }
         expect(TokenType.CloseBrace, "Expected '}'")
@@ -559,7 +603,7 @@ class Parser {
      */
     private fun parseVariableStatement(): VariableStatement {
         val modifier = consume()
-        if(modifier.value != "var" && modifier.value != "konst"){
+        if (modifier.value != "var" && modifier.value != "konst") {
             throw Exception("Unexpected token at [${getLineCol()}]")
         }
         val declarations = parseVariableDeclarationList()
@@ -574,7 +618,7 @@ class Parser {
      *      | VariableDeclarationList "," VariableDeclaration
      *      ;
      */
-    private fun parseVariableDeclarationList(): ArrayList<VariableDeclaration>{
+    private fun parseVariableDeclarationList(): ArrayList<VariableDeclaration> {
         val declarations = arrayListOf<VariableDeclaration>()
 
         do {
@@ -592,7 +636,7 @@ class Parser {
     private fun parseVariableDeclaration(): VariableDeclaration {
         val identifier = parseIdentifier()
         var initializer: Expression? = null
-        if(current().type != TokenType.Semicolon && current().type != TokenType.Comma){
+        if (current().type != TokenType.Semicolon && current().type != TokenType.Comma) {
             initializer = parseVariableInitializer()
         }
         return VariableDeclaration(
@@ -618,7 +662,7 @@ class Parser {
      *      ;
      */
     private fun parseExpression(): Expression {
-        if(current().type == TokenType.Funkcija){
+        if (current().type == TokenType.Funkcija) {
             return parseFunctionExpression()
         }
         return parseAssignmentExpression()
@@ -629,24 +673,24 @@ class Parser {
         expect(TokenType.OpenParen, "Expected (")
         var params: ArrayList<FunctionParameter> = arrayListOf()
 
-        if(current().type != TokenType.CloseParen){
+        if (current().type != TokenType.CloseParen) {
             params = parseFormalParameterList()
         }
 
         expect(TokenType.CloseParen, "Missing ')'")
         var returnType: TypeAnnotation? = null
 
-        if(current().type == TokenType.Colon){
+        if (current().type == TokenType.Colon) {
             // Non-void return function
             consume()
             returnType = parseTypeAnnotation()
         }
 
-        val functionBody: BlockStatement = if(current().type == TokenType.Arrow){
+        val functionBody: BlockStatement = if (current().type == TokenType.Arrow) {
             // Inline function
             consume(/*The arrow*/)
             BlockStatement(body = arrayListOf(ReturnStatement(argument = parseExpression())))
-        } else{
+        } else {
             // Normal function
             parseBlockStatement()
         }
@@ -668,7 +712,7 @@ class Parser {
         val left = parseLogicalOrExpression()
 
 
-        if(current().type != TokenType.ComplexAssign && current().type != TokenType.SimpleAssign){
+        if (current().type != TokenType.ComplexAssign && current().type != TokenType.SimpleAssign) {
             return left
         }
 
@@ -688,7 +732,7 @@ class Parser {
     private fun parseLogicalOrExpression(): Expression {
         var left = parseLogicalAndExpression()
 
-        while (current().type == TokenType.LogicalOr){
+        while (current().type == TokenType.LogicalOr) {
             val operator = consume().value
             val right = parseLogicalAndExpression()
 
@@ -707,7 +751,7 @@ class Parser {
     private fun parseLogicalAndExpression(): Expression {
         var left = parseEqualityExpression()
 
-        while (current().type == TokenType.LogicalAnd){
+        while (current().type == TokenType.LogicalAnd) {
             val operator = consume().value
             val right = parseEqualityExpression()
 
@@ -726,7 +770,7 @@ class Parser {
     private fun parseEqualityExpression(): Expression {
         var left = parseRelationalExpression()
 
-        while (current().type == TokenType.EqualityOperator){
+        while (current().type == TokenType.EqualityOperator) {
             val operator = consume().value
 
             val right = parseEqualityExpression()
@@ -745,7 +789,7 @@ class Parser {
     private fun parseRelationalExpression(): Expression {
         var left = parseAdditiveExpression()
 
-        while (current().type == TokenType.RelationalOperator){
+        while (current().type == TokenType.RelationalOperator) {
             val operator = consume().value
 
             val right = parseRelationalExpression()
@@ -773,7 +817,7 @@ class Parser {
     private fun parseCallMemberExpression(): Expression {
         val member = parseMemberExpression()
 
-        if(current().type == TokenType.OpenParen){
+        if (current().type == TokenType.OpenParen) {
             return parseCallExpression(member)
         }
 
@@ -796,7 +840,7 @@ class Parser {
             args = parseArguments()
         )
 
-        if(current().type == TokenType.OpenParen){
+        if (current().type == TokenType.OpenParen) {
             callExpression = parseCallExpression(callExpression)
         }
 
@@ -808,17 +852,17 @@ class Parser {
      *      : "(" [ArgumentsList] ")"
      *      ;
      */
-    private fun parseArguments(): ArrayList<Expression>{
+    private fun parseArguments(): ArrayList<Expression> {
         expect(TokenType.OpenParen, "Missing '(")
         var args = arrayListOf<Expression>()
-        if(current().type != TokenType.CloseParen){
+        if (current().type != TokenType.CloseParen) {
             args = parseArgumentList()
         }
         expect(TokenType.CloseParen, "Missing ')'")
         return args
     }
 
-    private fun parseArgumentList(): ArrayList<Expression>{
+    private fun parseArgumentList(): ArrayList<Expression> {
         val argList = arrayListOf<Expression>()
 
         do {
@@ -838,12 +882,12 @@ class Parser {
     private fun parseMemberExpression(): Expression {
         var targetObject = parsePrimaryExpression()
 
-        if(targetObject is Identifier && targetObject.symbol == "@" && current().type == TokenType.Identifier || current().type == TokenType.OpenBracket){
+        if (targetObject is Identifier && targetObject.symbol == "@" && current().type == TokenType.Identifier || current().type == TokenType.OpenBracket) {
             tokens.add(0, Token(".", TokenType.Dot, current().line, current().col))
         }
 
-        while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket){
-            if(current().type == TokenType.Dot){
+        while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket) {
+            if (current().type == TokenType.Dot) {
                 consume()
                 val property = parseIdentifier()
                 targetObject = MemberExpression(
@@ -851,8 +895,7 @@ class Parser {
                     targetObject = targetObject,
                     property = property
                 )
-            }
-            else if(current().type == TokenType.OpenBracket){
+            } else if (current().type == TokenType.OpenBracket) {
                 consume()
                 val property = parseExpression()
                 expect(TokenType.CloseBracket, "Missing ']'")
@@ -875,7 +918,7 @@ class Parser {
      */
 
     private fun parseIdentifier(): Identifier {
-        if(current().type == TokenType.This){
+        if (current().type == TokenType.This) {
             consume(/* @ */)
             return Identifier(symbol = "@")
         }
@@ -893,7 +936,7 @@ class Parser {
     private fun parseTypeAnnotation(): TypeAnnotation {
         val typename = parseIdentifier()
         var isArray = false
-        if(current().type == TokenType.OpenBracket){
+        if (current().type == TokenType.OpenBracket) {
             consume()
             expect(TokenType.CloseBracket, "Missing ]")
             isArray = true
@@ -904,8 +947,8 @@ class Parser {
         )
     }
 
-    private fun parseAssignmentOperator(): String{
-        if(current().type == TokenType.SimpleAssign || current().type == TokenType.ComplexAssign){
+    private fun parseAssignmentOperator(): String {
+        if (current().type == TokenType.SimpleAssign || current().type == TokenType.ComplexAssign) {
             return consume().value
         }
         throw Exception("Unexpected lexer.Token")
@@ -919,7 +962,7 @@ class Parser {
     private fun parseAdditiveExpression(): Expression {
         var left = parseMultiplicativeExpression()
 
-        while (current().value == "+" || current().value == "-"){
+        while (current().value == "+" || current().value == "-") {
             val operator = consume().value
 
             val right = parseMultiplicativeExpression()
@@ -937,7 +980,7 @@ class Parser {
     private fun parseMultiplicativeExpression(): Expression {
         var left = parseExponentiationExpression()
 
-        while (current().value == "*" || current().value == "/" || current().value == "%"){
+        while (current().value == "*" || current().value == "/" || current().value == "%") {
             val operator = consume().value
 
             val right = parseExponentiationExpression()
@@ -955,7 +998,7 @@ class Parser {
     private fun parseExponentiationExpression(): Expression {
         var left = parseUnaryExpression()
 
-        while (current().type == TokenType.Exponent){
+        while (current().type == TokenType.Exponent) {
             val operator = consume().value
 
             val right = parseUnaryExpression()
@@ -976,11 +1019,11 @@ class Parser {
         var operator: String? = null
         val validOperators = listOf("+", "-", "++", "--", "!")
 
-        if(current().value in validOperators){
+        if (current().value in validOperators) {
             operator = consume().value
         }
 
-        if(operator != null){
+        if (operator != null) {
             return UnaryExpression(
                 operator = operator,
                 argument = parseUnaryExpression()
@@ -1000,28 +1043,35 @@ class Parser {
      *      ;
      */
     private fun parsePrimaryExpression(): Expression {
-        when(current().type){
+        when (current().type) {
             TokenType.Number -> {
                 return parseNumericLiteral()
             }
+
             TokenType.DoubleQuote -> {
                 return parseStringLiteral()
             }
+
             TokenType.OpenParen -> {
                 return parseParenthesizedExpression()
             }
+
             TokenType.OpenBracket -> {
                 return parseArrayLiteral()
             }
+
             TokenType.OpenBrace -> {
                 return parseObjectLiteral()
             }
+
             TokenType.Tacno, TokenType.Netacno -> {
                 return parseBooleanLiteral()
             }
+
             TokenType.Nedefinisano -> {
                 return parseNullLiteral()
             }
+
             else -> {
                 return parseIdentifier()
             }
@@ -1080,7 +1130,7 @@ class Parser {
         val array = arrayListOf<Expression>()
         expect(TokenType.OpenBracket, "Missing [")
 
-        if(current().type == TokenType.CloseBracket){
+        if (current().type == TokenType.CloseBracket) {
             // Empty array
             consume()
             return ArrayLiteral(arrayListOf())
@@ -1102,7 +1152,7 @@ class Parser {
         expect(TokenType.OpenBrace, "Missing {")
         val properties = arrayListOf<Property>()
 
-        while (notEOF() && current().type != TokenType.CloseBrace){
+        while (notEOF() && current().type != TokenType.CloseBrace) {
             val key = expect(TokenType.Identifier, "Object key expected").value
 
             expect(TokenType.Colon, "Missing :")
@@ -1110,7 +1160,7 @@ class Parser {
 
             properties.add(Property(key, value))
 
-            if(current().type != TokenType.CloseBrace){
+            if (current().type != TokenType.CloseBrace) {
                 expect(TokenType.Comma, "Expected , or }")
             }
         }

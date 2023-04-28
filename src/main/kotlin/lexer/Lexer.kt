@@ -41,6 +41,7 @@ val keywords = mapOf(
     "javno" to TokenType.Public,
     "opsta" to TokenType.Static,
     "opšta" to TokenType.Static,
+    "konstruktor" to TokenType.Constructor,
 )
 
 fun tokenize(src: String): ArrayList<Token>{
