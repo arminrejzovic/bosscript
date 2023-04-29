@@ -2,6 +2,7 @@ package typechecker
 
 import interpreter.Environment
 import interpreter.values.*
+import interpreter.values.classes.ModelObject
 import parser.TypeAnnotation
 
 class TypeChecker(private val env: Environment) {
@@ -30,6 +31,13 @@ class TypeChecker(private val env: Environment) {
                         val prop = providedValue.properties[it.name] ?: throw Exception("Missing property ${it.name}")
                         expect(it.type, prop)
                     }
+                }
+            }
+            is ModelObject -> {
+                if(expectedType.isArrayType) throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
+                if(providedValue.typename == expectedType.typeName) return
+                if(!providedValue.isOfType(expectedType.typeName)){
+                    throw Exception("Type error: Expected ${expectedType.typeName}, got ${providedValue.typename}")
                 }
             }
         }

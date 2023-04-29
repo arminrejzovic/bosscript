@@ -170,7 +170,7 @@ class Parser {
         expect(TokenType.OpenBrace, "Expected '{'")
 
         while(current().type != TokenType.CloseBrace){
-            if(current().type == TokenType.Constructor){
+            if(current().type == TokenType.Constructor && constructor == null){
                 consume(/* konstruktor */)
                 expect(TokenType.OpenParen, "Expected (")
 
@@ -192,11 +192,11 @@ class Parser {
                     body = functionBody
                 )
             }
-            else if (current().type == TokenType.Private) {
+            else if (current().type == TokenType.Private && privateBlock == null) {
                 consume(/* privatno */)
                 privateBlock = parseModelBlock()
             }
-            else if (current().type == TokenType.Public) {
+            else if (current().type == TokenType.Public && publicBlock == null) {
                 consume(/* javno */)
                 publicBlock = parseModelBlock()
             }
