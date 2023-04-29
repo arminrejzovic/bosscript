@@ -56,6 +56,22 @@ class Environment(
         return env.variables[name]!!
     }
 
+    private fun resolveOrNull(name: String): Environment? {
+        if(variables.containsKey(name)) {
+            return this
+        }
+        if(parent == null) {
+            return null
+        }
+
+        return parent.resolve(name)
+    }
+
+    fun getVariableOrNull(name: String): RuntimeValue?{
+        val env = resolveOrNull(name) ?: return null
+        return env.variables[name]
+    }
+
     fun importEnv(env: Environment){
         variables.putAll(env.variables)
         constants.addAll(env.constants)
@@ -74,6 +90,10 @@ class Environment(
         }
 
         return parent.resolveTypeDefinitionEnv(name)
+    }
+
+    fun getParent(): Environment? {
+        return parent
     }
 
     fun resolveTypeDefinition(name: String): Tip?{
@@ -168,4 +188,10 @@ class Environment(
             isConstant = true
         )
     }
+
+    override fun toString(): String {
+        return "Environment(variables=$variables)"
+    }
+
+
 }

@@ -3,10 +3,13 @@ package interpreter
 import parser.Parser
 import errors.SyntaxError
 import interpreter.values.*
+import interpreter.values.classes.Model
+import interpreter.values.classes.ModelDefinition
 import isInt
 import parser.*
 import typechecker.TypeChecker
 import java.io.File
+import kotlin.math.exp
 import kotlin.math.pow
 
 class Interpreter {
@@ -259,6 +262,10 @@ class Interpreter {
                 return evaluateTypeDefinition(node as TipDefinitionStatement, environment)
             }
 
+            NodeType.ModelDefinition -> {
+                return evaluateModelDefinition(node as ModelDefinitionStatement, environment)
+            }
+
             NodeType.TryCatch -> {
                 return evaluateTryCatch(node as TryCatchStatement, environment)
             }
@@ -267,6 +274,59 @@ class Interpreter {
                 throw SyntaxError("Unexpected token, $node")
             }
         }
+    }
+
+    private fun evaluateModelDefinition(stmt: ModelDefinitionStatement, env: Environment): RuntimeValue {
+        val classname = stmt.className.symbol
+        var parentEnv = env
+        var parentClass: ModelDefinition? = null
+        if(stmt.parentClassName != null){
+            parentClass = evaluate(stmt.parentClassName, env) as ModelDefinition
+            parentEnv = parentClass.classEnv
+        }
+        val classEnv = Environment(parentEnv)
+        val privateMembers = mutableSetOf<String>()
+        val constructor = Funkcija(
+            name = stmt.constructor.name.symbol,
+            params = stmt.constructor.params,
+            returnType = stmt.constructor.returnType,
+            body = stmt.constructor.body,
+            parentEnv = env
+        )
+        classEnv.declareVariable("konstruktor", constructor)
+        if(stmt.publicBlock != null){
+            stmt.publicBlock.getBody().forEach {
+                evaluate(it, classEnv)
+            }
+        }
+        if(stmt.privateBlock != null){
+            stmt.privateBlock.getBody().forEach {
+                if(it is FunctionDeclaration){
+                    privateMembers.add(it.name.symbol)
+                    evaluateFunctionDeclaration(it, classEnv)
+                }
+                else if(it is VariableStatement){
+                    it.declarations.forEach { vd ->
+                        privateMembers.add(vd.identifier)
+                    }
+                    evaluateVariableStatement(it, classEnv)
+                }
+                else {
+                    throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+                }
+            }
+        }
+        val modelDefinition = ModelDefinition(
+            className = classname,
+            classEnv = classEnv,
+            superclass = parentClass,
+            privateMembers = privateMembers,
+            value = null
+        )
+
+        env.declareVariable(classname, modelDefinition)
+
+        return Null()
     }
 
     private fun evaluateTryCatch(stmt: TryCatchStatement, env: Environment): RuntimeValue {
@@ -559,8 +619,25 @@ class Interpreter {
                     return Null()
                 }
             }
+
+            if(target is Model){
+                val modelDefinition = env.getVariable(target.typename) as ModelDefinition
+                val prop = expr.assignee.property as Identifier
+
+                if(modelDefinition.privateMembers.contains(prop.symbol)){
+                    if(env.getVariableOrNull("@") == null || env.getVariableOrNull("@")!!.typename != target.typename){
+                        throw Exception("${prop.symbol} is private.")
+                    }
+                }
+
+                `this` = target
+                target.instanceEnv.assignVariable(expr.assignee.property.symbol, newValue)
+                println("Assigned ${expr.assignee.property.symbol} to $newValue in env: $env")
+                return Null()
+            }
+
         }
-        throw Exception("Invalid assignment operation ")
+        throw Exception("Invalid assignment operation ${expr}")
     }
 
     fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue {
@@ -653,8 +730,35 @@ class Interpreter {
                 return fn.constructor(args, env)
             }
 
+            is ModelDefinition -> {
+                val instanceEnv = Environment(fn.classEnv)
+                val constructor = fn.classEnv.getVariable("konstruktor") as Funkcija
+                val instance = Model(instanceEnv = instanceEnv, typename = fn.className)
+                `this` = instance
+
+                val activationRecord = hashMapOf<String, RuntimeValue>("@" to `this`)
+                val typeChecker = TypeChecker(env)
+
+                if(constructor.params.size != call.args.size){
+                    throw Exception("Argument mismatch: Constructor takes ${constructor.params.size} arguments, got ${call.args.size}")
+                }
+
+                constructor.params.forEachIndexed{index, param ->
+                    val providedParam = evaluate(call.args[index], env)
+                    if(param.type != null){
+                        typeChecker.expect(param.type, providedParam)
+                    }
+                    activationRecord[param.identifier.symbol] = providedParam
+                }
+
+                val functionEnv = Environment(parent = instance.instanceEnv, variables = activationRecord)
+                evaluateBlockStatement(constructor.body, functionEnv)
+
+                return instance
+            }
+
             else -> {
-                throw Exception("Is not a function")
+                throw Exception("${fn.typename} is not a function")
             }
         }
     }
@@ -801,6 +905,7 @@ class Interpreter {
         val target = evaluate(expr.targetObject, env)
         `this` = target
         if(expr.isComputed){
+
             when(val prop = evaluate(expr.property, env)){
                 is Tekst -> {
                     // obj["hello"];
@@ -827,9 +932,18 @@ class Interpreter {
                     throw Exception("Type ${prop.javaClass.simpleName} cannot be used as an index type")
                 }
             }
+
         }
-        else{
+        else {
             val propertyName = expr.property as Identifier
+            if(target is Model){
+                val modelDefinition = env.getVariable(target.typename) as ModelDefinition
+                if(modelDefinition.privateMembers.contains(propertyName.symbol)){
+                    if(env.getVariableOrNull("@") == null || env.getVariableOrNull("@")!!.typename != target.typename){
+                        throw Exception("${propertyName.symbol} is private.")
+                    }
+                }
+            }
             return target.getProperty(propertyName.symbol)
         }
     }
