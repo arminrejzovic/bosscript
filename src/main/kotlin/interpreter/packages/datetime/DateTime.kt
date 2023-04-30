@@ -10,10 +10,9 @@ import java.time.format.DateTimeFormatter
 
 val DateTime = Environment(
     variables = hashMapOf(
-        "sada" to object : NativeFunkcija("sada"){
+        "datumVrijemeSada" to object : NativeFunkcija("datumVrijemeSada"){
             override fun call(vararg args: RuntimeValue): RuntimeValue {
-                val dt = DateTimeObject(LocalDateTime.now())
-                return dt.construct()
+                return DateTimeObjectFactory.construct(LocalDateTime.now())
             }
         },
         "puniDatum" to object : NativeFunkcija("puniDatum"){
@@ -29,11 +28,10 @@ val DateTime = Environment(
                 val seconds = (args[5] as Broj).value.toInt()
                 val nanos = (args[6] as Broj).value.toInt()
 
-                val dt = DateTimeObject(LocalDateTime.of(year, month, day, hours, minutes, seconds, nanos))
-                return dt.construct()
+                return DateTimeObjectFactory.construct(LocalDateTime.of(year, month, day, hours, minutes, seconds, nanos))
             }
         },
-        "datum" to object : NativeFunkcija("datum"){
+        "DatumVrijeme" to object : NativeFunkcija("DatumVrijeme"){
             override fun call(vararg args: RuntimeValue): RuntimeValue {
                 if(args.size != 5){
                     throw Exception("Argument mismatch")
@@ -44,22 +42,20 @@ val DateTime = Environment(
                 val hours = (args[3] as Broj).value.toInt()
                 val minutes = (args[4] as Broj).value.toInt()
 
-                val dt = DateTimeObject(LocalDateTime.of(year, month, day, hours, minutes))
-                return dt.construct()
+                return DateTimeObjectFactory.construct(LocalDateTime.of(year, month, day, hours, minutes))
             }
         },
-        "datumIzTeksta" to object : NativeFunkcija("datumIzTeksta"){
+        "datumVrijemeIzTeksta" to object : NativeFunkcija("datumVrijemeIzTeksta"){
             override fun call(vararg args: RuntimeValue): RuntimeValue {
                 if(args.size != 1 || args[0] !is Tekst){
                     throw Exception("Argument mismatch")
                 }
                 val dateString = (args[0] as Tekst).value
                 val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
-                val dt = DateTimeObject(LocalDateTime.parse(dateString, formatter))
-                return dt.construct()
+                return DateTimeObjectFactory.construct(LocalDateTime.parse(dateString, formatter))
             }
         },
-        "datumPoFormatu" to object : NativeFunkcija("datumPoFormatu"){
+        "datumVrijemePoFormatu" to object : NativeFunkcija("datumVrijemePoFormatu"){
             override fun call(vararg args: RuntimeValue): RuntimeValue {
                 if(args.size != 2 || args[0] !is Tekst || args[1] !is Tekst){
                     throw Exception("Argument mismatch")
@@ -67,8 +63,7 @@ val DateTime = Environment(
                 val dateString = (args[0] as Tekst).value
                 val format = (args[1] as Tekst).value
                 val formatter = DateTimeFormatter.ofPattern(format)
-                val dt = DateTimeObject(LocalDateTime.parse(dateString, formatter))
-                return dt.construct()
+                return DateTimeObjectFactory.construct(LocalDateTime.parse(dateString, formatter))
             }
         },
     )
