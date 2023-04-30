@@ -31,3 +31,18 @@ fun ArrayList<RuntimeValue>.flatten(): ArrayList<RuntimeValue> {
     }
     return flattenedList
 }
+
+fun operatorToFunctionName(operator: String): String{
+    val map = hashMapOf<String, String>(
+        "+" to "plus",
+        "-" to "minus",
+        "*" to "puta",
+        "/" to "podijeljeno",
+        "<" to "manjeOd",
+        ">" to "veceOd"
+    )
+
+    val functionName = map[operator]
+
+    return functionName ?: throw Exception("Invalid operator $operator")
+}

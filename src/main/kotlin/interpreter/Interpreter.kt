@@ -6,6 +6,7 @@ import interpreter.values.*
 import interpreter.values.classes.ModelDefinition
 import interpreter.values.classes.ModelObject
 import isInt
+import operatorToFunctionName
 import parser.*
 import typechecker.TypeChecker
 import java.io.File
@@ -68,131 +69,7 @@ class Interpreter {
             // ---------------------------------------------------------------------------------------------------------
 
             NodeType.BinaryExpression -> {
-                val binExpNode = node as BinaryExpression
-                val left = evaluate(binExpNode.left, environment)
-                val right = evaluate(binExpNode.right, environment)
-                when (binExpNode.operator) {
-                    "+" -> {
-                        if (left.value is Double && right.value is Double) {
-                            return Broj(
-                                value = left.value as Double + right.value as Double
-                            )
-                        }
-                        if (left.value is String && right.value is String) {
-                            return Tekst(
-                                value = left.value as String + right.value as String
-                            )
-                        }
-
-                        throw Exception("Type error: Operator '+' is not defined for ${left.javaClass.simpleName} and ${right.javaClass.simpleName}")
-                    }
-
-                    "-" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Broj(
-                            value = left.value as Double - right.value as Double
-                        )
-                    }
-
-                    "*" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Broj(
-                            value = left.value as Double * right.value as Double
-                        )
-                    }
-
-                    "/" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Broj(
-                            value = left.value as Double / right.value as Double
-                        )
-                    }
-
-                    "%" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Broj(
-                            value = left.value as Double % right.value as Double
-                        )
-                    }
-
-                    "^" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Broj(
-                            value = (left.value as Double).pow(right.value as Double)
-                        )
-                    }
-
-                    "<" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Logicki(
-                            value = (left.value as Double) < (right.value as Double)
-                        )
-                    }
-
-                    "<=" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Logicki(
-                            value = (left.value as Double) <= (right.value as Double)
-                        )
-                    }
-
-                    ">" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Logicki(
-                            value = (left.value as Double) > (right.value as Double)
-                        )
-                    }
-
-                    ">=" -> {
-                        if (left.value !is Double || right.value !is Double) {
-                            throw Exception("Type error: Operator '+' is not defined for provided operands")
-                        }
-
-                        return Logicki(
-                            value = (left.value as Double) >= (right.value as Double)
-                        )
-                    }
-
-                    "==" -> {
-                        return Logicki(
-                            value = left.value == right.value
-                        )
-                    }
-
-                    "!=" -> {
-                        return Logicki(
-                            value = left.value != right.value
-                        )
-                    }
-
-                    else -> {
-                        throw NotImplementedError("Unsupported operator")
-                    }
-                }
+                return evaluateBinaryExpression(node as BinaryExpression, environment)
             }
 
             NodeType.UnaryExpression -> {
@@ -282,6 +159,172 @@ class Interpreter {
 
             else -> {
                 throw SyntaxError("Unexpected token, $node")
+            }
+        }
+    }
+
+    private fun evaluateBinaryExpression(expr: BinaryExpression, env: Environment): RuntimeValue {
+        val left = evaluate(expr.left, env)
+        val right = evaluate(expr.right, env)
+        if(left is ModelObject){
+            return evaluateModelBinaryExpression(left, right, expr.operator, env)
+        }
+        when (expr.operator) {
+            "+" -> {
+                if (left.value is Double && right.value is Double) {
+                    return Broj(
+                        value = left.value as Double + right.value as Double
+                    )
+                }
+                if (left.value is String && right.value is String) {
+                    return Tekst(
+                        value = left.value as String + right.value as String
+                    )
+                }
+
+                throw Exception("Type error: Operator '+' is not defined for ${left.javaClass.simpleName} and ${right.javaClass.simpleName}")
+            }
+
+            "-" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Broj(
+                    value = left.value as Double - right.value as Double
+                )
+            }
+
+            "*" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Broj(
+                    value = left.value as Double * right.value as Double
+                )
+            }
+
+            "/" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Broj(
+                    value = left.value as Double / right.value as Double
+                )
+            }
+
+            "%" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Broj(
+                    value = left.value as Double % right.value as Double
+                )
+            }
+
+            "^" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Broj(
+                    value = (left.value as Double).pow(right.value as Double)
+                )
+            }
+
+            "<" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Logicki(
+                    value = (left.value as Double) < (right.value as Double)
+                )
+            }
+
+            "<=" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Logicki(
+                    value = (left.value as Double) <= (right.value as Double)
+                )
+            }
+
+            ">" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Logicki(
+                    value = (left.value as Double) > (right.value as Double)
+                )
+            }
+
+            ">=" -> {
+                if (left.value !is Double || right.value !is Double) {
+                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                }
+
+                return Logicki(
+                    value = (left.value as Double) >= (right.value as Double)
+                )
+            }
+
+            "==" -> {
+                return Logicki(
+                    value = left.value == right.value
+                )
+            }
+
+            "!=" -> {
+                return Logicki(
+                    value = left.value != right.value
+                )
+            }
+
+            else -> {
+                throw NotImplementedError("Unsupported operator")
+            }
+        }
+    }
+
+    private fun evaluateModelBinaryExpression(left: ModelObject, right: RuntimeValue, operator: String, env: Environment): RuntimeValue {
+        when(operator){
+            "+", "-", "*", "/", "<", ">" -> {
+                val operatorFun = left.getProperty(operatorToFunctionName(operator))
+                if(operatorFun !is Funkcija){
+                    throw Exception("$operatorFun is not a function.")
+                }
+                `this` = left
+                val activationRecord = hashMapOf<String, RuntimeValue>("@" to `this`)
+                val typeChecker = TypeChecker(env)
+
+                if(operatorFun.params[0].type != null){
+                    operatorFun.params[0].type?.let { typeChecker.expect(it, right) }
+                }
+
+                activationRecord[operatorFun.params[0].identifier.symbol] = right
+
+                val functionEnv = Environment(parent = env, variables = activationRecord)
+                val functionResult = evaluateBlockStatement(operatorFun.body, functionEnv)
+
+                if (operatorFun.returnType != null) {
+                    when (functionResult) {
+                        is ReturnValue -> typeChecker.expect(operatorFun.returnType, functionResult.value)
+                        else -> typeChecker.expect(operatorFun.returnType, functionResult)
+                    }
+                }
+
+                return if (functionResult is ReturnValue) functionResult.value else functionResult
+            }
+
+            else -> {
+                throw Exception("Operator $operator is not defined for provided model: ${left.typename}")
             }
         }
     }
