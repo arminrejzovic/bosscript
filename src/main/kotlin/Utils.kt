@@ -39,7 +39,9 @@ fun operatorToFunctionName(operator: String): String{
         "*" to "puta",
         "/" to "podijeljeno",
         "<" to "manjeOd",
-        ">" to "veceOd"
+        ">" to "veceOd",
+        "==" to "jednako",
+        "!=" to "nijeJednako"
     )
 
     val functionName = map[operator]

@@ -295,7 +295,7 @@ class Interpreter {
 
     private fun evaluateModelBinaryExpression(left: ModelObject, right: RuntimeValue, operator: String, env: Environment): RuntimeValue {
         when(operator){
-            "+", "-", "*", "/", "<", ">" -> {
+            "+", "-", "*", "/", "<", ">", "==", "!=" -> {
                 val operatorFun = left.getProperty(operatorToFunctionName(operator))
                 if(operatorFun !is Funkcija){
                     throw Exception("$operatorFun is not a function.")
