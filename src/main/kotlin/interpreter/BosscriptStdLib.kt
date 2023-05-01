@@ -4,6 +4,7 @@ import interpreter.packages.IO
 import interpreter.packages.date.Date
 import interpreter.packages.datetime.DateTime
 import interpreter.packages.math
+import interpreter.packages.telnet.telnet
 import interpreter.packages.time.Time
 
 val stdlib = hashMapOf<String, Environment>(
@@ -12,4 +13,5 @@ val stdlib = hashMapOf<String, Environment>(
     "DatumVrijeme" to DateTime,
     "Datum" to Date,
     "Vrijeme" to Time,
+    "telnet" to telnet
 )
