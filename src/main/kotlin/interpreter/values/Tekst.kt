@@ -46,7 +46,9 @@ data class Tekst(
 
                 val boolValue = when(value.lowercase()){
                     "tacno" -> true
+                    "tačno" -> true
                     "netacno" -> false
+                    "netačno" -> false
                     else -> throw Exception("$value is not a boolean")
                 }
                 return Logicki(
