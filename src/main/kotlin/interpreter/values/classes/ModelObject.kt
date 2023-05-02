@@ -1,8 +1,7 @@
 package interpreter.values.classes
 
-import interpreter.values.Funkcija
-import interpreter.values.Null
-import interpreter.values.RuntimeValue
+import interpreter.packages.JSONStringify
+import interpreter.values.*
 
 data class ModelObject(
     val prototype: ModelObject?,
@@ -59,5 +58,27 @@ data class ModelObject(
             return false
         }
         return prototype.isOfType(typeName)
+    }
+
+    fun JSONString(): String {
+        val sb = java.lang.StringBuilder("{")
+        instanceObject.forEach {
+            if(it.value !is Funkcija && it.value !is NativeFunkcija && it.value !is ContextualNativeFunction){
+                sb.append("\"${it.key}\": ${JSONStringify(it.value)}")
+                sb.append(", ")
+            }
+        }
+        var obj = prototype
+        while (obj != null){
+            obj.instanceObject.forEach{ (k, v) ->
+                if(v !is Funkcija && v !is Null){
+                    sb.append("\"${k}\": ${JSONStringify(v)}")
+                    sb.append(", ")
+                }
+            }
+            obj = obj.prototype
+        }
+        sb.append("\b\b}")
+        return sb.toString()
     }
 }

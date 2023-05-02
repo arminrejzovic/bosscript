@@ -1,6 +1,7 @@
 package interpreter
 
 import interpreter.packages.IO
+import interpreter.packages.JSON
 import interpreter.packages.date.Date
 import interpreter.packages.datetime.DateTime
 import interpreter.packages.math
@@ -13,5 +14,6 @@ val stdlib = hashMapOf<String, Environment>(
     "DatumVrijeme" to DateTime,
     "Datum" to Date,
     "Vrijeme" to Time,
-    "telnet" to telnet
+    "telnet" to telnet,
+    "JSON" to JSON
 )

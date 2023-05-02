@@ -1,5 +1,6 @@
-import interpreter.values.Niz
-import interpreter.values.RuntimeValue
+import interpreter.values.*
+import interpreter.values.classes.ModelObject
+import java.lang.StringBuilder
 
 fun Double.isInt(): Boolean {
     return this % 1 == 0.0
