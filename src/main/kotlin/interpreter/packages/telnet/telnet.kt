@@ -6,10 +6,8 @@ import kotlin.math.*
 
 val telnet = Environment(
     variables = hashMapOf(
-        "TelnetKlijent" to object : NativeFunkcija("TelnetKlijent"){
-            override fun call(vararg args: RuntimeValue): RuntimeValue {
-                return TelnetClientFactory.construct()
-            }
+        "TelnetKlijent" to NativeFunction("TelnetKlijent") {
+            return@NativeFunction TelnetClientFactory.construct()
         }
     )
 )

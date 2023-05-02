@@ -63,7 +63,7 @@ data class ModelObject(
     fun JSONString(): String {
         val sb = java.lang.StringBuilder("{")
         instanceObject.forEach {
-            if(it.value !is Funkcija && it.value !is NativeFunkcija && it.value !is ContextualNativeFunction){
+            if(it.value !is Funkcija && it.value !is NativeFunction && it.value !is ContextualNativeFunction){
                 sb.append("\"${it.key}\": ${JSONStringify(it.value)}")
                 sb.append(", ")
             }

@@ -7,10 +7,14 @@ import typechecker.TypeChecker
 data class Tip(
     val name: String,
     val properties: ArrayList<TypeProperty>,
-    override val value: Any? = null,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-    override val typename: String = "Tip"
 ) : RuntimeValue {
+    override val value: Any?
+        get() = null
+    override val builtIns: HashMap<String, RuntimeValue>
+        get() = hashMapOf()
+    override val typename: String
+        get() = "Tip"
+
     override fun getProperty(prop: String): RuntimeValue {
         throw Exception("Tip has no properties of itself")
     }

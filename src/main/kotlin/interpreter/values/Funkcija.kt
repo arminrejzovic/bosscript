@@ -11,9 +11,6 @@ data class Funkcija(
     val returnType: TypeAnnotation?,
     val body: BlockStatement,
     val parentEnv: Environment?, // closure
-    override val value: Any? = null,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-    override val typename: String = "funkcija"
 ) : RuntimeValue {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -39,6 +36,13 @@ data class Funkcija(
         val reset = "\u001B[0m"
         return "ƒ $name($paramString) → ${returnType?.typeName ?: "${italics}nepoznato${reset}"}"
     }
+
+    override val value: Any?
+        get() = null
+    override val builtIns: HashMap<String, RuntimeValue>
+        get() = hashMapOf()
+    override val typename: String
+        get() = "funkcija"
 
     override fun getProperty(prop: String): RuntimeValue {
         return builtIns[prop] ?: throw Exception("$prop does not exist on type Function")

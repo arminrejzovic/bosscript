@@ -4,8 +4,6 @@ import errors.SyntaxError
 
 data class ReturnValue(
     override val value: RuntimeValue,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-    override val typename: String = "povrat"
 ) : RuntimeValue {
     init {
         /*
@@ -17,6 +15,12 @@ data class ReturnValue(
             throw SyntaxError("Something went wrong")
         }
     }
+
+    override val builtIns: HashMap<String, RuntimeValue>
+        get() = hashMapOf()
+    override val typename: String
+        get() = "return"
+
 
     override fun getProperty(prop: String): RuntimeValue {
         throw Exception("ReturnValue members should never be accessed")

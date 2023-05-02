@@ -4,9 +4,12 @@ import interpreter.values.RuntimeValue
 
 data class Bajt(
     override val value: Byte,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-    override val typename: String = "bajt"
 ): RuntimeValue {
+    override val builtIns: HashMap<String, RuntimeValue>
+        get() = hashMapOf()
+    override val typename: String
+        get() = "bajt"
+
     override fun getProperty(prop: String): RuntimeValue {
         return builtIns[prop] ?: throw Exception("Bajt has no property $prop")
     }

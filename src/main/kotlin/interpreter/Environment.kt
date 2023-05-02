@@ -104,119 +104,112 @@ class Environment(
     private fun createGlobalEnvironment(env: Environment){
         env.declareVariable(
             "ispis",
-            object : NativeFunkcija(name = "ispis"){
-                override fun call(vararg args: RuntimeValue): Null {
+            NativeFunction(name = "ispis"){args ->
+                
                     args.forEach {
                         print(it)
                     }
                     println()
-                    return Null()
-                }
-            },
+                    Null()
+                },
+
             isConstant = true
         )
 
         env.declareVariable(
             "upozorenje",
-            object : NativeFunkcija(name = "upozorenje"){
-                override fun call(vararg args: RuntimeValue): Null {
+            NativeFunction(name = "upozorenje"){ args ->
+                
                     val reset = "\u001b[0m"
                     val yellow = "\u001b[33m"
                     args.forEach {
                         println(yellow + "⚠ " + it.value.toString() + reset)
                     }
-                    return Null()
-                }
+                    Null()
             },
             isConstant = true
         )
 
         env.declareVariable(
             "greska",
-            object : NativeFunkcija(name = "greska"){
-                override fun call(vararg args: RuntimeValue): Null {
+            NativeFunction(name = "greska"){ args ->
+                
                     val reset = "\u001b[0m"
                     val red = "\u001b[31m"
 
                     args.forEach {
                         println(red + "⚠ " + it.value.toString() + reset)
                     }
-                    return Null()
-                }
+                    Null()
+
             },
             isConstant = true
         )
 
         env.declareVariable(
             "unos",
-            object : NativeFunkcija(name = "unos"){
-                override fun call(vararg args: RuntimeValue): Tekst {
+            NativeFunction(name = "unos"){args ->
+
                     if(args.size == 1){
                         val message = (args[0] as Tekst).value
                         println(message)
                     }
                     val scanner = Scanner(System.`in`)
                     val str = scanner.nextLine()
-                    return Tekst(value = str)
-                }
+                    Tekst(value = str)
+
             },
             isConstant = true
         )
 
         env.declareVariable(
             "postoji",
-            object : NativeFunkcija(name = "postoji"){
-                override fun call(vararg args: RuntimeValue): Logicki {
-                    val valueInQuestion = args[0]
-                    return Logicki(value = valueInQuestion !is Null)
-                }
+            NativeFunction(name = "postoji"){args ->
+                val valueInQuestion = args[0]
+                Logicki(value = valueInQuestion !is Null)
             },
             isConstant = true
         )
 
         env.declareVariable(
             "nasumicni",
-            object : NativeFunkcija(name = "nasumicni"){
-                override fun call(vararg args: RuntimeValue): Broj {
-                    val until = if(args.size == 1) args[0] as Broj else Broj(value = 100.0)
-                    val untilVal = until.value
-                    return Broj(
-                        value = (Random.nextInt(until = untilVal.toInt())).toDouble()
-                    )
-                }
+            NativeFunction(name = "nasumicni"){args ->
+                val until = if(args.size == 1) args[0] as Broj else Broj(value = 100.0)
+                val untilVal = until.value
+                Broj(
+                    value = (Random.nextInt(until = untilVal.toInt())).toDouble()
+                )
             },
             isConstant = true
         )
 
         env.declareVariable(
             "brojOd",
-            object : NativeFunkcija("broj"){
-                override fun call(vararg args: RuntimeValue): RuntimeValue {
-                    if(args.size != 1){
-                        throw Exception("Argument mismatch: Function 'broj' accepts 1 argument (obj: nepoznato)")
+            NativeFunction("broj"){args ->
+                if(args.size != 1){
+                    throw Exception("Argument mismatch: Function 'broj' accepts 1 argument (obj: nepoznato)")
+                }
+
+                when(args[0]){
+                    is Broj -> {
+                        return@NativeFunction args[0]
+                    }
+                    is Tekst -> {
+                        val t = args[0] as Tekst
+                        val numberValue = t.value.toDoubleOrNull() ?: throw Exception("Cannot parse ${t.value} to Broj.")
+                        return@NativeFunction Broj(
+                            value = numberValue
+                        )
+                    }
+                    is Logicki -> {
+                        val l = args[0] as Logicki
+                        return@NativeFunction Broj(
+                            value = if (l.value) 1.0 else 0.0
+                        )
                     }
 
-                    when(args[0]){
-                        is Broj -> {
-                            return args[0]
-                        }
-                        is Tekst -> {
-                            val t = args[0] as Tekst
-                            val numberValue = t.value.toDoubleOrNull() ?: throw Exception("Cannot parse ${t.value} to Broj.")
-                            return Broj(
-                                value = numberValue
-                            )
-                        }
-                        is Logicki -> {
-                            val l = args[0] as Logicki
-                            return Broj(
-                                value = if (l.value) 1.0 else 0.0
-                            )
-                        }
-
-                        else -> {
-                            throw Exception("Cannot convert ${args[0]} to Broj")
-                        }
+                    else -> {
+                        throw Exception("Cannot convert ${args[0]} to Broj")
                     }
                 }
             }
@@ -224,38 +217,36 @@ class Environment(
 
         env.declareVariable(
             "logickiOd",
-            object : NativeFunkcija("logicki"){
-                override fun call(vararg args: RuntimeValue): RuntimeValue {
-                    if(args.size != 1){
-                        throw Exception("Argument mismatch: Function 'logicki' accepts 1 argument (obj: nepoznato)")
+            NativeFunction("logicki"){args ->
+                if(args.size != 1){
+                    throw Exception("Argument mismatch: Function 'logicki' accepts 1 argument (obj: nepoznato)")
+                }
+
+                when(args[0]){
+                    is Logicki -> {
+                        return@NativeFunction args[0]
+                    }
+                    is Broj -> {
+                        val b = args[0] as Broj
+                        return@NativeFunction Logicki(b.value.toInt() == 0)
+                    }
+                    is Tekst -> {
+                        val t = args[0] as Tekst
+
+                        val boolValue = when(t.value.lowercase()){
+                            "tacno" -> true
+                            "tačno" -> true
+                            "netacno" -> false
+                            "netačno" -> false
+                            else -> throw Exception("${t.value} is not a boolean")
+                        }
+                        return@NativeFunction Logicki(
+                            value = boolValue
+                        )
                     }
 
-                    when(args[0]){
-                        is Logicki -> {
-                            return args[0]
-                        }
-                        is Broj -> {
-                            val b = args[0] as Broj
-                            return Logicki(b.value.toInt() == 0)
-                        }
-                        is Tekst -> {
-                            val t = args[0] as Tekst
-
-                            val boolValue = when(t.value.lowercase()){
-                                "tacno" -> true
-                                "tačno" -> true
-                                "netacno" -> false
-                                "netačno" -> false
-                                else -> throw Exception("$value is not a boolean")
-                            }
-                            return Logicki(
-                                value = boolValue
-                            )
-                        }
-
-                        else -> {
-                            throw Exception("Cannot convert ${args[0]} to Logicki")
-                        }
+                    else -> {
+                        throw Exception("Cannot convert ${args[0]} to Logicki")
                     }
                 }
             }
@@ -263,10 +254,8 @@ class Environment(
 
         env.declareVariable(
             "nizOd",
-            object : NativeFunkcija("nizOd"){
-                override fun call(vararg args: RuntimeValue): RuntimeValue {
-                    return Niz(value = args.toCollection(ArrayList()))
-                }
+            NativeFunction("nizOd"){args ->
+                Niz(value = args.toCollection(ArrayList()))
             }
         )
     }
@@ -274,6 +263,5 @@ class Environment(
     override fun toString(): String {
         return "Environment(variables=$variables)"
     }
-
 
 }

@@ -8,24 +8,20 @@ import org.json.JSONObject
 import java.lang.StringBuilder
 
 val JSON = Environment(variables = hashMapOf(
-    "objekatIzJSON" to object : NativeFunkcija("objekatIzJSON"){
-        override fun call(vararg args: RuntimeValue): RuntimeValue {
-            if(args.size != 1 && args[0] !is Tekst){
-                throw Exception("Argument mismatch")
-            }
-            val jsonString = (args[0] as Tekst).value
+    "objekatIzJSON" to NativeFunction("objekatIzJSON"){ args ->
+        if(args.size != 1 && args[0] !is Tekst){
+            throw Exception("Argument mismatch")
+        }
+        val jsonString = (args[0] as Tekst).value
 
-            val jsonObj = JSONObject(jsonString)
-            return parseJSONObject(jsonObj)
-        }
+        val jsonObj = JSONObject(jsonString)
+        return@NativeFunction parseJSONObject(jsonObj)
     },
-    "JSONTekst" to object : NativeFunkcija("JSONTekst"){
-        override fun call(vararg args: RuntimeValue): RuntimeValue {
-            if(args.size != 1){
-                throw Exception("Argument mismatch")
-            }
-            return Tekst(value = JSONStringify(args[0]))
+    "JSONTekst" to NativeFunction("JSONTekst"){ args ->
+        if(args.size != 1){
+            throw Exception("Argument mismatch")
         }
+        return@NativeFunction Tekst(value = JSONStringify(args[0]))
     }
 ))
 

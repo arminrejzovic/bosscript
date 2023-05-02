@@ -5,9 +5,6 @@ import java.lang.StringBuilder
 
 data class Objekat(
     val properties: HashMap<String, RuntimeValue>,
-    override val value: Any? = null,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
-    override var typename: String = "objekat"
 ) : RuntimeValue {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -24,6 +21,13 @@ data class Objekat(
         return properties.toString().replace("=", ": ")
     }
 
+    override val value: Any?
+        get() = null
+    override val builtIns: HashMap<String, RuntimeValue>
+        get() = hashMapOf()
+    override val typename: String
+        get() = "objekat"
+
     override fun getProperty(prop: String): RuntimeValue {
         return (builtIns[prop] ?: properties[prop]) ?: throw Exception("Property $prop does not exist on object $this")
     }
@@ -36,7 +40,7 @@ data class Objekat(
     fun JSONString(): String{
         val sb = StringBuilder("{")
         properties.forEach {
-            if(it.value !is Funkcija && it.value !is NativeFunkcija && it.value !is ContextualNativeFunction){
+            if(it.value !is Funkcija && it.value !is NativeFunction && it.value !is ContextualNativeFunction){
                 sb.append("\"${it.key}\": ${JSONStringify(it.value)}")
                 sb.append(", ")
             }

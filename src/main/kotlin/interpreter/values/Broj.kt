@@ -5,28 +5,14 @@ import kotlin.math.roundToInt
 
 data class Broj(
     override var value: Double,
-    override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
-        "zaokruzi" to object : NativeFunkcija(name = "zaokruzi"){
-            override fun call(vararg args: RuntimeValue): RuntimeValue {
-                if(args.isNotEmpty()){
-                    throw Exception("Function 'zaokruzi' takes 0 arguments")
-                }
-                return Broj(
-                    value = value.roundToInt().toDouble()
-                )
-            }
-        },
-        "tekst" to object : NativeFunkcija(name = "tekst"){
-            override fun call(vararg args: RuntimeValue): RuntimeValue {
-                return Tekst(
-                    value = value.toString()
-                )
-            }
-
-        }
-    ),
-    override val typename: String = "broj"
 ) : RuntimeValue {
+    override val builtIns: HashMap<String, RuntimeValue>
+        get() = hashMapOf(
+            "zaokruzi" to zaokruzi,
+            "tekst" to tekst
+        )
+    override val typename: String
+        get() = "broj"
 
     override fun getProperty(prop: String): RuntimeValue {
         return builtIns[prop] ?: throw Exception("$prop does not exist on type Number")
@@ -39,4 +25,16 @@ data class Broj(
         }
         return "$value"
     }
+
+    private val zaokruzi = NativeFunction("zaokruzi") { args ->
+        if (args.isNotEmpty()) {
+            throw Exception("Function 'zaokruzi' takes 0 arguments")
+        }
+        Broj(value = value.roundToInt().toDouble())
+    }
+
+    private val tekst = NativeFunction("tekst") { args ->
+        Tekst(value = value.toString())
+    }
+
 }

@@ -639,7 +639,7 @@ class Interpreter {
             return target
         }
         if (target is Tekst && addedValue is Tekst) {
-            target.value += addedValue
+            target.value = target.value + addedValue.value
             return target
         }
         throw Exception("Type error: Operator '+=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
@@ -764,12 +764,12 @@ class Interpreter {
                 return if (functionResult is ReturnValue) functionResult.value else functionResult
             }
 
-            is NativeFunkcija -> {
+            is NativeFunction -> {
                 val args = arrayListOf<RuntimeValue>()
                 call.args.forEach {
                     args.add(evaluate(it, env))
                 }
-                return fn.call(*(args.toTypedArray()))
+                return fn.call(args)
             }
 
             is ContextualNativeFunction -> {
