@@ -40,7 +40,7 @@ class Parser {
     private fun expect(expectedType: TokenType, errorMessage: String): Token {
         val prev = tokens.removeAt(0)
         if (prev.type != expectedType) {
-            println("Expected ${expectedType.name}, got ${prev.type}")
+            println("Expected ${expectedType.name}, got ${prev.type} @ ${prev.getLineCol()}")
             throw Exception(errorMessage)
         }
         return prev
@@ -882,11 +882,11 @@ class Parser {
     private fun parseMemberExpression(): Expression {
         var targetObject = parsePrimaryExpression()
 
-        if (targetObject is Identifier && targetObject.symbol == "@" && current().type == TokenType.Identifier || current().type == TokenType.OpenBracket) {
+        if (targetObject is Identifier && targetObject.symbol == "@" && (current().type == TokenType.Identifier || current().type == TokenType.OpenBracket)) {
             tokens.add(0, Token(".", TokenType.Dot, current().line, current().col))
         }
 
-        while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket) {
+        while (current().type == TokenType.Dot || current().type == TokenType.OpenBracket || current().type == TokenType.OpenParen) {
             if (current().type == TokenType.Dot) {
                 consume()
                 val property = parseIdentifier()
@@ -905,6 +905,12 @@ class Parser {
                     targetObject = targetObject,
                     property = property
                 )
+            } else if (current().type == TokenType.OpenParen) {
+                val callExpression = CallExpression(
+                    callee = targetObject,
+                    args = parseArguments()
+                )
+                targetObject = callExpression
             }
         }
 
