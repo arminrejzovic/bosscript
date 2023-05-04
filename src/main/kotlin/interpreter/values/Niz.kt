@@ -277,6 +277,10 @@ data class Niz(
         return@ContextualNativeFunction Null()
     }
 
+    private val kraj = NativeFunction("kraj"){
+        return@NativeFunction Broj((value.size - 1).toDouble())
+    }
+
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf(
             "duzina" to duzina,
@@ -294,7 +298,8 @@ data class Niz(
             "primijeni" to primijeni,
             "zaSvaki" to zaSvaki,
             "zaSvakiUnazad" to zaSvakiUnazad,
-            "sortirajSa" to sortirajSa
+            "sortirajSa" to sortirajSa,
+            "kraj" to kraj
         )
 
     override val typename: String

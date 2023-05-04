@@ -939,7 +939,7 @@ class Interpreter {
         if (start < end) {
             // Regular ascending loop
             var i = start
-            while (i < end) {
+            while (i < end + 1) {
                 val iterationResult = evaluate(stmt.body, loopEnv)
                 if (iterationResult is ReturnValue) {
                     return iterationResult
@@ -953,7 +953,7 @@ class Interpreter {
         } else {
             // Backward loop
             var i = start
-            while (i > end) {
+            while (i > end - 1) {
                 val iterationResult = evaluate(stmt.body, loopEnv)
                 if (iterationResult is ReturnValue) {
                     return iterationResult
