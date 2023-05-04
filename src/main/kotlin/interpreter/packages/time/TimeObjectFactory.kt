@@ -2,6 +2,7 @@ package interpreter.packages.time
 
 import interpreter.packages.datetime.DateTimeObjectFactory
 import interpreter.values.*
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -68,6 +69,29 @@ class TimeObjectFactory{
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.minusNanos(nDays))
+                },
+                "periodIzmedju" to NativeFunction("periodIzmedju"){args ->
+                    if(args.size != 1 && args[0] !is Objekat){
+                        throw Exception("periodIzmedju accepts 1 argument (v: Vrijeme)")
+                    }
+                    val providedTime = args[0] as Objekat
+                    val hours = (providedTime.getProperty("sati") as Broj).value
+                    val minutes = (providedTime.getProperty("minute") as Broj).value
+                    val seconds = (providedTime.getProperty("sekunde") as Broj).value
+
+                    val other = LocalTime.of(
+                        hours.toInt(),
+                        minutes.toInt(),
+                        seconds.toInt()
+                    )
+
+                    val diff = Duration.between(time, other)
+
+                    return@NativeFunction Objekat(hashMapOf(
+                        "sati" to Broj(diff.toHoursPart().toDouble()),
+                        "minute" to Broj(diff.toMinutesPart().toDouble()),
+                        "sekunde" to Broj(diff.toSecondsPart().toDouble()),
+                    ))
                 },
                 "jePoslije" to NativeFunction("jePoslije"){args ->
                     if(args.size != 1 && args[0] !is Objekat){

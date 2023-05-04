@@ -5,6 +5,7 @@ import interpreter.packages.JSON
 import interpreter.packages.system
 import interpreter.packages.date.Date
 import interpreter.packages.datetime.DateTime
+import interpreter.packages.http.http
 import interpreter.packages.math
 import interpreter.packages.regex.regex
 import interpreter.packages.telnet.telnet
@@ -20,4 +21,5 @@ val stdlib = hashMapOf<String, Environment>(
     "JSON" to JSON,
     "sistem" to system,
     "regex" to regex,
+    "http" to http
 )

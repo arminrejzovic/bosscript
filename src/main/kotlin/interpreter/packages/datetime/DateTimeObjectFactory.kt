@@ -1,7 +1,9 @@
 package interpreter.packages.datetime
 
 import interpreter.values.*
+import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Period
 
 class DateTimeObjectFactory{
     companion object{
@@ -153,6 +155,42 @@ class DateTimeObjectFactory{
 
                     return@NativeFunction Logicki(value = date.isAfter(newDate))
                 },
+                "periodIzmedju" to NativeFunction("periodIzmedju"){args ->
+                    if(args.size != 1 && args[0] !is Objekat){
+                        throw Exception("periodIzmedju accepts 1 argument (d: Datum)")
+                    }
+                    val providedDate = args[0] as Objekat
+                    val year = (providedDate.getProperty("godina") as Broj).value
+                    val month = (providedDate.getProperty("mjesec") as Broj).value
+                    val day = (providedDate.getProperty("danMjeseca") as Broj).value
+                    val hours = (providedDate.getProperty("sati") as Broj).value
+                    val minutes = (providedDate.getProperty("minute") as Broj).value
+                    val seconds = (providedDate.getProperty("sekunde") as Broj).value
+                    val nanos = (providedDate.getProperty("nanosekunde") as Broj).value
+
+                    val newDate = LocalDateTime.of(
+                        year.toInt(),
+                        month.toInt(),
+                        day.toInt(),
+                        hours.toInt(),
+                        minutes.toInt(),
+                        seconds.toInt(),
+                        nanos.toInt()
+                    )
+
+                    val period = Period.between(date.toLocalDate(), newDate.toLocalDate())
+                    val duration = Duration.between(date.toLocalTime(), newDate.toLocalTime())
+
+                    return@NativeFunction Objekat(hashMapOf(
+                        "godine" to Broj(period.years.toDouble()),
+                        "mjeseci" to Broj(period.months.toDouble()),
+                        "dani" to Broj(period.days.toDouble()),
+                        "sati" to Broj(duration.toHoursPart().toDouble()),
+                        "minute" to Broj(duration.toMinutesPart().toDouble()),
+                        "sekunde" to Broj(duration.toSecondsPart().toDouble()),
+                    ))
+                },
+
                 "jePrije" to NativeFunction("jePrije"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
                         throw Exception("jePrije accepts 1 argument (d: Datum)")
@@ -178,6 +216,7 @@ class DateTimeObjectFactory{
 
                     return@NativeFunction Logicki(value = date.isBefore(newDate))
                 },
+
                 "jednako" to NativeFunction("jednako"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
                         throw Exception("jednako accepts 1 argument (d: Datum)")

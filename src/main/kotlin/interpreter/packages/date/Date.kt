@@ -14,9 +14,9 @@ val Date = Environment(
             if(args.size != 3){
                 throw Exception("Argument mismatch")
             }
-            val year = (args[0] as Broj).value.toInt()
+            val year = (args[2] as Broj).value.toInt()
             val month = (args[1] as Broj).value.toInt()
-            val day = (args[2] as Broj).value.toInt()
+            val day = (args[0] as Broj).value.toInt()
 
             return@NativeFunction DateObjectFactory.construct(LocalDate.of(year, month, day))
         },

@@ -2,6 +2,7 @@ package interpreter.packages.date
 
 import interpreter.values.*
 import java.time.LocalDate
+import java.time.Period
 
 class DateObjectFactory {
     companion object {
@@ -84,6 +85,29 @@ class DateObjectFactory {
                     )
 
                     return@NativeFunction Logicki(value = ld.isAfter(date))
+                },
+                "periodIzmedju" to NativeFunction("periodIzmedju") { args ->
+                    if (args.size != 1 && args[0] !is Objekat) {
+                        throw Exception("jePoslije accepts 1 argument (d: Datum)")
+                    }
+                    val providedDate = args[0] as Objekat
+                    val year = (providedDate.getProperty("godina") as Broj).value
+                    val month = (providedDate.getProperty("mjesec") as Broj).value
+                    val day = (providedDate.getProperty("danMjeseca") as Broj).value
+
+                    val date = LocalDate.of(
+                        year.toInt(),
+                        month.toInt(),
+                        day.toInt(),
+                    )
+
+                    val diff = Period.between(ld, date)
+
+                    return@NativeFunction Objekat(hashMapOf(
+                        "godine" to Broj(diff.years.toDouble()),
+                        "mjeseci" to Broj(diff.months.toDouble()),
+                        "dani" to Broj(diff.days.toDouble())
+                    ))
                 },
                 "jePrije" to NativeFunction("jePrije") { args ->
                     if (args.size != 1 && args[0] !is Objekat) {

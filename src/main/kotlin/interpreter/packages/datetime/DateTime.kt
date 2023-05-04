@@ -28,9 +28,9 @@ val DateTime = Environment(
             if(args.size != 5){
                 throw Exception("Argument mismatch")
             }
-            val year = (args[0] as Broj).value.toInt()
+            val year = (args[2] as Broj).value.toInt()
             val month = (args[1] as Broj).value.toInt()
-            val day = (args[2] as Broj).value.toInt()
+            val day = (args[0] as Broj).value.toInt()
             val hours = (args[3] as Broj).value.toInt()
             val minutes = (args[4] as Broj).value.toInt()
 

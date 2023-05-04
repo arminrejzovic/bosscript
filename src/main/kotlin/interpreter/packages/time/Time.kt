@@ -11,7 +11,7 @@ val Time = Environment(
             return@NativeFunction TimeObjectFactory.construct(LocalTime.now())
         },
         "Vrijeme" to NativeFunction("Vrijeme"){args ->
-            if(args.size != 5){
+            if(args.size != 3){
                 throw Exception("Argument mismatch")
             }
             val hours = (args[0] as Broj).value.toInt()
