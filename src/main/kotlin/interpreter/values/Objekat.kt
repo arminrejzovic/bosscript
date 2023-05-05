@@ -3,7 +3,7 @@ package interpreter.values
 import interpreter.packages.JSONStringify
 import java.lang.StringBuilder
 
-data class Objekat(
+open class Objekat(
     val properties: HashMap<String, RuntimeValue>,
 ) : RuntimeValue {
     override fun equals(other: Any?): Boolean {

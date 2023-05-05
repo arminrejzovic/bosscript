@@ -654,6 +654,10 @@ class Interpreter {
             val target = evaluate(expr.assignee.targetObject, env)
             val newValue = evaluate(expr.value, env)
 
+            if(target is ReadonlyObject){
+                throw Exception("${target.typename} is readonly.")
+            }
+
             if (target is Objekat) {
                 `this` = target
                 if (expr.assignee.property is Identifier) {
