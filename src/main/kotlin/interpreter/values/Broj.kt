@@ -6,6 +6,7 @@ import kotlin.math.roundToInt
 data class Broj(
     override var value: Double,
 ) : RuntimeValue {
+    constructor(n: Int) : this(n.toDouble())
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf(
             "zaokruzi" to zaokruzi,
