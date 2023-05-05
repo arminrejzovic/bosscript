@@ -2,6 +2,7 @@ package interpreter
 
 import interpreter.packages.io.IO
 import interpreter.packages.JSON
+import interpreter.packages.collections.collections
 import interpreter.packages.system
 import interpreter.packages.date.Date
 import interpreter.packages.datetime.DateTime
@@ -21,5 +22,6 @@ val stdlib = hashMapOf<String, Environment>(
     "JSON" to JSON,
     "sistem" to system,
     "regex" to regex,
-    "http" to http
+    "http" to http,
+    "strukture" to collections
 )
