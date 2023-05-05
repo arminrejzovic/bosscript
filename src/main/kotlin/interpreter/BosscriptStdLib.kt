@@ -1,6 +1,6 @@
 package interpreter
 
-import interpreter.packages.IO
+import interpreter.packages.io.IO
 import interpreter.packages.JSON
 import interpreter.packages.system
 import interpreter.packages.date.Date

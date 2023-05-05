@@ -2,6 +2,7 @@ package benchmarks
 
 import org.junit.jupiter.api.Test
 import interpreter.Interpreter
+import java.io.File
 
 class PerformanceTests {
     @Test
