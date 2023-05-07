@@ -4,9 +4,10 @@ import isAlpha
 import isIgnoredWhitespace
 import isNumeric
 import isValidVariableChar
+import java.lang.StringBuilder
 import kotlin.Exception
 
-val keywords = mapOf(
+val keywords = mutableMapOf(
     "var" to TokenType.Var,
     "konst" to TokenType.Konst,
     "za" to TokenType.Za,
@@ -44,7 +45,7 @@ val keywords = mapOf(
     "konstruktor" to TokenType.Constructor,
 )
 
-fun tokenize(src: String): ArrayList<Token>{
+fun tokenize(src: String, js: Boolean): ArrayList<Token>{
     val tokens = ArrayList<Token>()
     var line = 1
     var col = 1
@@ -228,6 +229,27 @@ fun tokenize(src: String): ArrayList<Token>{
                     tokens.add(Token(identifier, TokenType.Identifier, line, col))
                 }
                 col += identifier.length
+            }
+
+            else if(sourceCode[0] == "`"){
+                if(!js){
+                    throw Exception("Javascript snippets are not allowed here.")
+                }
+                val sb = StringBuilder("")
+                sourceCode.removeAt(0)
+                while (sourceCode.isNotEmpty() && sourceCode[0] != "`"){
+                    if(sourceCode[0] == "\n"){
+                        line++
+                        col = 1
+                    }
+                    sb.append(sourceCode.removeAt(0))
+                    col++
+                }
+                if(sourceCode[0] != "`"){
+                    throw Exception("Missing closing backtick")
+                }
+                sourceCode.removeAt(0)
+                tokens.add(Token(sb.toString(), TokenType.Javascript, line, col))
             }
 
             else {

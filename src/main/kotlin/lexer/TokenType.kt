@@ -70,5 +70,6 @@ enum class TokenType{
     Try,
     Catch,
     Finally,
-    Constructor
+    Constructor,
+    Javascript
 }

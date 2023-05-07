@@ -14,7 +14,7 @@ import kotlin.math.pow
 
 class Interpreter {
     private val globalEnv = Environment()
-    private val parser = Parser()
+    private val parser = Parser(false)
     private var `this`: RuntimeValue = Null()
 
     fun evaluateProgram(src: String): ArrayList<RuntimeValue> {

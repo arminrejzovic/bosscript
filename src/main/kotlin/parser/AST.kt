@@ -174,6 +174,11 @@ data class ImportStatement(
     override val kind: NodeType = NodeType.ImportStatement
 ): Statement
 
+data class JavascriptSnippet(
+    val code: String,
+    override val kind: NodeType = NodeType.TypeDefinition
+): Expression
+
 interface Expression : Statement
 
 data class BinaryExpression(

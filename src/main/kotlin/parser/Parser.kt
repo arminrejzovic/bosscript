@@ -3,8 +3,9 @@ package parser
 import lexer.Token
 import lexer.TokenType
 import lexer.tokenize
+import kotlin.math.exp
 
-class Parser {
+class Parser(val js: Boolean = false) {
     private var tokens: ArrayList<Token> = arrayListOf()
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -58,7 +59,7 @@ class Parser {
     // Parsing methods
 
     fun parseProgram(src: String): Program {
-        tokens = tokenize(src)
+        tokens = tokenize(src, js)
         return Program(parseStatementList())
     }
 
@@ -152,6 +153,14 @@ class Parser {
                 return parseExpressionStatement()
             }
         }
+    }
+
+    private fun parseJavascriptSnippet(): Expression {
+        if(!js){
+            throw Exception("Javascript snippets are not allowed here.")
+        }
+        val jsCode = expect(TokenType.Javascript, "Expected JS Snippet")
+        return JavascriptSnippet(jsCode.value)
     }
 
     private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
@@ -1076,6 +1085,10 @@ class Parser {
 
             TokenType.Nedefinisano -> {
                 return parseNullLiteral()
+            }
+
+            TokenType.Javascript -> {
+                return parseJavascriptSnippet()
             }
 
             else -> {
