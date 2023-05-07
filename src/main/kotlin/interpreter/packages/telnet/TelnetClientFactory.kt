@@ -5,10 +5,10 @@ import org.apache.commons.net.telnet.TelnetClient
 
 class TelnetClientFactory {
     companion object{
-        fun construct(): Objekat{
+        fun construct(): ReadonlyObject{
             val client = TelnetClient()
 
-            return Objekat(properties = hashMapOf(
+            return ReadonlyObject(properties = hashMapOf(
                 "uspostaviKonekciju" to NativeFunction("uspostaviKonekciju"){ args ->
                     if(args.size != 2 || args[0] !is Tekst || args[1] !is Broj){
                         throw Exception("Argument mismatch: Function 'uspostaviKonekciju' accepts 2 arguments (host: Tekst, port: Broj)")

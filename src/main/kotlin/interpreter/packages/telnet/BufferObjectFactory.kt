@@ -6,8 +6,8 @@ import java.io.BufferedWriter
 
 class BufferObjectFactory {
     companion object {
-        fun constructReader(reader: BufferedReader): Objekat {
-            return Objekat(hashMapOf(
+        fun constructReader(reader: BufferedReader): ReadonlyObject {
+            return ReadonlyObject(hashMapOf(
                 "zatvoriTok" to NativeFunction("zatvoriTok"){
                     try {
                         reader.close()

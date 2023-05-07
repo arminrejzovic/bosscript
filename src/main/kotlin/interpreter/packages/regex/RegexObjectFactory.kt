@@ -4,9 +4,9 @@ import interpreter.values.*
 
 class RegexObjectFactory {
     companion object{
-        fun constructRegexObject(regexp: String): Objekat{
+        fun constructRegexObject(regexp: String): ReadonlyObject{
             val regex = Regex(regexp)
-            return Objekat(properties = hashMapOf(
+            return ReadonlyObject(properties = hashMapOf(
                 "sablon" to Tekst(regex.pattern),
                 "pronadji" to NativeFunction("pronadji"){args ->
                     if(args.size != 1 || args[0] !is Tekst){

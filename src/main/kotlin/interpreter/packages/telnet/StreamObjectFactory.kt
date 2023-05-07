@@ -7,8 +7,8 @@ import java.io.OutputStream
 
 class StreamObjectFactory {
     companion object{
-        fun constructInputStream(stream: InputStream): Objekat{
-            return Objekat(hashMapOf(
+        fun constructInputStream(stream: InputStream): ReadonlyObject{
+            return ReadonlyObject(hashMapOf(
                 "zatvoriTok" to NativeFunction("zatvoriTok"){
                     try {
                         stream.close()

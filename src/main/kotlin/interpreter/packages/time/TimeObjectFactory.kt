@@ -8,8 +8,8 @@ import java.time.LocalTime
 
 class TimeObjectFactory{
     companion object{
-        fun construct(time: LocalTime): Objekat{
-            return Objekat(properties = hashMapOf(
+        fun construct(time: LocalTime): ReadonlyObject{
+            return ReadonlyObject(properties = hashMapOf(
                 "sati" to Broj(value = time.hour.toDouble()),
                 "minute" to Broj(value = time.minute.toDouble()),
                 "sekunde" to Broj(value = time.second.toDouble()),

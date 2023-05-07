@@ -7,8 +7,8 @@ import java.time.Period
 
 class DateTimeObjectFactory{
     companion object{
-        fun construct(date: LocalDateTime): Objekat{
-            return Objekat(properties = hashMapOf(
+        fun construct(date: LocalDateTime): ReadonlyObject{
+            return ReadonlyObject(properties = hashMapOf(
                 "godina" to Broj(value = date.year.toDouble()),
                 "mjesec" to Broj(value = date.monthValue.toDouble()),
                 "danGodine" to Broj(value = date.dayOfYear.toDouble()),

@@ -170,8 +170,8 @@ class FileObject(file: File) {
         Logicki(ok)
     }
 
-    fun construct() : Objekat {
-        return Objekat(hashMapOf(
+    fun construct() : ReadonlyObject {
+        return ReadonlyObject(hashMapOf(
             "apsolutnaAdresa" to apsolutnaAdresa,
             "relativnaAdresa" to relativnaAdresa,
             "ime" to ime,
