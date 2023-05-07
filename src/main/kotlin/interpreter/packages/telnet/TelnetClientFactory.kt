@@ -103,6 +103,19 @@ class TelnetClientFactory {
                     catch (e: Exception){
                         throw Exception("Unable to establish input stream")
                     }
+                },
+
+                "izlazniTok" to NativeFunction("izlazniTok"){ args ->
+                    if(args.isNotEmpty()){
+                        throw Exception("Argument mismatch: Function 'izlazniTok' accepts 0 arguments")
+                    }
+
+                    try {
+                        StreamObjectFactory.constructOutputStream(client.outputStream)
+                    }
+                    catch (e: Exception){
+                        throw Exception("Unable to establish output stream")
+                    }
                 }
             ))
         }
