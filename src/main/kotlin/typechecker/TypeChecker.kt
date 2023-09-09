@@ -9,16 +9,24 @@ class TypeChecker(private val env: Environment) {
     fun expect(expectedType: TypeAnnotation, providedValue: RuntimeValue) {
         when(providedValue){
             is Tekst, is Broj, is Funkcija, is Null -> {
-                if(expectedType.isArrayType) throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
-                if(providedValue.typename != expectedType.typeName) throw Exception("Type error: Expected ${expectedType.typeName}, got ${providedValue.typename}")
+                if(expectedType.isArrayType) {
+                    throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
+                }
+                if(providedValue.typename != expectedType.typeName) {
+                    throw Exception("Type error: Expected ${expectedType.typeName}, got ${providedValue.typename}")
+                }
             }
             is Logicki -> {
                 if(expectedType.isArrayType) throw Exception("Type error: Expected logicki[], got logicki")
                 if(providedValue.typename != "logicki" && providedValue.typename != "logički") throw Exception("Type error: Expected logicki, got ${providedValue.typename}")
             }
             is Niz -> {
-                if(!expectedType.isArrayType) throw Exception("Type error: Expected ${expectedType.typeName}, got ${providedValue.typename}[]")
-                if(expectedType.typeName != "niz") providedValue.value.forEach { expect(TypeAnnotation(expectedType.typeName), it) }
+                if(!expectedType.isArrayType) {
+                    throw Exception("Type error: Expected ${expectedType.typeName}, got ${providedValue.typename}[]")
+                }
+                if(expectedType.typeName != "niz") {
+                    providedValue.value.forEach { expect(TypeAnnotation(expectedType.typeName), it) }
+                }
             }
             is Objekat -> {
                 if(expectedType.isArrayType) throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
@@ -38,8 +46,12 @@ class TypeChecker(private val env: Environment) {
                 }
             }
             is ModelObject -> {
-                if(expectedType.isArrayType) throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
-                if(providedValue.typename == expectedType.typeName) return
+                if(expectedType.isArrayType) {
+                    throw Exception("Type error: Expected ${expectedType.typeName}[], got ${providedValue.typename}")
+                }
+                if(providedValue.typename == expectedType.typeName) {
+                    return
+                }
                 if(!providedValue.isOfType(expectedType.typeName)){
                     throw Exception("Type error: Expected ${expectedType.typeName}, got ${providedValue.typename}")
                 }

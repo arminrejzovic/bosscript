@@ -1,10 +1,7 @@
 package transpiler
 
 import errors.SyntaxError
-import interpreter.Environment
-import interpreter.values.classes.ModelDefinition
 import parser.*
-import kotlin.math.exp
 
 class Transpiler {
     private val parser = Parser(js = true)
@@ -78,7 +75,7 @@ class Transpiler {
             }
 
             is UnaryExpression -> {
-                return "${node.operator} ${transpile(node.argument)}"
+                return "${node.operator} ${transpile(node.operand)}"
             }
 
             is Identifier -> {
@@ -174,9 +171,6 @@ class Transpiler {
     }
 
     private fun transpileJavascriptSnippet(js: JavascriptSnippet): String {
-        val regex = Regex("""\b(?:var|let|const|function)\s+(\w+)\b""")
-        val variables = regex.findAll(js.code)
-        
         return js.code
     }
 

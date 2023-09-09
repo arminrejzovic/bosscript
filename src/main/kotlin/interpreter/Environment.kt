@@ -2,7 +2,6 @@ package interpreter
 
 import interpreter.values.*
 import parser.TipDefinitionStatement
-import java.util.Scanner
 import kotlin.random.Random
 
 class Environment(
@@ -77,8 +76,8 @@ class Environment(
         constants.addAll(env.constants)
     }
 
-    fun addModelDefinition(modelDefinition: TipDefinitionStatement){
-        typeDefinitions[modelDefinition.name.symbol] = Tip(name = modelDefinition.name.symbol, properties = modelDefinition.properties)
+    fun addTypeDefinition(definition: TipDefinitionStatement){
+        typeDefinitions[definition.name.symbol] = Tip(name = definition.name.symbol, properties = definition.properties)
     }
 
     private fun resolveTypeDefinitionEnv(name: String): Environment?{
@@ -105,7 +104,6 @@ class Environment(
         env.declareVariable(
             "ispis",
             NativeFunction(name = "ispis"){args ->
-                
                     args.forEach {
                         print(it)
                     }
@@ -149,15 +147,12 @@ class Environment(
         env.declareVariable(
             "unos",
             NativeFunction(name = "unos"){args ->
-
                     if(args.size == 1){
                         val message = (args[0] as Tekst).value
                         println(message)
                     }
-                    val scanner = Scanner(System.`in`)
-                    val str = scanner.nextLine()
+                    val str = readln()
                     Tekst(value = str)
-
             },
             isConstant = true
         )
@@ -192,7 +187,7 @@ class Environment(
 
                 when(args[0]){
                     is Broj -> {
-                        return@NativeFunction args[0]
+                        return@NativeFunction Broj((args[0] as Broj).value)
                     }
                     is Tekst -> {
                         val t = args[0] as Tekst
@@ -224,11 +219,11 @@ class Environment(
 
                 when(args[0]){
                     is Logicki -> {
-                        return@NativeFunction args[0]
+                        return@NativeFunction Logicki((args[0] as Logicki).value)
                     }
                     is Broj -> {
                         val b = args[0] as Broj
-                        return@NativeFunction Logicki(b.value.toInt() == 0)
+                        return@NativeFunction Logicki(b.value.toInt() != 0)
                     }
                     is Tekst -> {
                         val t = args[0] as Tekst
@@ -256,6 +251,13 @@ class Environment(
             "nizOd",
             NativeFunction("nizOd"){args ->
                 Niz(value = args.toCollection(ArrayList()))
+            }
+        )
+
+        env.declareVariable(
+            "tip",
+            NativeFunction("tip"){args ->
+                Tekst(args[0].typename)
             }
         )
     }

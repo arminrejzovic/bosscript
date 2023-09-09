@@ -8,16 +8,6 @@ class PerformanceTests {
     @Test
     fun testFibonacciFunction(){
         val src = """
-            funkcija fib(n: broj): broj{
-                ako (n <= 1){
-                    vrati n;
-                }
-                inace {
-                    vrati fib(n-1) + fib(n-2);
-                }
-            }
-            
-            var n = fib(10);
             ispis(n);
         """.trimIndent()
 

@@ -12,9 +12,7 @@ open class Objekat(
 
         other as Objekat
 
-        if (properties != other.properties) return false
-
-        return true
+        return properties == other.properties
     }
 
     override fun toString(): String {

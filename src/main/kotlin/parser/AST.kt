@@ -190,7 +190,7 @@ data class BinaryExpression(
 
 data class UnaryExpression(
     val operator: String,
-    val argument: Expression,
+    val operand: Expression,
     override val kind: NodeType = NodeType.UnaryExpression
 ) : Expression
 

@@ -3,7 +3,7 @@ package parser
 import lexer.Token
 import lexer.TokenType
 import lexer.tokenize
-import kotlin.math.exp
+import kotlin.reflect.KClass
 
 class Parser(val js: Boolean = false) {
     private var tokens: ArrayList<Token> = arrayListOf()
@@ -155,7 +155,7 @@ class Parser(val js: Boolean = false) {
         }
     }
 
-    private fun parseJavascriptSnippet(): Expression {
+    private fun parseJavascriptSnippet(): JavascriptSnippet {
         if(!js){
             throw Exception("Javascript snippets are not allowed here.")
         }
@@ -239,7 +239,7 @@ class Parser(val js: Boolean = false) {
         return modelBlock
     }
 
-    private fun parseTryCatchStatement(): Statement {
+    private fun parseTryCatchStatement(): TryCatchStatement {
         expect(TokenType.Try, "Expected 'try'")
         val tryBlock = parseBlockStatement()
         expect(TokenType.Catch, "Expecting 'catch' block")
@@ -256,7 +256,7 @@ class Parser(val js: Boolean = false) {
         )
     }
 
-    private fun parseImportStatement(): Statement {
+    private fun parseImportStatement(): ImportStatement {
         expect(TokenType.Paket, "Expected 'paket' at this point")
         val packageName = parseStringLiteral()
         val imports = arrayListOf<Identifier>()
@@ -379,7 +379,7 @@ class Parser(val js: Boolean = false) {
         )
     }
 
-    private fun parseForStatement(): Statement {
+    private fun parseForStatement(): ForStatement {
         expect(TokenType.Za, "Expected 'za'")
         expect(TokenType.Svako, "Missing 'svako' following 'za'")
         expect(TokenType.OpenParen, "Expected '('")
@@ -904,7 +904,8 @@ class Parser(val js: Boolean = false) {
                     targetObject = targetObject,
                     property = property
                 )
-            } else if (current().type == TokenType.OpenBracket) {
+            }
+            else if (current().type == TokenType.OpenBracket) {
                 consume()
                 val property = parseExpression()
                 expect(TokenType.CloseBracket, "Missing ']'")
@@ -914,7 +915,8 @@ class Parser(val js: Boolean = false) {
                     targetObject = targetObject,
                     property = property
                 )
-            } else if (current().type == TokenType.OpenParen) {
+            }
+            else if (current().type == TokenType.OpenParen) {
                 val callExpression = CallExpression(
                     callee = targetObject,
                     args = parseArguments()
@@ -966,7 +968,7 @@ class Parser(val js: Boolean = false) {
         if (current().type == TokenType.SimpleAssign || current().type == TokenType.ComplexAssign) {
             return consume().value
         }
-        throw Exception("Unexpected lexer.Token")
+        throw Exception("Unexpected Token")
     }
 
     /**
@@ -1041,7 +1043,7 @@ class Parser(val js: Boolean = false) {
         if (operator != null) {
             return UnaryExpression(
                 operator = operator,
-                argument = parseUnaryExpression()
+                operand = parseUnaryExpression()
             )
         }
 

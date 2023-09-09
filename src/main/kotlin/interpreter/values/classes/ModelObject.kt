@@ -8,7 +8,8 @@ data class ModelObject(
     var instanceObject: HashMap<String, RuntimeValue> = hashMapOf(),
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
-        "__proto__" to (prototype ?: Null())
+        "__proto__" to (prototype ?: Null()),
+        "__roditelj__" to (prototype?.prototype ?: Null())
     ),
     override val typename: String = "model"
 ): RuntimeValue {

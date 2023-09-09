@@ -152,15 +152,16 @@ class TimeObjectFactory{
                     if(args.size != 1 && args[0] !is Objekat){
                         throw Exception("jednako accepts 1 argument (d: Datum)")
                     }
-                    val providedDate = args[0] as Objekat
-                    val year = (providedDate.getProperty("godina") as Broj).value
-                    val month = (providedDate.getProperty("mjesec") as Broj).value
-                    val day = (providedDate.getProperty("danMjeseca") as Broj).value
+                    val hours = (args[0].getProperty("sati") as Broj).value
+                    val minutes = (args[0].getProperty("minute") as Broj).value
+                    val seconds = (args[0].getProperty("sekunde") as Broj).value
+                    val nanos = (args[0].getProperty("nanosekunde") as Broj).value
 
-                    val date = LocalDate.of(
-                        year.toInt(),
-                        month.toInt(),
-                        day.toInt(),
+                    val date = LocalTime.of(
+                        hours.toInt(),
+                        minutes.toInt(),
+                        seconds.toInt(),
+                        nanos.toInt()
                     )
                     return@NativeFunction Logicki(value = time.equals(date))
                 }

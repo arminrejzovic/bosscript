@@ -61,7 +61,7 @@ val math = Environment(
 
             val num = args[0] as Broj
             return@NativeFunction Broj(
-                value = sin(num.value)
+                value = sin(Math.toRadians(num.value))
             )
         },
 
@@ -75,7 +75,7 @@ val math = Environment(
 
             val num = args[0] as Broj
             return@NativeFunction Broj(
-                value = cos(num.value)
+                value = cos(Math.toRadians(num.value))
             )
         },
 
@@ -89,7 +89,7 @@ val math = Environment(
 
             val num = args[0] as Broj
             return@NativeFunction Broj(
-                value = tan(num.value)
+                value = tan(Math.toRadians(num.value))
             )
         },
 
@@ -280,6 +280,21 @@ val math = Environment(
 
             return@NativeFunction Broj(
                 value = cbrt(num.value)
+            )
+        },
+
+        "uStepenima" to NativeFunction(name = "uStepenima"){args ->
+            if (args.size != 1){
+                throw Exception("Function uStepenima accepts only one parameter")
+            }
+            if(args[0] !is Broj){
+                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function uStepenima. It accepts Broj")
+            }
+
+            val num = args[0] as Broj
+
+            return@NativeFunction Broj(
+                value = Math.toDegrees(num.value)
             )
         },
 

@@ -281,6 +281,10 @@ data class Niz(
         return@NativeFunction Broj((value.size - 1).toDouble())
     }
 
+    private val jePrazan = NativeFunction("jePrazan"){
+        return@NativeFunction Logicki(value.isEmpty())
+    }
+
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf(
             "duzina" to duzina,
@@ -299,7 +303,8 @@ data class Niz(
             "zaSvaki" to zaSvaki,
             "zaSvakiUnazad" to zaSvakiUnazad,
             "sortirajSa" to sortirajSa,
-            "kraj" to kraj
+            "jePrazan" to jePrazan,
+            "kraj" to kraj,
         )
 
     override val typename: String
@@ -314,6 +319,6 @@ data class Niz(
     }
 
     fun set(index: Int, newValue: RuntimeValue) {
-        value[index] = newValue
+        value.set(index, newValue)
     }
 }

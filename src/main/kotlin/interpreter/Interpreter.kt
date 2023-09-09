@@ -26,29 +26,28 @@ class Interpreter {
         return result
     }
 
-    fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue {
-        when (node.kind) {
+    private fun evaluate(node: Statement, environment: Environment = globalEnv): RuntimeValue {
+        when (node) {
             // ---------------------------------------------------------------------------------------------------------
             // Literals
-            NodeType.NumericLiteral -> {
-                return Broj(value = (node as NumericLiteral).value)
+            is NumericLiteral -> {
+                return Broj(value = node.value)
             }
 
-            NodeType.StringLiteral -> {
-                return Tekst(value = (node as StringLiteral).value)
+            is StringLiteral -> {
+                return Tekst(value = node.value)
             }
 
-            NodeType.BooleanLiteral -> {
-                return Logicki(value = (node as BooleanLiteral).value)
+            is BooleanLiteral -> {
+                return Logicki(value = node.value)
             }
 
-            NodeType.NullLiteral -> {
+            is NullLiteral -> {
                 return Null()
             }
 
-            NodeType.ArrayLiteral -> {
-                val arrayNode = node as ArrayLiteral
-                val values = arrayNode.arr.map {
+            is ArrayLiteral -> {
+                val values = node.arr.map {
                     evaluate(it, environment)
                 }
                 return Niz(
@@ -56,11 +55,10 @@ class Interpreter {
                 )
             }
 
-            NodeType.Object -> {
-                val objNode = node as ObjectLiteral
+            is ObjectLiteral -> {
                 val obj = Objekat(properties = hashMapOf())
                 `this` = obj
-                objNode.properties.forEach {
+                node.properties.forEach {
                     obj.properties[it.key] = evaluate(it.value, environment)
                 }
                 `this` = Null()
@@ -68,93 +66,93 @@ class Interpreter {
             }
             // ---------------------------------------------------------------------------------------------------------
 
-            NodeType.BinaryExpression -> {
-                return evaluateBinaryExpression(node as BinaryExpression, environment)
+            is BinaryExpression -> {
+                return evaluateBinaryExpression(node, environment)
             }
 
-            NodeType.UnaryExpression -> {
-                return evaluateUnaryExpression(node as UnaryExpression, environment)
+            is UnaryExpression -> {
+                return evaluateUnaryExpression(node, environment)
             }
 
-            NodeType.Identifier -> {
-                return evaluateIdentifier(node as Identifier, environment)
+            is Identifier -> {
+                return evaluateIdentifier(node, environment)
             }
 
-            NodeType.VariableStatement -> {
-                evaluateVariableStatement(node as VariableStatement, environment)
+            is VariableStatement -> {
+                evaluateVariableStatement(node, environment)
                 return Null()
             }
 
-            NodeType.AssignmentExpression -> {
-                return evaluateAssignmentExpression(node as AssignmentExpression, environment)
+            is AssignmentExpression -> {
+                return evaluateAssignmentExpression(node, environment)
             }
 
-            NodeType.Block -> {
-                return evaluateBlockStatement(node as BlockStatement, environment)
+            is BlockStatement -> {
+                return evaluateBlockStatement(node, environment)
             }
 
-            NodeType.FunctionDeclaration -> {
-                return evaluateFunctionDeclaration(node as FunctionDeclaration, environment)
+            is FunctionDeclaration -> {
+                return evaluateFunctionDeclaration(node, environment)
             }
 
-            NodeType.FunctionExpression -> {
-                return evaluateFunctionExpression(node as FunctionExpression, environment)
+            is FunctionExpression -> {
+                return evaluateFunctionExpression(node, environment)
             }
 
-            NodeType.ReturnStatement -> {
-                return evaluateReturnStatement(node as ReturnStatement, environment)
+            is ReturnStatement -> {
+                return evaluateReturnStatement(node, environment)
             }
 
-            NodeType.BreakStatement -> {
-                return evaluateBreakStatement(node as BreakStatement, environment)
+            is BreakStatement -> {
+                return evaluateBreakStatement(node, environment)
             }
 
-            NodeType.IfStatement -> {
-                return evaluateIfStatement(node as IfStatement, environment)
+            is IfStatement -> {
+                return evaluateIfStatement(node, environment)
             }
 
-            NodeType.UnlessStatement -> {
-                return evaluateUnlessStatement(node as UnlessStatement, environment)
+            is UnlessStatement -> {
+                return evaluateUnlessStatement(node, environment)
             }
 
-            NodeType.CallExpression -> {
-                return evaluateFunctionCall(node as CallExpression, environment)
+            is CallExpression -> {
+                return evaluateFunctionCall(node, environment)
             }
 
-            NodeType.ForStatement -> {
-                return evaluateForStatement(node as ForStatement, environment) ?: Null()
+            is ForStatement -> {
+                return evaluateForStatement(node, environment) ?: Null()
             }
 
-            NodeType.WhileStatement -> {
-                return evaluateWhileStatement(node as WhileStatement, environment) ?: Null()
+            is WhileStatement -> {
+                return evaluateWhileStatement(node, environment) ?: Null()
             }
 
-            NodeType.DoWhileStatement -> {
-                return evaluateDoWhileStatement(node as DoWhileStatement, environment) ?: Null()
+            is DoWhileStatement -> {
+                return evaluateDoWhileStatement(node, environment) ?: Null()
             }
 
-            NodeType.MemberExpression -> {
-                return evaluateMemberExpression(node as MemberExpression, environment)
+            is MemberExpression -> {
+                return evaluateMemberExpression(node, environment)
             }
 
-            NodeType.LogicalExpression -> {
-                return evaluateLogicalExpression(node as LogicalExpression, environment)
+            is LogicalExpression -> {
+                return evaluateLogicalExpression(node, environment)
             }
 
-            NodeType.ImportStatement -> {
-                return evaluateImportStatement(node as ImportStatement, environment)
+            is ImportStatement -> {
+                return evaluateImportStatement(node, environment)
             }
 
-            NodeType.TypeDefinition -> {
-                return evaluateTypeDefinition(node as TipDefinitionStatement, environment)
+            is TipDefinitionStatement -> {
+                return evaluateTypeDefinition(node, environment)
             }
 
-            NodeType.ModelDefinition -> {
-                return evaluateModelDefinition(node as ModelDefinitionStatement, environment)
+            is ModelDefinitionStatement -> {
+                return evaluateModelDefinition(node, environment)
             }
 
-            NodeType.TryCatch -> {
-                return evaluateTryCatch(node as TryCatchStatement, environment)
+            is TryCatchStatement -> {
+                return evaluateTryCatch(node, environment)
             }
 
             else -> {
@@ -171,14 +169,21 @@ class Interpreter {
         }
         when (expr.operator) {
             "+" -> {
-                if (left.value is Double && right.value is Double) {
+                if (left is Broj && right is Broj) {
                     return Broj(
-                        value = left.value as Double + right.value as Double
+                        value = left.value + right.value
                     )
                 }
-                if (left.value is String && right.value is String) {
+                else if (left is Tekst && right is Tekst) {
                     return Tekst(
-                        value = left.value as String + right.value as String
+                        value = left.value + right.value
+                    )
+                }
+
+                else if(left is Tekst){
+                    val rightStr = right.toString()
+                    return Tekst(
+                        value = left.value + rightStr
                     )
                 }
 
@@ -186,92 +191,92 @@ class Interpreter {
             }
 
             "-" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '-' is not defined for provided operands")
                 }
 
                 return Broj(
-                    value = left.value as Double - right.value as Double
+                    value = left.value - right.value
                 )
             }
 
             "*" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '*' is not defined for provided operands")
                 }
 
                 return Broj(
-                    value = left.value as Double * right.value as Double
+                    value = left.value * right.value
                 )
             }
 
             "/" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '/' is not defined for provided operands")
                 }
 
                 return Broj(
-                    value = left.value as Double / right.value as Double
+                    value = left.value / right.value
                 )
             }
 
             "%" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '%' is not defined for provided operands")
                 }
 
                 return Broj(
-                    value = left.value as Double % right.value as Double
+                    value = left.value % right.value
                 )
             }
 
             "^" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '^' is not defined for provided operands")
                 }
 
                 return Broj(
-                    value = (left.value as Double).pow(right.value as Double)
+                    value = left.value.pow(right.value)
                 )
             }
 
             "<" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '<' is not defined for provided operands")
                 }
 
                 return Logicki(
-                    value = (left.value as Double) < (right.value as Double)
+                    value = left.value < right.value
                 )
             }
 
             "<=" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '<=' is not defined for provided operands")
                 }
 
                 return Logicki(
-                    value = (left.value as Double) <= (right.value as Double)
+                    value = left.value <= right.value
                 )
             }
 
             ">" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '>' is not defined for provided operands")
                 }
 
                 return Logicki(
-                    value = (left.value as Double) > (right.value as Double)
+                    value = left.value > right.value
                 )
             }
 
             ">=" -> {
-                if (left.value !is Double || right.value !is Double) {
-                    throw Exception("Type error: Operator '+' is not defined for provided operands")
+                if (left !is Broj || right !is Broj) {
+                    throw Exception("Type error: Operator '>=' is not defined for provided operands")
                 }
 
                 return Logicki(
-                    value = (left.value as Double) >= (right.value as Double)
+                    value = left.value >= right.value
                 )
             }
 
@@ -435,7 +440,8 @@ class Interpreter {
         if (imports == null) {
             // Full import
             env.importEnv(tempEnv)
-        } else {
+        }
+        else {
             imports.forEach {
                 val packageElement = tempEnv.getVariable(it.symbol)
                 env.declareVariable(it.symbol, packageElement)
@@ -447,7 +453,8 @@ class Interpreter {
         if (imports == null) {
             // Full import
             env.importEnv(target)
-        } else {
+        }
+        else {
             imports.forEach {
                 val packageElement = target.getVariable(it.symbol)
                 env.declareVariable(it.symbol, packageElement)
@@ -456,7 +463,7 @@ class Interpreter {
     }
 
     private fun evaluateUnaryExpression(expr: UnaryExpression, env: Environment): RuntimeValue {
-        val arg = evaluate(expr.argument, env)
+        val arg = evaluate(expr.operand, env)
 
         when (expr.operator) {
             "+" -> {
@@ -570,7 +577,7 @@ class Interpreter {
     }
 
     private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue {
-        if (expr.assignee.kind != NodeType.Identifier && expr.assignee.kind != NodeType.MemberExpression) {
+        if (expr.assignee !is Identifier && expr.assignee !is MemberExpression) {
             throw Exception("Invalid assignment target: ${expr.assignee}")
         }
 
@@ -660,12 +667,7 @@ class Interpreter {
 
             if (target is Objekat) {
                 `this` = target
-                if (expr.assignee.property is Identifier) {
-                    // a.b.c = 10;
-                    return target.setProperty(expr.assignee.property.symbol, newValue)
-                } else {
-                    // Computed value
-                    // a.b["c"] = 10;
+                if(expr.assignee.isComputed){
                     val prop = evaluate(expr.assignee.property, env)
                     if (prop is Tekst) {
                         return target.setProperty(prop.value, evaluate(expr.value, env))
@@ -673,6 +675,13 @@ class Interpreter {
                     if (prop is Broj) {
                         throw Exception("${target.javaClass.simpleName} is not indexable")
                     }
+                }
+                else if (expr.assignee.property is Identifier) {
+                    // a.b.c = 10;
+                    return target.setProperty(expr.assignee.property.symbol, newValue)
+                }
+                else {
+                    throw Exception("Invalid Assignment Expression")
                 }
             }
 
@@ -744,7 +753,7 @@ class Interpreter {
     private fun evaluateFunctionCall(call: CallExpression, env: Environment): RuntimeValue {
         when (val fn = evaluate(call.callee, env)) {
             is Funkcija -> {
-                val activationRecord = hashMapOf<String, RuntimeValue>("@" to `this`)
+                val activationRecord = hashMapOf("@" to `this`)
                 val typeChecker = TypeChecker(env)
 
                 fn.params.forEachIndexed { index, param ->
@@ -859,7 +868,8 @@ class Interpreter {
 
             val prototype = ModelObject(
                 prototype = evaluateModelInstantiation(definition.superclass, firstExpression.args, functionEnv),
-                instanceObject = definition.members
+                instanceObject = definition.members,
+                typename = definition.superclass.className
             )
 
             val instance = ModelObject(
@@ -887,7 +897,8 @@ class Interpreter {
 
         if (condition.value == true) {
             result = evaluate(stmt.consequent, env)
-        } else if (stmt.alternate != null) {
+        }
+        else if (stmt.alternate != null) {
             result = evaluate(stmt.alternate, env)
         }
 
@@ -926,7 +937,8 @@ class Interpreter {
         if (stmt.step == null) {
             // Infer the step if not provided
             step = 1.0
-        } else {
+        }
+        else {
             // Otherwise interpret the provided step
             val stepVal = evaluate(stmt.step, env)
             if (stepVal.value !is Double) {
@@ -954,7 +966,8 @@ class Interpreter {
                 i += step
                 loopEnv.assignVariable(stmt.counter.symbol, Broj(value = i))
             }
-        } else {
+        }
+        else {
             // Backward loop
             var i = start
             while (i > end - 1) {
@@ -1030,7 +1043,8 @@ class Interpreter {
 
                     if (target is Niz) {
                         return target.getElement(prop.value.toInt())
-                    } else if (target is Tekst) {
+                    }
+                    else if (target is Tekst) {
                         return Tekst(
                             value = "${target.value[prop.value.toInt()]}"
                         )
@@ -1047,7 +1061,7 @@ class Interpreter {
         }
         else {
             val propertyName = (expr.property as Identifier).symbol
-            if (target is ModelObject) {
+            if (target is ModelObject && propertyName != "__proto__") {
                 val modelDefinition = env.getVariable(target.typename) as ModelDefinition
                 if (modelDefinition.isPrivate(propertyName)) {
                     if (env.getVariableOrNull("@") == null || env.getVariableOrNull("@")!!.typename != target.typename) {
@@ -1059,14 +1073,12 @@ class Interpreter {
         }
     }
 
-    private fun evaluateTypeDefinition(modelDefinition: TipDefinitionStatement, env: Environment): RuntimeValue {
-        if (modelDefinition.parentType != null) {
-            val parent = evaluateIdentifier(modelDefinition.parentType, env) as Tip
-            modelDefinition.properties.addAll(0, parent.properties)
+    private fun evaluateTypeDefinition(typeDefinition: TipDefinitionStatement, env: Environment): RuntimeValue {
+        if (typeDefinition.parentType != null) {
+            val parent = evaluateIdentifier(typeDefinition.parentType, env) as Tip
+            typeDefinition.properties.addAll(0, parent.properties)
         }
-        env.addModelDefinition(modelDefinition)
+        env.addTypeDefinition(typeDefinition)
         return Null()
     }
 }
-
-// TODO Extract methods from evaluate

@@ -21,13 +21,13 @@ class UnaryOperatorsTest {
                         value = BinaryExpression(
                             left = UnaryExpression(
                                 operator = "-",
-                                argument = Identifier(
+                                operand = Identifier(
                                     symbol = "x"
                                 )
                             ),
                             right = UnaryExpression(
                                 operator = "-",
-                                argument = NumericLiteral(
+                                operand = NumericLiteral(
                                     value = 10.0
                                 )
                             ),
