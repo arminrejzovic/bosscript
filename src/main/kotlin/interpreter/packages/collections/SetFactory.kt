@@ -2,7 +2,7 @@ package interpreter.packages.collections
 
 import interpreter.Environment
 import interpreter.values.*
-import java.util.HashSet
+import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
 
 class SetFactory {

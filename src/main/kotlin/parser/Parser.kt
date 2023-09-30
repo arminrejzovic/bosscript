@@ -6,7 +6,7 @@ import lexer.tokenize
 import kotlin.reflect.KClass
 
 class Parser(val js: Boolean = false) {
-    private var tokens: ArrayList<Token> = arrayListOf()
+    private var tokens: ArrayDeque<Token> = ArrayDeque()
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ class Parser(val js: Boolean = false) {
     }
 
     private fun consume(): Token {
-        return tokens.removeAt(0)
+        return tokens.removeFirst()
     }
 
     private fun getLineCol(): String {
@@ -39,7 +39,7 @@ class Parser(val js: Boolean = false) {
      * Removes the first available token and throws Exception if it doesn't match the expected type.
      */
     private fun expect(expectedType: TokenType, errorMessage: String): Token {
-        val prev = tokens.removeAt(0)
+        val prev = tokens.removeFirst()
         if (prev.type != expectedType) {
             println("Expected ${expectedType.name}, got ${prev.type} @ ${prev.getLineCol()}")
             throw Exception(errorMessage)

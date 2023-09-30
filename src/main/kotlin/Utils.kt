@@ -1,31 +1,28 @@
-import interpreter.Interpreter
-import interpreter.values.*
-import interpreter.values.classes.ModelObject
-import lexer.Token
-import lexer.tokenize
+import interpreter.values.Niz
+import interpreter.values.RuntimeValue
 import parser.Parser
 import java.io.File
-import java.lang.StringBuilder
 import kotlin.system.measureTimeMillis
 
 fun Double.isInt(): Boolean {
     return this % 1 == 0.0
 }
 
-fun String.isAlpha(): Boolean{
-    return (this.lowercase() != this.uppercase()) || this == "$" || this == "_"
+fun Char.isAlpha(): Boolean{
+    return this.isLetter() || this == '$' || this == '_'
 }
 
-fun String.isValidVariableChar(): Boolean{
-    return this.isAlpha() || this.isNumeric() || this == "$" || this == "_"
+fun Char.isValidVariableChar(): Boolean{
+    return this.isAlpha() || this.isNumeric() || this == '$' || this == '_'
 }
 
-fun String.isNumeric(): Boolean{
-    return this.toDoubleOrNull() != null
+fun Char.isNumeric(): Boolean{
+    this.isLetter()
+    return this.isDigit()
 }
 
-fun String.isIgnoredWhitespace(): Boolean{
-    return this == " " || this == "\r" || this == "\t"
+fun Char.isIgnoredWhitespace(): Boolean{
+    return this == ' ' || this == '\r' || this == '\t'
 }
 
 fun ArrayList<RuntimeValue>.flatten(): ArrayList<RuntimeValue> {
