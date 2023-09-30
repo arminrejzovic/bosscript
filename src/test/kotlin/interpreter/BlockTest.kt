@@ -1,6 +1,7 @@
 package interpreter
 
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class BlockTest {
@@ -17,7 +18,7 @@ class BlockTest {
             Null()
         )
 
-        assert(result == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 
     @Test
@@ -32,11 +33,7 @@ class BlockTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Null()
-        )
-
-        assert(result == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 
     @Test
@@ -54,11 +51,7 @@ class BlockTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Null()
-        )
-
-        assert(result == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 
     @Test

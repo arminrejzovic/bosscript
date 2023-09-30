@@ -8,11 +8,11 @@ class TipTest {
     fun testModelDefinition(){
         val src = """
             tip Korisnik{
-                ime: tekst,
-                prezime: tekst,
-                godiste: broj,
-                lista: tekst[],
-                ucenik: logicki
+                ime: tekst;
+                prezime: tekst;
+                godiste: broj;
+                lista: tekst[];
+                ucenik: logicki;
             }
         """.trimIndent()
 
@@ -103,7 +103,7 @@ class TipTest {
             parser.parseProgram(src)
         }
 
-        val expectedError = "Expected , or }"
+        val expectedError = "Expected Semicolon, got Identifier @ 3:5"
         val error = exception.message
 
         assert(error == expectedError)
@@ -124,7 +124,7 @@ class TipTest {
             parser.parseProgram(src)
         }
 
-        val expectedError = "Missing :"
+        val expectedError = "Expected Semicolon, got Comma @ 2:15"
         val error = exception.message
         assert(error == expectedError)
     }

@@ -1,5 +1,6 @@
 package parser
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class WhileLoopTest {
@@ -52,7 +53,7 @@ class WhileLoopTest {
                 )
             )
         )
-        assert(program.body == expectedResult)
+        Assertions.assertEquals(program.body, expectedResult)
     }
 
     @Test
@@ -114,7 +115,7 @@ class WhileLoopTest {
                 )
             )
         )
-        assert(program.body == expectedResult)
+        Assertions.assertEquals(program.body, expectedResult)
     }
 
     @Test

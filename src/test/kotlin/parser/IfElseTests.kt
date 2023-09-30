@@ -1,5 +1,6 @@
 package parser
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class IfElseTests {
@@ -423,7 +424,7 @@ class IfElseTests {
         """.trimIndent()
 
         val parser = Parser()
-        val expectedException = "parser.Identifier expected"
+        val expectedException = "Identifier expected"
         var exception = ""
         try {
             val program = parser.parseProgram(src)
@@ -432,9 +433,8 @@ class IfElseTests {
         }
         catch (e: Exception){
             exception = e.message.toString()
-
         }
 
-        assert(exception == expectedException)
+        Assertions.assertEquals(expectedException, exception)
     }
 }

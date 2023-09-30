@@ -2,6 +2,7 @@ package interpreter
 
 import org.junit.jupiter.api.Test
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
 
 class VariableDeclarationTest {
     @Test
@@ -21,7 +22,7 @@ class VariableDeclarationTest {
             )
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -39,7 +40,7 @@ class VariableDeclarationTest {
             Null()
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -59,7 +60,7 @@ class VariableDeclarationTest {
             Broj(value = 5.0)
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -79,7 +80,7 @@ class VariableDeclarationTest {
             Null()
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -99,7 +100,7 @@ class VariableDeclarationTest {
             )
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -118,7 +119,7 @@ class VariableDeclarationTest {
                 value = 50.0
             )
         )
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -147,7 +148,7 @@ class VariableDeclarationTest {
                 )
             )
         )
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -176,7 +177,6 @@ class VariableDeclarationTest {
                 )
             )
         )
-        println(result)
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 }

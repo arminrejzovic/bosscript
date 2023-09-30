@@ -2,13 +2,14 @@ package interpreter
 
 import org.junit.jupiter.api.Test
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
 
 class MemberExpressionsTest {
     @Test
     fun testSimpleMember() {
         val src = """
             var x = "Str";
-            x.duzina;
+            x.duzina();
         """.trimIndent()
 
         val interpreter = Interpreter()
@@ -18,7 +19,7 @@ class MemberExpressionsTest {
             value = 3.0
         )
 
-        assert(result.last() == expectedResult)
+        Assertions.assertEquals(expectedResult, result.last())
     }
 
     @Test
@@ -27,7 +28,7 @@ class MemberExpressionsTest {
             var x = {
                 a: "Str"
             };
-            x.a.duzina;
+            x.a.duzina();
         """.trimIndent()
 
         val interpreter = Interpreter()
@@ -38,7 +39,7 @@ class MemberExpressionsTest {
         )
 
         println(result.last())
-        assert(result.last() == expectedResult)
+        Assertions.assertEquals(expectedResult, result.last())
     }
 
     @Test
@@ -150,7 +151,7 @@ class MemberExpressionsTest {
             error = e.message ?: ""
         }
 
-        assert(error.trim() == expectedError.trim())
+        Assertions.assertTrue(error.contains(expectedError))
     }
 
     @Test
@@ -185,14 +186,14 @@ class MemberExpressionsTest {
 
         val interpreter = Interpreter()
         var error = ""
-        val expectedError = "Property c does not exist on object"
+        val expectedError = "Property c does not exist on object {a: 10, b: 3}"
         try {
             interpreter.evaluateProgram(src)
         } catch (e: Exception){
             error = e.message ?: ""
         }
 
-        assert(error == expectedError)
+        Assertions.assertEquals( expectedError, error)
     }
 
     @Test

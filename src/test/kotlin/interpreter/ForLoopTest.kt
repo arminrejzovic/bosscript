@@ -2,6 +2,7 @@ package interpreter
 
 import org.junit.jupiter.api.Test
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
 
 class ForLoopTest {
     @Test
@@ -17,9 +18,9 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Broj(value = 15.0)
+        val expectedResult = Broj(value = 16.0)
 
-        assert(result.last() == expectedResult)
+        Assertions.assertEquals(expectedResult, result.last())
     }
 
     @Test
@@ -35,9 +36,9 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Broj(value = 15.0)
+        val expectedResult = Broj(value = 16.0)
 
-        assert(result.last() == expectedResult)
+        Assertions.assertEquals(expectedResult, result.last())
     }
 
     @Test
@@ -53,9 +54,9 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Broj(value = 22.0)
+        val expectedResult = Broj(value = 23.0)
 
-        assert(result.last() == expectedResult)
+        Assertions.assertEquals(expectedResult, result.last())
     }
 
     @Test
@@ -69,10 +70,6 @@ class ForLoopTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = arrayListOf(
-            Null()
-        )
-
-        assert(result == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 }

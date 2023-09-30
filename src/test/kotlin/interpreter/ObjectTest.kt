@@ -13,6 +13,7 @@ import parser.VariableDeclaration
 import parser.VariableStatement
 import org.junit.jupiter.api.Test
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
 
 class ObjectTest {
     @Test
@@ -32,7 +33,7 @@ class ObjectTest {
             )
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test

@@ -7,6 +7,7 @@ import parser.ReturnStatement
 import parser.TypeAnnotation
 import org.junit.jupiter.api.Test
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
 
 class LambdaFunctionTest {
     @Test
@@ -32,7 +33,7 @@ class LambdaFunctionTest {
             )
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test
@@ -79,7 +80,7 @@ class LambdaFunctionTest {
             )
         )
 
-        assert(result == expectedResult)
+        Assertions.assertEquals(expectedResult, result)
     }
 
     @Test

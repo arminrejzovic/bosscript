@@ -29,7 +29,7 @@ class StdMathTest {
             
             ispis(e);
             
-            ispis(exp(3));
+            ispis(eNa(3));
             
             ispis(ln(3));
             ispis(log(3, 2));

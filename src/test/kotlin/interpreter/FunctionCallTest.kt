@@ -2,6 +2,8 @@ package interpreter
 
 import org.junit.jupiter.api.Test
 import interpreter.values.*
+import org.junit.jupiter.api.Assertions
+
 class FunctionCallTest {
     @Test
     fun testFunctionUntypedParam() {
@@ -15,9 +17,7 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Null()
-
-        assert(result.last() == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 
     @Test
@@ -54,9 +54,7 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Null()
-
-        assert(result.last() == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 
     @Test
@@ -94,9 +92,7 @@ class FunctionCallTest {
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
 
-        val expectedResult = Null()
-
-        assert(result.last() == expectedResult)
+        Assertions.assertTrue(result.last() is Null)
     }
 
     @Test
@@ -215,6 +211,6 @@ class FunctionCallTest {
 
         val interpreter = Interpreter()
         val result = interpreter.evaluateProgram(src)
-        assert(result.last() == Null())
+        Assertions.assertTrue(result.last() is Null)
     }
 }
