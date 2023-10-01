@@ -255,8 +255,8 @@ class Environment(
         )
 
         env.declareVariable(
-            "tip",
-            NativeFunction("tip"){args ->
+            "tipOd",
+            NativeFunction("tipOd"){args ->
                 Tekst(args[0].typename)
             }
         )

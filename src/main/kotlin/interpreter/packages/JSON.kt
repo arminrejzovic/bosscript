@@ -5,7 +5,7 @@ import interpreter.values.*
 import interpreter.values.classes.ModelObject
 import org.json.JSONArray
 import org.json.JSONObject
-import java.lang.StringBuilder
+import java.math.BigDecimal
 
 val JSON = Environment(variables = hashMapOf(
     "objekatIzJSON" to NativeFunction("objekatIzJSON"){ args ->
@@ -39,13 +39,13 @@ private fun parseJSONObject(jsonObj: JSONObject): Objekat{
 
 private fun parseJSONAttribute(attr: Any?): RuntimeValue{
     return when(attr){
-        is Int, is Double, is Long, is Float -> Broj(attr.toString().toDouble())
+        is Int, is Double, is Long, is Float, is BigDecimal -> Broj(attr.toString().toDouble())
         is String -> Tekst(attr)
         is Boolean -> Logicki(attr)
         is JSONObject -> parseJSONObject(attr)
         is JSONArray -> Niz(ArrayList(attr.map { parseJSONAttribute(it) }))
         JSONObject.NULL -> Null()
-        else -> throw Exception("Unsupported JSON attribute encountered: $attr")
+        else -> throw Exception("Unsupported JSON attribute encountered: $attr ${attr?.javaClass?.simpleName}")
     }
 }
 
