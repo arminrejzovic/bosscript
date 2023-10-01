@@ -1,6 +1,5 @@
 package interpreter
 
-import parser.Parser
 import errors.SyntaxError
 import interpreter.values.*
 import interpreter.values.classes.ModelDefinition
@@ -790,7 +789,7 @@ class Interpreter {
                 call.args.forEach {
                     args.add(evaluate(it, env))
                 }
-                return fn.call(args, this)
+                return fn.call(args, this, env)
             }
 
             is Tip -> {
