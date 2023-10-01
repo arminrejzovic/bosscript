@@ -789,7 +789,7 @@ class Interpreter {
                 call.args.forEach {
                     args.add(evaluate(it, env))
                 }
-                return fn.call(args, this, env)
+                return fn.call(args, this)
             }
 
             is Tip -> {

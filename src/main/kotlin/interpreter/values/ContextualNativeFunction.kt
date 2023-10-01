@@ -1,11 +1,10 @@
 package interpreter.values
 
-import interpreter.Environment
 import interpreter.Interpreter
 
 class ContextualNativeFunction(
     val name: String,
-    val call: (args: ArrayList<RuntimeValue>, interpretationContext: Interpreter, currentEnv: Environment) -> RuntimeValue,
+    val call: (args: ArrayList<RuntimeValue>, interpretationContext: Interpreter) -> RuntimeValue,
 ) : RuntimeValue {
     override val value: Any?
         get() = null
