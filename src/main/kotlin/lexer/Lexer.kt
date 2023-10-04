@@ -229,6 +229,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 col += identifier.length
             }
 
+            // JavaScript snippets
             else if(src[cursor] == '`'){
                 if(!js){
                     throw Exception("Javascript snippets are not allowed here.")
@@ -248,6 +249,13 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 }
                 src[cursor++].toString()
                 tokens.add(Token(sb.toString(), TokenType.Javascript, line, col))
+            }
+
+            // Comments
+            else if (src[cursor] == '#'){
+                while (src[cursor] != '\n'){
+                    cursor++
+                }
             }
 
             else {
