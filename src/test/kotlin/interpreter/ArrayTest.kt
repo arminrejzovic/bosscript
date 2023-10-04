@@ -1,16 +1,9 @@
 package interpreter
 
-import interpreter.values.*
-import parser.ArrayLiteral
-import parser.AssignmentExpression
-import parser.BooleanLiteral
-import parser.Identifier
-import parser.NumericLiteral
-import parser.StringLiteral
-import parser.VariableDeclaration
-import parser.VariableStatement
+import interpreter.values.Broj
+import interpreter.values.Niz
 import org.junit.jupiter.api.Test
-import parser.Parser
+import parser.*
 
 class ArrayTest {
 
@@ -101,7 +94,8 @@ class ArrayTest {
                                 NumericLiteral(value = 2.0),
                                 StringLiteral(value = "3")
                             )
-                        )
+                        ),
+                        type = null
                     )
                 ),
                 isConstant = false

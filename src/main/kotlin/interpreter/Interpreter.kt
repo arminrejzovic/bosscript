@@ -337,6 +337,7 @@ class Interpreter {
         val classname = stmt.className.symbol
         var superclass: ModelDefinition? = null
         val members = hashMapOf<String, RuntimeValue>()
+        val memberTypes = hashMapOf<String, TypeAnnotation>()
         val privateMembers = mutableSetOf<String>()
 
         if (stmt.parentClassName != null) {
@@ -355,29 +356,53 @@ class Interpreter {
 
         if (stmt.publicBlock != null) {
             stmt.publicBlock.getBody().forEach {
-                if (it is FunctionDeclaration) {
-                    members[it.name.symbol] = evaluateFunctionDeclaration(it, modelEnv)
-                } else if (it is VariableStatement) {
-                    it.declarations.forEach { vd ->
-                        members[vd.identifier] = evaluate(vd.value ?: NullLiteral(), modelEnv)
+                when (it) {
+                    is FunctionDeclaration -> {
+                        members[it.name.symbol] = evaluateFunctionDeclaration(it, modelEnv)
                     }
-                } else {
-                    throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+
+                    is VariableStatement -> {
+                        it.declarations.forEach { vd ->
+                            val memberValue = evaluate(vd.value ?: NullLiteral(), modelEnv)
+                            if(vd.type != null && memberValue !is Null){
+                                val typeChecker = TypeChecker(modelEnv)
+                                typeChecker.expect(vd.type, memberValue)
+                                memberTypes[vd.identifier] = vd.type
+                            }
+                            members[vd.identifier] = memberValue
+                        }
+                    }
+
+                    else -> {
+                        throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+                    }
                 }
             }
         }
         if (stmt.privateBlock != null) {
             stmt.privateBlock.getBody().forEach {
-                if (it is FunctionDeclaration) {
-                    privateMembers.add(it.name.symbol)
-                    members[it.name.symbol] = evaluateFunctionDeclaration(it, modelEnv)
-                } else if (it is VariableStatement) {
-                    it.declarations.forEach { vd ->
-                        privateMembers.add(vd.identifier)
-                        members[vd.identifier] = evaluate(vd.value ?: NullLiteral(), modelEnv)
+                when (it) {
+                    is FunctionDeclaration -> {
+                        privateMembers.add(it.name.symbol)
+                        members[it.name.symbol] = evaluateFunctionDeclaration(it, modelEnv)
                     }
-                } else {
-                    throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+
+                    is VariableStatement -> {
+                        it.declarations.forEach { vd ->
+                            val memberValue = evaluate(vd.value ?: NullLiteral(), modelEnv)
+                            if(vd.type != null && memberValue !is Null){
+                                val typeChecker = TypeChecker(modelEnv)
+                                typeChecker.expect(vd.type, memberValue)
+                                memberTypes[vd.identifier] = vd.type
+                            }
+                            privateMembers.add(vd.identifier)
+                            members[vd.identifier] = memberValue
+                        }
+                    }
+
+                    else -> {
+                        throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+                    }
                 }
             }
         }
@@ -390,7 +415,7 @@ class Interpreter {
             privateMembers = privateMembers
         )
 
-        env.declareVariable(classname, definition);
+        env.declareVariable(classname, definition)
 
         return Null()
     }
@@ -400,7 +425,7 @@ class Interpreter {
         try {
             result = evaluate(stmt.tryBlock, env)
         } catch (e: Exception) {
-            env.declareVariable("g", Tekst("${e.message}"), true)
+            env.declareVariable("g", Tekst("${e.message}"), isConstant = true)
             result = evaluate(stmt.catchBlock, env)
         }
         if (stmt.finallyBlock != null) {
@@ -572,7 +597,7 @@ class Interpreter {
     private fun evaluateVariableDeclaration(declaration: VariableDeclaration, env: Environment, isConstant: Boolean) {
         val value = if (declaration.value == null) Null() else evaluate(declaration.value, env)
 
-        env.declareVariable(declaration.identifier, value, isConstant)
+        env.declareVariable(declaration.identifier, value, declaration.type, isConstant)
     }
 
     private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue {

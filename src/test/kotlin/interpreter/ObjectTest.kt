@@ -1,19 +1,10 @@
 package interpreter
 
-import parser.BinaryExpression
-import parser.BooleanLiteral
-import parser.CallExpression
-import parser.Identifier
-import parser.NumericLiteral
-import parser.ObjectLiteral
-import parser.Parser
-import parser.Property
-import parser.StringLiteral
-import parser.VariableDeclaration
-import parser.VariableStatement
-import org.junit.jupiter.api.Test
-import interpreter.values.*
+import interpreter.values.Null
+import interpreter.values.Objekat
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import parser.*
 
 class ObjectTest {
     @Test
@@ -75,7 +66,8 @@ class ObjectTest {
                                     )
                                 ),
                             )
-                        )
+                        ),
+                        type = null
                     )
                 ),
                 isConstant = false
@@ -110,7 +102,8 @@ class ObjectTest {
                                     )
                                 )
                             )
-                        )
+                        ),
+                        type = null
                     )
                 ),
                 isConstant = false
@@ -161,8 +154,9 @@ class ObjectTest {
                                     )
                                 )
                             )
-                        )
-                    )
+                        ),
+                        type = null
+                    ),
                 ),
                 isConstant = false
             )
@@ -206,7 +200,8 @@ class ObjectTest {
                                     )
                                 )
                             )
-                        )
+                        ),
+                        type = null
                     )
                 ),
                 isConstant = false
@@ -243,7 +238,8 @@ class ObjectTest {
                                     )
                                 )
                             )
-                        )
+                        ),
+                        type = null
                     )
                 ),
                 isConstant = false

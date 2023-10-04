@@ -3,7 +3,6 @@ package parser
 import lexer.Token
 import lexer.TokenType
 import lexer.tokenize
-import kotlin.reflect.KClass
 
 class Parser(val js: Boolean = false) {
     private var tokens: ArrayDeque<Token> = ArrayDeque()
@@ -645,12 +644,21 @@ class Parser(val js: Boolean = false) {
     private fun parseVariableDeclaration(): VariableDeclaration {
         val identifier = parseIdentifier()
         var initializer: Expression? = null
+        var typeAnnotation: TypeAnnotation? = null
+
+        if(current().type == TokenType.Colon){
+            // Type Annotation specified
+            consume(/* colon */)
+            typeAnnotation = parseTypeAnnotation()
+        }
+
         if (current().type != TokenType.Semicolon && current().type != TokenType.Comma) {
             initializer = parseVariableInitializer()
         }
         return VariableDeclaration(
             identifier = identifier.symbol,
-            value = initializer
+            value = initializer,
+            type = typeAnnotation
         )
     }
 

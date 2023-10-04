@@ -120,6 +120,7 @@ data class LogicalExpression(
 data class VariableDeclaration(
     val identifier: String,
     val value: Expression?,
+    val type: TypeAnnotation? = null,
     override val kind: NodeType = NodeType.VariableDeclaration
 ): Statement
 

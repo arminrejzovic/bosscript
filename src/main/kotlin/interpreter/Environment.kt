@@ -2,11 +2,14 @@ package interpreter
 
 import interpreter.values.*
 import parser.TipDefinitionStatement
+import parser.TypeAnnotation
+import typechecker.TypeChecker
 import kotlin.random.Random
 
 class Environment(
     private val parent: Environment? = null,
     private val variables: HashMap<String, RuntimeValue> = HashMap(),
+    private val variableTypes: HashMap<String, TypeAnnotation> = HashMap(),
     private val constants: MutableSet<String> = mutableSetOf(),
     private val typeDefinitions: HashMap<String, Tip> = HashMap()
 ){
@@ -17,9 +20,16 @@ class Environment(
         }
     }
 
-    fun declareVariable(name: String, value: RuntimeValue, isConstant: Boolean = false): RuntimeValue {
+    private val typeChecker = TypeChecker(this)
+
+    fun declareVariable(name: String, value: RuntimeValue, type: TypeAnnotation? = null, isConstant: Boolean = false): RuntimeValue {
         if(variables.containsKey(name)){
             throw Exception("Error: $name has already been defined")
+        }
+
+        if(type != null && value !is Null){
+            typeChecker.expect(type, value)
+            variableTypes[name] = type
         }
 
         variables[name] = value
@@ -33,6 +43,10 @@ class Environment(
         val env = resolve(name)
         if(env.constants.contains(name)){
             throw Exception("Constants cannot be reassigned")
+        }
+        val expectedType = env.variableTypes[name]
+        if(expectedType != null && value !is Null){
+            typeChecker.expect(expectedType, value)
         }
         env.variables[name] = value
         return value
@@ -110,7 +124,6 @@ class Environment(
                     println()
                     Null()
                 },
-
             isConstant = true
         )
 
