@@ -337,7 +337,6 @@ class Interpreter {
         val classname = stmt.className.symbol
         var superclass: ModelDefinition? = null
         val members = hashMapOf<String, RuntimeValue>()
-        val memberTypes = hashMapOf<String, TypeAnnotation>()
         val privateMembers = mutableSetOf<String>()
 
         if (stmt.parentClassName != null) {
@@ -367,7 +366,6 @@ class Interpreter {
                             if(vd.type != null && memberValue !is Null){
                                 val typeChecker = TypeChecker(modelEnv)
                                 typeChecker.expect(vd.type, memberValue)
-                                memberTypes[vd.identifier] = vd.type
                             }
                             members[vd.identifier] = memberValue
                         }
@@ -393,7 +391,6 @@ class Interpreter {
                             if(vd.type != null && memberValue !is Null){
                                 val typeChecker = TypeChecker(modelEnv)
                                 typeChecker.expect(vd.type, memberValue)
-                                memberTypes[vd.identifier] = vd.type
                             }
                             privateMembers.add(vd.identifier)
                             members[vd.identifier] = memberValue
