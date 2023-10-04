@@ -1,5 +1,6 @@
 package interpreter
 
+import errors.BosscriptRuntimeException
 import errors.SyntaxError
 import interpreter.values.*
 import interpreter.values.classes.ModelDefinition
@@ -421,12 +422,27 @@ class Interpreter {
         var result: RuntimeValue = Null()
         try {
             result = evaluate(stmt.tryBlock, env)
-        } catch (e: Exception) {
-            env.declareVariable("g", Tekst("${e.message}"), isConstant = true)
-            result = evaluate(stmt.catchBlock, env)
         }
+        catch (e: BosscriptRuntimeException){
+            val catchEnv = Environment(env)
+            catchEnv.declareVariable(stmt.exceptionIdentifier.symbol, e.exceptionObject, isConstant = true)
+            result = evaluate(stmt.catchBlock, catchEnv)
+        }
+        catch (e: Exception) {
+            val catchEnv = Environment(env)
+            catchEnv.declareVariable(
+                stmt.exceptionIdentifier.symbol,
+                Objekat(properties = hashMapOf(
+                    "poruka" to Tekst("${e.message}")
+                )),
+                isConstant = true
+            )
+            result = evaluate(stmt.catchBlock, catchEnv)
+        }
+
         if (stmt.finallyBlock != null) {
-            result = evaluate(stmt.finallyBlock, env)
+            val finallyEnv = Environment(env)
+            result = evaluate(stmt.finallyBlock, finallyEnv)
         }
 
         return result

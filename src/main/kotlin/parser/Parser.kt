@@ -242,15 +242,21 @@ class Parser(val js: Boolean = false) {
         expect(TokenType.Try, "Expected 'try'")
         val tryBlock = parseBlockStatement()
         expect(TokenType.Catch, "Expecting 'catch' block")
+        expect(TokenType.OpenParen, "Expecting '('")
+        val exceptionIdentifier = parseIdentifier()
+        expect(TokenType.CloseParen, "Expecting ')'")
+
         val catchBlock = parseBlockStatement()
         var finallyBlock: BlockStatement? = null
         if (current().type == TokenType.Finally) {
             consume(/* finally */)
             finallyBlock = parseBlockStatement()
         }
+
         return TryCatchStatement(
             tryBlock = tryBlock,
             catchBlock = catchBlock,
+            exceptionIdentifier = exceptionIdentifier,
             finallyBlock = finallyBlock
         )
     }

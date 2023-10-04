@@ -25,6 +25,7 @@ data class BlockStatement(
 data class TryCatchStatement(
     val tryBlock: BlockStatement,
     val catchBlock: BlockStatement,
+    val exceptionIdentifier: Identifier,
     val finallyBlock: BlockStatement?,
     override val kind: NodeType = NodeType.TryCatch
 ): Statement

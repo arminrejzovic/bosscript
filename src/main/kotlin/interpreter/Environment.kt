@@ -1,5 +1,6 @@
 package interpreter
 
+import errors.BosscriptRuntimeException
 import interpreter.values.*
 import parser.TipDefinitionStatement
 import parser.TypeAnnotation
@@ -271,6 +272,17 @@ class Environment(
             "tipOd",
             NativeFunction("tipOd"){args ->
                 Tekst(args[0].typename)
+            }
+        )
+
+        env.declareVariable(
+            "izazoviGrešku",
+            NativeFunction("izazoviGrešku"){ args ->
+                if (args.size != 1 || args[0] !is Objekat){
+                    throw RuntimeException("Funkcija 'izazoviGrešku' očekuje 1 argument (greška: objekat)")
+                }
+                val exception = args[0] as Objekat
+                throw BosscriptRuntimeException(exception)
             }
         )
     }
