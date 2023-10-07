@@ -1,5 +1,7 @@
 package lexer
 
+import errors.BosscriptSyntaxError
+import errors.BosscriptTokenException
 import isAlpha
 import isIgnoredWhitespace
 import isNumeric
@@ -78,7 +80,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 col += 2
             }
             else{
-                throw Exception("Unexpected token found at[$line:$col]: '${src[cursor]}'")
+                throw BosscriptTokenException(src[cursor], line, col)
             }
         }
         else if(src[cursor] == '|'){
@@ -88,7 +90,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 col += 2
             }
             else{
-                throw Exception("Unexpected token found at[$line:$col]: '${src[cursor]}'")
+                throw BosscriptTokenException(src[cursor], line, col)
             }
         }
         else if(src[cursor] == '+' || src[cursor] == '-' || src[cursor] == '*' || src[cursor] == '/' || src[cursor] == '%'){
@@ -214,7 +216,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                     col += number.length
                 }
                 else{
-                    throw Exception("Unexpected token at [$line:$col]")
+                    throw BosscriptTokenException(src[cursor], line, col)
                 }
             }
 
@@ -238,7 +240,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             // JavaScript snippets
             else if(src[cursor] == '`'){
                 if(!js){
-                    throw Exception("Javascript snippets are not allowed here.")
+                    throw BosscriptSyntaxError("Neočekivan JavaScript kod. Transpilacija nije uključena.")
                 }
                 val sb = StringBuilder("")
                 src[cursor++].toString()
@@ -251,7 +253,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                     col++
                 }
                 if(src[cursor] != '`'){
-                    throw Exception("Missing closing backtick")
+                    throw BosscriptSyntaxError("Nedostaje ` na kraju JavaScript koda.")
                 }
                 src[cursor++].toString()
                 tokens.add(Token(sb.toString(), TokenType.Javascript, line, col))
@@ -266,7 +268,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
 
             else {
                 // Something unexpected
-                throw Exception("Unexpected token found at[$line:$col]: '${src[cursor]}'")
+                throw BosscriptTokenException(src[cursor], line, col)
             }
         }
     }
