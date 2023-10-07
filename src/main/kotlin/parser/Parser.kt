@@ -732,7 +732,7 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseAssignmentExpression(): Expression {
-        val left = parseLogicalOrExpression()
+        val left = parseElvisExpression()
 
 
         if (current().type != TokenType.ComplexAssign && current().type != TokenType.SimpleAssign) {
@@ -744,6 +744,18 @@ class Parser(val js: Boolean = false) {
             assignmentOperator = parseAssignmentOperator(),
             value = parseAssignmentExpression()
         )
+    }
+
+    private fun parseElvisExpression(): Expression {
+        var left = parseLogicalOrExpression()
+
+        while (current().value == "?:") {
+            val operator = consume().value
+            val right = parseElvisExpression()
+            left = BinaryExpression(left, right, operator)
+        }
+
+        return left
     }
 
     /**

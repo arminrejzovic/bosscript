@@ -130,6 +130,12 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 tokens.add(Token(src[cursor++].toString(), TokenType.LogicalNot, line, col++))
             }
         }
+        else if(src[cursor] == '?'){
+            if(src[cursor + 1] == ':'){
+               tokens.add(Token("${src[cursor++]}${src[cursor++]}", TokenType.BinaryOperator, line, col))
+               col += 2
+            }
+        }
         else if(src[cursor] == ':'){
             tokens.add(Token(src[cursor++].toString(), TokenType.Colon, line, col++))
         }

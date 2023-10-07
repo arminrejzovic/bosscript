@@ -292,6 +292,13 @@ class Interpreter {
                 )
             }
 
+            "?:" -> {
+                if(left is Null){
+                    return right
+                }
+                return left
+            }
+
             else -> {
                 throw NotImplementedError("Unsupported operator")
             }
