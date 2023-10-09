@@ -53,29 +53,35 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
 
     while (cursor < src.length){
         if(src[cursor] == '('){
-            tokens.add(Token(src[cursor++].toString(), TokenType.OpenParen, line, col++))
+            tokens.add(
+                Token(
+                    value = src[cursor++].toString(),
+                    type = TokenType.OpenParen,
+                    start = Pair(line, col++),
+                    end = Pair(line, col))
+            )
         }
         else if(src[cursor] == ')'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.CloseParen, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.CloseParen, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '['){
-            tokens.add(Token(src[cursor++].toString(), TokenType.OpenBracket, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.OpenBracket, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == ']'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.CloseBracket, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.CloseBracket, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '{'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.OpenBrace, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.OpenBrace, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '}'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.CloseBrace, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.CloseBrace, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '^'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.Exponent, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.Exponent, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '&'){
             if(src.length > 1 && src[cursor + 1] == '&'){
-                tokens.add(Token(value = "&&", TokenType.LogicalAnd, line, col))
+                tokens.add(Token(value = "&&", TokenType.LogicalAnd, start = Pair(line, col), end = Pair(line, col + 2)))
                 cursor += 2
                 col += 2
             }
@@ -85,7 +91,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
         }
         else if(src[cursor] == '|'){
             if(src.length > 1 && src[cursor + 1] == '|'){
-                tokens.add(Token(value = "||", TokenType.LogicalOr, line, col))
+                tokens.add(Token(value = "||", TokenType.LogicalOr, start = Pair(line, col), end = Pair(line, col + 2)))
                 cursor += 2
                 col += 2
             }
@@ -95,71 +101,71 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
         }
         else if(src[cursor] == '+' || src[cursor] == '-' || src[cursor] == '*' || src[cursor] == '/' || src[cursor] == '%'){
             if(src.length > 1 && src[cursor + 1] == '='){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.ComplexAssign, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.ComplexAssign, start = Pair(line, col), end = Pair(line, col + 2)))
                 col+=2
             }
             else if(src.length > 1 && src[cursor] == '+' && src[cursor + 1] == '+'){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.UnaryIncrement, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.UnaryIncrement, start = Pair(line, col), end = Pair(line, col + 2)))
                 col+=2
             }
             else if(src.length > 1 && src[cursor] == '-' && src[cursor + 1] == '-'){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.UnaryDecrement, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.UnaryDecrement, start = Pair(line, col), end = Pair(line, col + 2)))
                 col+=2
             }
             else{
-                tokens.add(Token(src[cursor++].toString(), TokenType.BinaryOperator, line, col++))
+                tokens.add(Token(src[cursor++].toString(), TokenType.BinaryOperator, start = Pair(line, col++), end = Pair(line, col)))
             }
         }
         else if(src[cursor] == '='){
             if(src.length > 1 && src[cursor + 1] == '='){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.EqualityOperator, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.EqualityOperator, start = Pair(line, col), end = Pair(line, col + 2)))
                 col += 2
             }
             else if(src.length > 1 && src[cursor + 1] == '>'){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.Arrow, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.Arrow, start = Pair(line, col), end = Pair(line, col + 2)))
                 col += 2
             }
             else{
-                tokens.add(Token(src[cursor++].toString(), TokenType.SimpleAssign, line, col++))
+                tokens.add(Token(src[cursor++].toString(), TokenType.SimpleAssign, start = Pair(line, col++), end = Pair(line, col)))
             }
         }
         else if(src[cursor] == '!'){
             if(src.length > 1 && src[cursor + 1] == '='){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.EqualityOperator, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.EqualityOperator, start = Pair(line, col), end = Pair(line, col + 2)))
                 col += 2
             }
             else{
-                tokens.add(Token(src[cursor++].toString(), TokenType.LogicalNot, line, col++))
+                tokens.add(Token(src[cursor++].toString(), TokenType.LogicalNot, start = Pair(line, col++), end = Pair(line, col)))
             }
         }
         else if(src[cursor] == '?'){
             if(src[cursor + 1] == ':'){
-               tokens.add(Token("${src[cursor++]}${src[cursor++]}", TokenType.BinaryOperator, line, col))
+               tokens.add(Token("${src[cursor++]}${src[cursor++]}", TokenType.BinaryOperator, start = Pair(line, col), end = Pair(line, col + 2)))
                col += 2
             }
         }
         else if(src[cursor] == ':'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.Colon, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.Colon, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == ';'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.Semicolon, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.Semicolon, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == ','){
-            tokens.add(Token(src[cursor++].toString(), TokenType.Comma, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.Comma, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '.'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.Dot, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.Dot, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '@'){
-            tokens.add(Token(src[cursor++].toString(), TokenType.This, line, col++))
+            tokens.add(Token(src[cursor++].toString(), TokenType.This, start = Pair(line, col++), end = Pair(line, col)))
         }
         else if(src[cursor] == '<' || src[cursor] == '>'){
             if(src.length > 1 && src[cursor + 1] == '='){
-                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.RelationalOperator, line, col))
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.RelationalOperator, start = Pair(line, col), end = Pair(line, col + 2)))
                 col += 2
             }
             else{
-                tokens.add(Token(src[cursor++].toString(), TokenType.RelationalOperator, line, col++))
+                tokens.add(Token(src[cursor++].toString(), TokenType.RelationalOperator, start = Pair(line, col++), end = Pair(line, col)))
             }
         }
         else if(src[cursor] == '\n'){
@@ -176,7 +182,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             //String literals
             if(src[cursor] == '"'){
                 // Add the opening quotation mark
-                tokens.add(Token(src[cursor++].toString(), TokenType.DoubleQuote, line, col++))
+                tokens.add(Token(src[cursor++].toString(), TokenType.DoubleQuote, start = Pair(line, col++), end = Pair(line, col)))
                 var string = ""
                 while (cursor < src.length && src[cursor] != '"'){
                     if(src[cursor] == '\\' && src.length > 1){
@@ -194,12 +200,12 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                     }
                 }
                 // Add the string value
-                tokens.add(Token(string, TokenType.String, line, col))
+                tokens.add(Token(string, TokenType.String, start = Pair(line, col), end = Pair(line, col + string.length)))
                 col += string.length
 
                 // If exists, add closing quotation mark
                 if(src.isNotEmpty() && src[cursor] == '"'){
-                    tokens.add(Token(src[cursor++].toString(), TokenType.DoubleQuote, line, col++))
+                    tokens.add(Token(src[cursor++].toString(), TokenType.DoubleQuote, start = Pair(line, col++), end = Pair(line, col)))
                 }
             }
 
@@ -211,9 +217,9 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 }
                 val validNumberPattern = Regex("^-?(0|[1-9](_?[0-9])*)(\\.[0-9](_?[0-9])*)?([eE][-+]?[0-9]+)?")
                 if(validNumberPattern.matches(number)){
-                    number = number.replace("_", "")
-                    tokens.add(Token(number, TokenType.Number, line, col))
-                    col += number.length
+                    val validatedNumber = number.replace("_", "")
+                    tokens.add(Token(validatedNumber, TokenType.Number, start = Pair(line, col), end = Pair(line, col + validatedNumber.length)))
+                    col += validatedNumber.length
                 }
                 else{
                     throw BosscriptTokenException(src[cursor], line, col)
@@ -229,10 +235,10 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 // Check for reserved lexer.getKeywords
                 val reserved = keywords[identifier]
                 if (reserved != null){
-                    tokens.add(Token(identifier, reserved, line, col))
+                    tokens.add(Token(identifier, reserved, start = Pair(line, col), end = Pair(line, col + identifier.length)))
                 }
                 else {
-                    tokens.add(Token(identifier, TokenType.Identifier, line, col))
+                    tokens.add(Token(identifier, TokenType.Identifier, start = Pair(line, col), end = Pair(line, col + identifier.length)))
                 }
                 col += identifier.length
             }
@@ -243,7 +249,8 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                     throw BosscriptSyntaxError("Neočekivan JavaScript kod. Transpilacija nije uključena.")
                 }
                 val sb = StringBuilder("")
-                src[cursor++].toString()
+                src[cursor++].toString() // this is to remove the backtick
+                val start = Pair(line, col)
                 while (src.isNotEmpty() && src[cursor] != '`'){
                     if(src[cursor] == '\n'){
                         line++
@@ -255,8 +262,8 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 if(src[cursor] != '`'){
                     throw BosscriptSyntaxError("Nedostaje ` na kraju JavaScript koda.")
                 }
-                src[cursor++].toString()
-                tokens.add(Token(sb.toString(), TokenType.Javascript, line, col))
+                src[cursor++].toString() // this is to remove the backtick
+                tokens.add(Token(sb.toString(), TokenType.Javascript, start, Pair(line, col)))
             }
 
             // Comments
@@ -264,6 +271,8 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 while (src[cursor] != '\n'){
                     cursor++
                 }
+                line++
+                col = 1
             }
 
             else {
@@ -272,6 +281,6 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             }
         }
     }
-    tokens.add(Token("EOF", TokenType.EOF, line, col))
+    tokens.add(Token("EOF", TokenType.EOF, Pair(Int.MAX_VALUE, Int.MAX_VALUE), Pair(Int.MAX_VALUE, Int.MAX_VALUE)))
     return tokens
 }

@@ -1,7 +1,5 @@
 package lexer
 
-import interpreter.Interpreter
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 class LexerTests {
@@ -19,38 +17,38 @@ class LexerTests {
 
         val tokens = tokenize(src, false)
         val expectedTokens = arrayListOf(
-            Token(value = "paket", TokenType.Paket, 0, 0),
-            Token(value = "\"", TokenType.DoubleQuote, 0, 0),
-            Token(value = "matematika", TokenType.String, 0, 0),
-            Token(value = "\"", TokenType.DoubleQuote, 0, 0),
-            Token(value = ";", TokenType.Semicolon, 0, 0),
-            Token(value = "funkcija", TokenType.Funkcija, 0, 0),
-            Token(value = "main", TokenType.Identifier, 0, 0),
-            Token(value = "(", TokenType.OpenParen, 0, 0),
-            Token(value = ")", TokenType.CloseParen, 0, 0),
-            Token(value = "{", TokenType.OpenBrace, 0, 0),
-            Token(value = "za", TokenType.Za, 0, 0),
-            Token(value = "svako", TokenType.Svako, 0, 0),
-            Token(value = "(", TokenType.OpenParen, 0, 0),
-            Token(value = "x", TokenType.Identifier, 0, 0),
-            Token(value = "od", TokenType.Od, 0, 0),
-            Token(value = "0", TokenType.Number, 0, 0),
-            Token(value = "do", TokenType.Do, 0, 0),
-            Token(value = "1", TokenType.Number, 0, 0),
-            Token(value = "korak", TokenType.Korak, 0, 0),
-            Token(value = "0.01", TokenType.Number, 0, 0),
-            Token(value = ")", TokenType.CloseParen, 0, 0),
-            Token(value = "{", TokenType.OpenBrace, 0, 0),
-            Token(value = "ispis", TokenType.Identifier, 0, 0),
-            Token(value = "(", TokenType.OpenParen, 0, 0),
-            Token(value = "sin", TokenType.Identifier, 0, 0),
-            Token(value = "(", TokenType.OpenParen, 0, 0),
-            Token(value = "x", TokenType.Identifier, 0, 0),
-            Token(value = ")", TokenType.CloseParen, 0, 0),
-            Token(value = ")", TokenType.CloseParen, 0, 0),
-            Token(value = ";", TokenType.Semicolon, 0, 0),
-            Token(value = "}", TokenType.CloseBrace, 0, 0),
-            Token(value = "}", TokenType.CloseBrace, 0, 0)
+            Token(value = "paket", TokenType.Paket, Pair(0, 0), Pair(0, 0)),
+            Token(value = "\"", TokenType.DoubleQuote, Pair(0, 0), Pair(0, 0)),
+            Token(value = "matematika", TokenType.String, Pair(0, 0), Pair(0, 0)),
+            Token(value = "\"", TokenType.DoubleQuote, Pair(0, 0), Pair(0, 0)),
+            Token(value = ";", TokenType.Semicolon, Pair(0, 0), Pair(0, 0)),
+            Token(value = "funkcija", TokenType.Funkcija, Pair(0, 0), Pair(0, 0)),
+            Token(value = "main", TokenType.Identifier, Pair(0, 0), Pair(0, 0)),
+            Token(value = "(", TokenType.OpenParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = ")", TokenType.CloseParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "{", TokenType.OpenBrace, Pair(0, 0), Pair(0, 0)),
+            Token(value = "za", TokenType.Za, Pair(0, 0), Pair(0, 0)),
+            Token(value = "svako", TokenType.Svako, Pair(0, 0), Pair(0, 0)),
+            Token(value = "(", TokenType.OpenParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "x", TokenType.Identifier, Pair(0, 0), Pair(0, 0)),
+            Token(value = "od", TokenType.Od, Pair(0, 0), Pair(0, 0)),
+            Token(value = "0", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = "do", TokenType.Do, Pair(0, 0), Pair(0, 0)),
+            Token(value = "1", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = "korak", TokenType.Korak, Pair(0, 0), Pair(0, 0)),
+            Token(value = "0.01", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = ")", TokenType.CloseParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "{", TokenType.OpenBrace, Pair(0, 0), Pair(0, 0)),
+            Token(value = "ispis", TokenType.Identifier, Pair(0, 0), Pair(0, 0)),
+            Token(value = "(", TokenType.OpenParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "sin", TokenType.Identifier, Pair(0, 0), Pair(0, 0)),
+            Token(value = "(", TokenType.OpenParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "x", TokenType.Identifier, Pair(0, 0), Pair(0, 0)),
+            Token(value = ")", TokenType.CloseParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = ")", TokenType.CloseParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = ";", TokenType.Semicolon, Pair(0, 0), Pair(0, 0)),
+            Token(value = "}", TokenType.CloseBrace, Pair(0, 0), Pair(0, 0)),
+            Token(value = "}", TokenType.CloseBrace, Pair(0, 0), Pair(0, 0))
         )
         expectedTokens.forEachIndexed{index, token ->
             assert(token == tokens[index])
@@ -65,14 +63,14 @@ class LexerTests {
 
         val tokens = tokenize(src, false)
         val expectedTokens = arrayListOf(
-            Token(value = "dok", TokenType.Dok, 0, 0),
-            Token(value = "(", TokenType.OpenParen, 0, 0),
-            Token(value = "x", TokenType.Identifier, 0, 0),
-            Token(value = "!=", TokenType.EqualityOperator, 0, 0),
-            Token(value = "10", TokenType.Number, 0, 0),
-            Token(value = ")", TokenType.CloseParen, 0, 0),
-            Token(value = "{", TokenType.OpenBrace, 0, 0),
-            Token(value = "}", TokenType.CloseBrace, 0, 0)
+            Token(value = "dok", TokenType.Dok, Pair(0, 0), Pair(0, 0)),
+            Token(value = "(", TokenType.OpenParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "x", TokenType.Identifier, Pair(0, 0), Pair(0, 0)),
+            Token(value = "!=", TokenType.EqualityOperator, Pair(0, 0), Pair(0, 0)),
+            Token(value = "10", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = ")", TokenType.CloseParen, Pair(0, 0), Pair(0, 0)),
+            Token(value = "{", TokenType.OpenBrace, Pair(0, 0), Pair(0, 0)),
+            Token(value = "}", TokenType.CloseBrace, Pair(0, 0), Pair(0, 0))
         )
         expectedTokens.forEachIndexed{index, token ->
             println("Found ${tokens[index]}")
@@ -91,12 +89,12 @@ class LexerTests {
 
         val tokens = tokenize(src, false)
         val expectedTokens = arrayListOf(
-            Token(value = "10.0", TokenType.Number, 0, 0),
-            Token(value = ";", TokenType.Semicolon, 0, 0),
-            Token(value = "1000000", TokenType.Number, 0, 0),
-            Token(value = ";", TokenType.Semicolon, 0, 0),
-            Token(value = "6969", TokenType.Number, 0, 0),
-            Token(value = ";", TokenType.Semicolon, 0, 0)
+            Token(value = "10.0", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = ";", TokenType.Semicolon, Pair(0, 0), Pair(0, 0)),
+            Token(value = "1000000", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = ";", TokenType.Semicolon, Pair(0, 0), Pair(0, 0)),
+            Token(value = "6969", TokenType.Number, Pair(0, 0), Pair(0, 0)),
+            Token(value = ";", TokenType.Semicolon, Pair(0, 0), Pair(0, 0))
         )
         expectedTokens.forEachIndexed{index, token ->
             println("Found ${tokens[index]}")

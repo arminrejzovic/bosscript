@@ -3,10 +3,10 @@ package lexer
 data class Token(
     val value: String,
     val type: TokenType,
-    val line: Int,
-    val col: Int
+    val start: Pair<Int, Int>,
+    val end: Pair<Int, Int>
 ){
-    fun getLineCol() = "$line:$col"
+    fun getLineCol() = "${start.first}:${start.second}"
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
