@@ -168,14 +168,19 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 tokens.add(Token(src[cursor++].toString(), TokenType.RelationalOperator, start = Pair(line, col++), end = Pair(line, col)))
             }
         }
-        else if(src[cursor] == '\n'){
+        else if (src[cursor] == '#') {
+            while (cursor < src.length && src[cursor] != '\n') {
+                cursor++
+            }
+        }
+        else if (src[cursor] == '\n') {
             line++
             col = 1
             cursor++
         }
-        else if(src[cursor].isIgnoredWhitespace()){
+        else if (src[cursor].isIgnoredWhitespace()) {
             cursor++
-            col += 1
+            col++
         }
         else{
             // Multi-character tokens
@@ -264,15 +269,6 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 }
                 src[cursor++].toString() // this is to remove the backtick
                 tokens.add(Token(sb.toString(), TokenType.Javascript, start, Pair(line, col)))
-            }
-
-            // Comments
-            else if (src[cursor] == '#'){
-                while (src[cursor] != '\n'){
-                    cursor++
-                }
-                line++
-                col = 1
             }
 
             else {
