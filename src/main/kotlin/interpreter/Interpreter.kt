@@ -1,7 +1,6 @@
 package interpreter
 
 import errors.BosscriptRuntimeException
-import errors.SyntaxError
 import interpreter.values.*
 import interpreter.values.classes.ModelDefinition
 import interpreter.values.classes.ModelObject
@@ -156,7 +155,7 @@ class Interpreter {
             }
 
             else -> {
-                throw SyntaxError("Unexpected token, $node")
+                throw Exception("Unexpected token, $node")
             }
         }
     }
@@ -454,8 +453,14 @@ class Interpreter {
 
         return result
     }
-
     private fun evaluatePackage(src: String, env: Environment) {
+        /* TODO Refactor evaluatePackage method to evaluate only:
+                1. Functions
+                2. Variable declarations
+                3. Model declarations
+                4. Type definitions
+            Since other things cannot be imported (loops, if-else, etc). It will help performance a little bit
+    */
         val program = parser.parseProgram(src)
         program.body.forEach {
             evaluate(it, env)

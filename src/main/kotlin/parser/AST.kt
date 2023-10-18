@@ -187,8 +187,8 @@ data class ModelDefinitionStatement(
 
 data class ModelBlock(
     private val body: ArrayList<Statement> = arrayListOf(),
-    override val start: Pair<Int, Int> = Pair(0, 0),
-    override val end: Pair<Int, Int> = Pair(0, 0),
+    override var start: Pair<Int, Int> = Pair(0, 0),
+    override var end: Pair<Int, Int> = Pair(0, 0),
     override val kind: NodeType = NodeType.ModelBlock
 ): Statement{
     fun getBody(): ArrayList<Statement>{

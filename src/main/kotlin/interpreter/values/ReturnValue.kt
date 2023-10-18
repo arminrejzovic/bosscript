@@ -1,7 +1,5 @@
 package interpreter.values
 
-import errors.SyntaxError
-
 data class ReturnValue(
     override val value: RuntimeValue,
 ) : RuntimeValue {
@@ -12,7 +10,7 @@ data class ReturnValue(
          This should never happen in reality, but let's have code handling it just in case
          */
         if (value is ReturnValue) {
-            throw SyntaxError("Something went wrong")
+            throw Exception("Something went wrong")
         }
     }
 

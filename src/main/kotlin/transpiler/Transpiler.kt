@@ -1,6 +1,5 @@
 package transpiler
 
-import errors.SyntaxError
 import parser.*
 
 class Transpiler {
@@ -165,7 +164,7 @@ class Transpiler {
             }
 
             else -> {
-                throw SyntaxError("Unexpected token, $node")
+                throw Exception("Unexpected token, $node")
             }
         }
     }

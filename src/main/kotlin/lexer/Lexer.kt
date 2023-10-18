@@ -217,7 +217,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             // Numbers
             else if(src[cursor].isNumeric()){
                 var number = ""
-                while (src.isNotEmpty() && src[cursor].isNumeric() || src[cursor] == '_' || src[cursor] == '.'){
+                while (cursor < src.length && src[cursor].isNumeric() || src[cursor] == '_' || src[cursor] == '.'){
                     number += src[cursor++]
                 }
                 val validNumberPattern = Regex("^-?(0|[1-9](_?[0-9])*)(\\.[0-9](_?[0-9])*)?([eE][-+]?[0-9]+)?")
@@ -251,7 +251,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             // JavaScript snippets
             else if(src[cursor] == '`'){
                 if(!js){
-                    throw BosscriptSyntaxError("Neočekivan JavaScript kod. Transpilacija nije uključena.")
+                    throw BosscriptSyntaxError("Neočekivan JavaScript kod. Transpilacija nije uključena.", Pair(line, col))
                 }
                 val sb = StringBuilder("")
                 src[cursor++].toString() // this is to remove the backtick
@@ -265,7 +265,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                     col++
                 }
                 if(src[cursor] != '`'){
-                    throw BosscriptSyntaxError("Nedostaje ` na kraju JavaScript koda.")
+                    throw BosscriptSyntaxError("Nedostaje ` na kraju JavaScript koda.", Pair(line, col))
                 }
                 src[cursor++].toString() // this is to remove the backtick
                 tokens.add(Token(sb.toString(), TokenType.Javascript, start, Pair(line, col)))
@@ -277,6 +277,6 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             }
         }
     }
-    tokens.add(Token("EOF", TokenType.EOF, Pair(Int.MAX_VALUE, Int.MAX_VALUE), Pair(Int.MAX_VALUE, Int.MAX_VALUE)))
+    tokens.add(Token("EOF", TokenType.EOF, Pair(line, col), Pair(line, col)))
     return tokens
 }

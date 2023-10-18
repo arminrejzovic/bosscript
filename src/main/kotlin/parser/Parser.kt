@@ -1,5 +1,6 @@
 package parser
 
+import errors.BosscriptParsingError
 import errors.BosscriptSyntaxError
 import lexer.Token
 import lexer.TokenType
@@ -32,7 +33,7 @@ class Parser(val js: Boolean = false) {
         if (node.kind == NodeType.Identifier || node.kind == NodeType.MemberExpression) {
             return node
         }
-        throw BosscriptSyntaxError("Navedenoj lijevoj strani nije moguće dodijeliti vrijednost.")
+        throw BosscriptSyntaxError("Navedenoj lijevoj strani nije moguće dodijeliti vrijednost.", node.start)
     }
 
     /**
@@ -41,8 +42,7 @@ class Parser(val js: Boolean = false) {
     private fun expect(expectedType: TokenType, errorMessage: String): Token {
         val prev = consume()
         if (prev.type != expectedType) {
-            println("Expected ${expectedType.name}, got ${prev.type} @ ${prev.getLineCol()}")
-            throw Exception(errorMessage)
+            throw BosscriptParsingError(errorMessage, prev.start)
         }
         return prev
     }
@@ -51,7 +51,7 @@ class Parser(val js: Boolean = false) {
         val reset = "\u001b[0m"
         val yellow = "\u001b[33m"
 
-        println("$yellow[WARN] $message $reset")
+        println("$yellow[UPOZORENJE] $message $reset")
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -142,11 +142,7 @@ class Parser(val js: Boolean = false) {
             }
 
             TokenType.Svako -> {
-                throw Exception("You are probably missing 'za' before 'svako'")
-            }
-
-            TokenType.Ili -> {
-                throw Exception("'ili' block must follow an 'ako' block")
+                throw BosscriptParsingError("Neočekivani token 'svako'. Vjerovatno ste mislili 'za svako'.", current().start)
             }
 
             else -> {
@@ -157,17 +153,17 @@ class Parser(val js: Boolean = false) {
 
     private fun parseJavascriptSnippet(): JavascriptSnippet {
         if(!js){
-            throw Exception("Javascript snippets are not allowed here.")
+            throw BosscriptParsingError("Javascript kod nije dozvoljen ovdje.", current().start)
         }
         val start = current().start
         val end = current().end
-        val jsCode = expect(TokenType.Javascript, "Expected JS Snippet")
+        val jsCode = expect(TokenType.Javascript, "Nedostaje očekivani Javascript blok")
         return JavascriptSnippet(jsCode.value, start, end)
     }
 
     private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
         val start = current().start
-        expect(TokenType.Model, "Expected 'model'")
+        expect(TokenType.Model, "Nedostaje ključna riječ 'model'")
         val classname = parseIdentifier()
         var parentClassName: Identifier? = null
         var privateBlock: ModelBlock? = null
@@ -179,12 +175,12 @@ class Parser(val js: Boolean = false) {
             parentClassName = parseIdentifier()
         }
 
-        expect(TokenType.OpenBrace, "Expected '{'")
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
 
         while(current().type != TokenType.CloseBrace){
             if(current().type == TokenType.Constructor && constructor == null){
                 consume(/* konstruktor */)
-                expect(TokenType.OpenParen, "Expected (")
+                expect(TokenType.OpenParen, "Nedostaje '('")
 
                 var params: ArrayList<FunctionParameter> = arrayListOf()
 
@@ -192,7 +188,7 @@ class Parser(val js: Boolean = false) {
                     params = parseFormalParameterList()
                 }
 
-                expect(TokenType.CloseParen, "Missing ')'")
+                expect(TokenType.CloseParen, "Nedostaje ')'")
 
                 val functionBody: BlockStatement = parseBlockStatement()
 
@@ -213,15 +209,15 @@ class Parser(val js: Boolean = false) {
                 publicBlock = parseModelBlock()
             }
             else {
-                throw Exception("Expecting private or public block, or constructor")
+                throw BosscriptParsingError("Neočekivani token pronađen. Definicija modela može sadržavati samo privatni blok, javni blok i konstruktor", current().start)
             }
         }
 
         val end = current().end
-        expect(TokenType.CloseBrace, "Expected '}'")
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
 
         if(constructor == null){
-            throw Exception("Model $classname has no constructor")
+            throw BosscriptParsingError("Model ${classname.symbol} nema definisan konstruktor.", start)
         }
 
         return ModelDefinitionStatement(
@@ -235,23 +231,28 @@ class Parser(val js: Boolean = false) {
     }
 
     private fun parseModelBlock(): ModelBlock {
-        expect(TokenType.OpenBrace, "Expected '{'")
+        val start = current().start
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
         val modelBlock = ModelBlock()
         while (current().type !== TokenType.CloseBrace) {
             modelBlock.addStatement(parseStatement())
         }
-        expect(TokenType.CloseBrace, "Expected '}'")
+        val end = current().end
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
+        modelBlock.start = start
+        modelBlock.end = end
+
         return modelBlock
     }
 
     private fun parseTryCatchStatement(): TryCatchStatement {
         val start = current().start
-        expect(TokenType.Try, "Expected 'try'")
+        expect(TokenType.Try, "Nedostaje 'probaj'")
         val tryBlock = parseBlockStatement()
-        expect(TokenType.Catch, "Expecting 'catch' block")
-        expect(TokenType.OpenParen, "Expecting '('")
+        expect(TokenType.Catch, "Nedostaje 'spasi' blok")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val exceptionIdentifier = parseIdentifier()
-        expect(TokenType.CloseParen, "Expecting ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
 
         val catchBlock = parseBlockStatement()
         var end = catchBlock.end
@@ -273,37 +274,44 @@ class Parser(val js: Boolean = false) {
     }
 
     private fun parseImportStatement(): ImportStatement {
-        expect(TokenType.Paket, "Expected 'paket' at this point")
+        val start = current().start
+        var end = current().end
+        expect(TokenType.Paket, "Nedostaje ključna riječ 'paket'")
         val packageName = parseStringLiteral()
         val imports = arrayListOf<Identifier>()
         if (current().type == TokenType.Semicolon) {
             // Full package import
+            end = current().end
             consume(/*semicolon*/)
             return ImportStatement(
                 packageName = packageName.value,
-                imports = null
+                imports = null,
+                start, end
             )
         }
-        expect(TokenType.OpenBrace, "Missing {")
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
 
         do {
             imports.add(parseIdentifier())
         } while (current().type != TokenType.CloseBrace && current().type == TokenType.Comma && expect(
                 TokenType.Comma,
-                "Missing ','"
+                "Nedostaje ','"
             ) != null
         )
 
-        expect(TokenType.CloseBrace, "Missing }")
-        expect(TokenType.Semicolon, "Missing ;")
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
+        expect(TokenType.Semicolon, "Nedostaje ';'")
+        end = current().end
         return ImportStatement(
             packageName = packageName.value,
-            imports = imports
+            imports = imports,
+            start, end
         )
     }
 
     private fun parseTypeDefinitionStatement(): TipDefinitionStatement {
-        expect(TokenType.Tip, "A type is defined using the tip keyword")
+        val start = current().start
+        expect(TokenType.Tip, "Nedostaje ključna riječ 'tip'")
         val name = parseIdentifier()
         var parentType: Identifier? = null
         if (current().value == "<") {
@@ -311,40 +319,45 @@ class Parser(val js: Boolean = false) {
             consume(/* < */)
             parentType = parseIdentifier()
         }
-        expect(TokenType.OpenBrace, "A type definition is surrounded with braces")
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
         val properties = arrayListOf<TypeProperty>()
         while (current().type != TokenType.EOF && current().type != TokenType.CloseBrace) {
             properties.add(parseTypeProperty())
         }
-        expect(TokenType.CloseBrace, "Missing }")
+        val end = current().end
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
 
         if (properties.isEmpty()) {
-            warning("Type '${name.symbol}' is empty")
+            warning("Tip '${name.symbol}' je prazan.")
         }
 
         return TipDefinitionStatement(
             name = name,
             parentType = parentType,
-            properties = properties
+            properties = properties,
+            start, end
         )
     }
 
     private fun parseTypeProperty(): TypeProperty {
-        val name = expect(TokenType.Identifier, "Type property name expected, got ${current().type}").value
+        val start = current().start
+        val name = expect(TokenType.Identifier, "Nedozvoljeni token '${current().value}' pronađen unutar definicije tipa.").value
 
-        expect(TokenType.Colon, "Missing :")
+        expect(TokenType.Colon, "Nedostaje ':'")
         val type = parseTypeAnnotation()
-        expect(TokenType.Semicolon, "Expected ;")
+        val end = current().end
+        expect(TokenType.Semicolon, "Nedostaje ';'")
 
         return TypeProperty(
             name = name,
-            type = type
+            type = type,
+            start, end
         )
     }
 
     private fun parseExpressionStatement(): Expression {
         val expression = parseExpression()
-        expect(TokenType.Semicolon, "Missing ;")
+        expect(TokenType.Semicolon, "Nedostaje ';'")
         return expression
     }
 
@@ -363,7 +376,7 @@ class Parser(val js: Boolean = false) {
             }
 
             else -> {
-                throw Exception("Unexpected token found")
+                throw BosscriptParsingError("Pronađen neočekivani token", current().start)
             }
         }
     }
@@ -374,10 +387,11 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseWhileStatement(): WhileStatement {
-        expect(TokenType.Dok, "Expected 'dok'")
-        expect(TokenType.OpenParen, "Expected '('")
+        val start = current().start
+        expect(TokenType.Dok, "Nedostaje 'dok'")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val condition = parseExpression()
-        expect(TokenType.CloseParen, "Expected ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
 
         // Same rules like in for-loop (shorthand and full loop)
         var body = BlockStatement(body = arrayListOf())
@@ -389,27 +403,31 @@ class Parser(val js: Boolean = false) {
             body = parseBlockStatement()
         }
 
+        val end = body.end
+
         return WhileStatement(
             condition = condition,
-            body = body
+            body = body,
+            start, end
         )
     }
 
     private fun parseForStatement(): ForStatement {
-        expect(TokenType.Za, "Expected 'za'")
-        expect(TokenType.Svako, "Missing 'svako' following 'za'")
-        expect(TokenType.OpenParen, "Expected '('")
+        val start = current().start
+        expect(TokenType.Za, "Nedostaje ključna riječ 'za'")
+        expect(TokenType.Svako, "Nedostaje ključna riječ 'svako' nakon 'za'")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val counter = parseIdentifier()
-        expect(TokenType.Od, "Expected starting condition for loop, missing keyword 'od'")
+        expect(TokenType.Od, "Nedostaje ključna riječ 'od'")
         val startCondition = parseExpression()
-        expect(TokenType.Do, "Expected ending condition for loop, missing keyword 'do'")
+        expect(TokenType.Do, "Nedostaje ključna riječ 'do'")
         val endCondition = parseExpression()
         var step: Expression? = null
         if (current().type == TokenType.Korak) {
             consume(/*korak*/)
             step = parseExpression()
         }
-        expect(TokenType.CloseParen, "Expected ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
 
         // For Statement body must be Block Statement
         // But shorthand syntax for single-line for loops is allowed: za svako(...) => ispis();
@@ -425,33 +443,41 @@ class Parser(val js: Boolean = false) {
             body = parseBlockStatement()
         }
 
+        val end = body.end
+
         return ForStatement(
             counter = counter,
             startValue = startCondition,
             endValue = endCondition,
             step = step,
-            body = body
+            body = body,
+            start, end
         )
     }
 
     private fun parseDoWhileStatement(): DoWhileStatement {
-        expect(TokenType.Radi, "Expected 'radi'")
+        val start = current().start
+        expect(TokenType.Radi, "Nedostaje ključna riječ 'radi'.")
         val body = parseBlockStatement()
-        expect(TokenType.Dok, "Expected 'dok' after 'radi'")
-        expect(TokenType.OpenParen, "Expected '('")
+        expect(TokenType.Dok, "Nedostaje ključna riječ 'dok' nakon 'radi' bloka.")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val condition = parseExpression()
-        expect(TokenType.CloseParen, "Expected ')'")
-        expect(TokenType.Semicolon, "Missing ';'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
+        val end = current().end
+        expect(TokenType.Semicolon, "Nedostaje ';'")
 
         return DoWhileStatement(
             condition = condition,
-            body = body
+            body = body,
+            start, end
         )
     }
 
     private fun parseBreakStatement(): BreakStatement {
-        expect(TokenType.Break, "Expected 'prekid'")
-        return BreakStatement()
+        val start = current().start
+        val end = current().end
+        expect(TokenType.Break, "Nedostaje ključna riječ 'prekid'")
+        return BreakStatement(start, end)
     }
 
     /**
@@ -460,11 +486,13 @@ class Parser(val js: Boolean = false) {
      *      | "ako" "(" Expression ")" Statement "else" Statement
      */
     private fun parseIfStatement(): IfStatement {
-        expect(TokenType.Ako, "Expected 'ako'")
-        expect(TokenType.OpenParen, "Expected '('")
+        val start = current().start
+        expect(TokenType.Ako, "Nedostaje ključna riječ 'ako'")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val condition = parseExpression()
-        expect(TokenType.CloseParen, "Expected ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
         val consequent = parseStatement()
+        var end = consequent.end
 
         var alternate: Statement? = null
         if (current().type == TokenType.Ili) {
@@ -475,10 +503,15 @@ class Parser(val js: Boolean = false) {
             alternate = parseStatement()
         }
 
+        if(alternate != null){
+            end = alternate.end
+        }
+
         return IfStatement(
             condition = condition,
             consequent = consequent,
-            alternate = alternate
+            alternate = alternate,
+            start, end
         )
     }
 
@@ -489,23 +522,28 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseUnlessStatement(): UnlessStatement {
-        expect(TokenType.Osim, "Expected 'osim'")
-        expect(TokenType.Ako, "Expected 'ako'")
-        expect(TokenType.OpenParen, "Expected '('")
+        val start = current().start
+        expect(TokenType.Osim, "Nedostaje ključna riječ 'osim'")
+        expect(TokenType.Ako, "Nedostaje ključna riječ 'ako'")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val condition = parseExpression()
-        expect(TokenType.CloseParen, "Expected ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
         val consequent = parseStatement()
+
+        var end = consequent.end
 
         var alternate: Statement? = null
         if (current().type == TokenType.Inace) {
             consume()
             alternate = parseStatement()
+            end = alternate.end
         }
 
         return UnlessStatement(
             condition = condition,
             consequent = consequent,
-            alternate = alternate
+            alternate = alternate,
+            start, end
         )
     }
 
@@ -516,9 +554,10 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseFunctionDeclaration(): FunctionDeclaration {
-        expect(TokenType.Funkcija, "Error at ${getLineCol()}: Functions are declared with 'funkcija' keyword")
+        val start = current().start
+        expect(TokenType.Funkcija, "Nedostaje ključna riječ 'funkcija'")
         val functionName = parseIdentifier()
-        expect(TokenType.OpenParen, "Missing '('")
+        expect(TokenType.OpenParen, "Nedostaje '('")
 
         var params: ArrayList<FunctionParameter> = arrayListOf()
 
@@ -526,7 +565,7 @@ class Parser(val js: Boolean = false) {
             params = parseFormalParameterList()
         }
 
-        expect(TokenType.CloseParen, "Missing ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
         var returnType: TypeAnnotation? = null
 
         if (current().type == TokenType.Colon) {
@@ -544,11 +583,14 @@ class Parser(val js: Boolean = false) {
             parseBlockStatement()
         }
 
+        val end = functionBody.end
+
         return FunctionDeclaration(
             name = functionName,
             params = params,
             returnType = returnType,
-            body = functionBody
+            body = functionBody,
+            start, end
         )
     }
 
@@ -559,17 +601,17 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseReturnStatement(): ReturnStatement {
         val start = current().start
-        expect(TokenType.Vrati, "Missing return statement")
+        expect(TokenType.Vrati, "Nedostaje ključna riječ 'vrati'")
         var argument: Expression? = null
 
         if (current().type != TokenType.Se) {
             argument = parseExpression()
         } else {
-            expect(TokenType.Se, "Void returns require keyword 'se'")
+            expect(TokenType.Se, "Nedostaje ključna riječ 'se', potrebna u slučaju vraćanja bez povratne vrijedosti")
         }
 
         val end = current().end
-        expect(TokenType.Semicolon, "Missing ';'")
+        expect(TokenType.Semicolon, "Nedostaje ';'")
 
         return ReturnStatement(
             argument = argument,
@@ -584,7 +626,6 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseFormalParameterList(): ArrayList<FunctionParameter> {
         val params = arrayListOf<FunctionParameter>()
-
         do {
             val start = current().start
             var end = current().end
@@ -596,7 +637,7 @@ class Parser(val js: Boolean = false) {
                 end = typeAnnotation.end
             }
             params.add(FunctionParameter(identifier = typename, type = typeAnnotation, start, end))
-        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
+        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Nedostaje ','") != null)
 
         return params
     }
@@ -608,13 +649,13 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseBlockStatement(): BlockStatement {
         val start = current().start
-        expect(TokenType.OpenBrace, "Expected '{'")
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
         val body = arrayListOf<Statement>()
         while (current().type !== TokenType.CloseBrace) {
             body.add(parseStatement())
         }
         val end = current().end
-        expect(TokenType.CloseBrace, "Expected '}'")
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
         return BlockStatement(body, start, end)
     }
 
@@ -624,8 +665,10 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseEmptyStatement(): EmptyStatement {
-        expect(TokenType.Semicolon, "")
-        return EmptyStatement()
+        val start = current().start
+        val end = current().end
+        expect(TokenType.Semicolon, "Nedostaje ';'")
+        return EmptyStatement(start, end)
     }
 
 
@@ -638,11 +681,11 @@ class Parser(val js: Boolean = false) {
         val start = current().start
         val modifier = consume()
         if (modifier.value != "var" && modifier.value != "konst") {
-            throw Exception("Unexpected token at [${getLineCol()}]")
+            throw BosscriptParsingError("Pronađen neočekivani token ${modifier.value}", modifier.start)
         }
         val declarations = parseVariableDeclarationList()
         val end = current().end
-        expect(TokenType.Semicolon, "Missing ;")
+        expect(TokenType.Semicolon, "Nedostaje ';'")
 
         return VariableStatement(declarations = declarations, isConstant = modifier.value == "konst", start, end)
     }
@@ -658,7 +701,7 @@ class Parser(val js: Boolean = false) {
 
         do {
             declarations.add(parseVariableDeclaration())
-        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Expected ,") != null)
+        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Nedostaje ','") != null)
 
         return declarations
     }
@@ -684,7 +727,7 @@ class Parser(val js: Boolean = false) {
             initializer = parseVariableInitializer()
         }
 
-        var end = initializer?.end ?: current().end
+        val end = initializer?.end ?: current().end
 
         return VariableDeclaration(
             identifier = identifier.symbol,
@@ -700,7 +743,7 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseVariableInitializer(): Expression {
-        expect(TokenType.SimpleAssign, "Expected assignment operator")
+        expect(TokenType.SimpleAssign, "Nedostaje operator dodjeljivanja ('=')")
         return parseExpression()
     }
 
@@ -719,15 +762,15 @@ class Parser(val js: Boolean = false) {
 
     private fun parseFunctionExpression(): FunctionExpression {
         val start = current().start
-        expect(TokenType.Funkcija, "Functions are declared using the funkcija keyword")
-        expect(TokenType.OpenParen, "Expected (")
+        expect(TokenType.Funkcija, "Nedostaje ključna riječ funkcija")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         var params: ArrayList<FunctionParameter> = arrayListOf()
 
         if (current().type != TokenType.CloseParen) {
             params = parseFormalParameterList()
         }
 
-        expect(TokenType.CloseParen, "Missing ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
         var returnType: TypeAnnotation? = null
 
         if (current().type == TokenType.Colon) {
@@ -763,26 +806,34 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseAssignmentExpression(): Expression {
         val left = parseElvisExpression()
-
-
         if (current().type != TokenType.ComplexAssign && current().type != TokenType.SimpleAssign) {
             return left
         }
 
+        val assignee = checkValidAssignmentTarget(left)
+        val operator = parseAssignmentOperator()
+        val value = parseAssignmentExpression()
+
+        val start = left.start
+        val end = value.end
+
         return AssignmentExpression(
-            assignee = checkValidAssignmentTarget(left),
-            assignmentOperator = parseAssignmentOperator(),
-            value = parseAssignmentExpression()
+            assignee,
+            value,
+            operator,
+            start, end
         )
     }
 
     private fun parseElvisExpression(): Expression {
         var left = parseLogicalOrExpression()
+        val start = left.start
 
         while (current().value == "?:") {
             val operator = consume().value
             val right = parseElvisExpression()
-            left = BinaryExpression(left, right, operator)
+            val end = right.end
+            left = BinaryExpression(left, right, operator, start, end)
         }
 
         return left
@@ -796,12 +847,13 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseLogicalOrExpression(): Expression {
         var left = parseLogicalAndExpression()
+        val start = left.start
 
         while (current().type == TokenType.LogicalOr) {
             val operator = consume().value
             val right = parseLogicalAndExpression()
-
-            left = LogicalExpression(left, right, operator)
+            val end = right.end
+            left = LogicalExpression(left, right, operator, start, end)
         }
 
         return left
@@ -815,12 +867,13 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseLogicalAndExpression(): Expression {
         var left = parseEqualityExpression()
+        val start = left.start
 
         while (current().type == TokenType.LogicalAnd) {
             val operator = consume().value
             val right = parseEqualityExpression()
-
-            left = LogicalExpression(left, right, operator)
+            val end = right.end
+            left = LogicalExpression(left, right, operator, start, end)
         }
 
         return left
@@ -834,12 +887,14 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseEqualityExpression(): Expression {
         var left = parseRelationalExpression()
+        val start = left.start
 
         while (current().type == TokenType.EqualityOperator) {
             val operator = consume().value
 
             val right = parseEqualityExpression()
-            left = BinaryExpression(left, right, operator)
+            val end = right.end
+            left = BinaryExpression(left, right, operator, start, end)
         }
 
         return left
@@ -853,12 +908,14 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseRelationalExpression(): Expression {
         var left = parseAdditiveExpression()
+        val start = left.start
 
         while (current().type == TokenType.RelationalOperator) {
             val operator = consume().value
 
             val right = parseRelationalExpression()
-            left = BinaryExpression(left, right, operator)
+            val end = right.end
+            left = BinaryExpression(left, right, operator, start, end)
         }
 
         return left
@@ -870,23 +927,7 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseLeftHandSideExpression(): Expression {
-        return parseCallMemberExpression()
-    }
-
-    /**
-     * CallMemberExpression
-     *      : MemberExpression
-     *      | CallExpression
-     *      ;
-     */
-    private fun parseCallMemberExpression(): Expression {
-        val member = parseMemberExpression()
-
-        if (current().type == TokenType.OpenParen) {
-            return parseCallExpression(member)
-        }
-
-        return member
+        return parseMemberExpression()
     }
 
     /**
@@ -900,9 +941,19 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseCallExpression(callee: Expression): CallExpression {
+        val start = callee.start
+        expect(TokenType.OpenParen, "Nedostaje '('")
+        var args = arrayListOf<Expression>()
+        if (current().type != TokenType.CloseParen) {
+            args = parseArgumentList()
+        }
+        val end = current().end
+        expect(TokenType.CloseParen, "Nedostaje ')'")
         var callExpression = CallExpression(
             callee = callee,
-            args = parseArguments()
+            args = args,
+            start = start,
+            end = end
         )
 
         if (current().type == TokenType.OpenParen) {
@@ -912,27 +963,12 @@ class Parser(val js: Boolean = false) {
         return callExpression
     }
 
-    /**
-     * Arguments
-     *      : "(" [ArgumentsList] ")"
-     *      ;
-     */
-    private fun parseArguments(): ArrayList<Expression> {
-        expect(TokenType.OpenParen, "Missing '(")
-        var args = arrayListOf<Expression>()
-        if (current().type != TokenType.CloseParen) {
-            args = parseArgumentList()
-        }
-        expect(TokenType.CloseParen, "Missing ')'")
-        return args
-    }
-
     private fun parseArgumentList(): ArrayList<Expression> {
         val argList = arrayListOf<Expression>()
 
         do {
             argList.add(parseExpression())
-        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
+        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Nedostaje ','") != null)
 
         return argList
     }
@@ -958,25 +994,30 @@ class Parser(val js: Boolean = false) {
                 targetObject = MemberExpression(
                     isComputed = false,
                     targetObject = targetObject,
-                    property = property
+                    property = property,
+                    targetObject.start,
+                    property.end
                 )
             }
             else if (current().type == TokenType.OpenBracket) {
                 consume()
                 val property = parseExpression()
-                expect(TokenType.CloseBracket, "Missing ']'")
+                val end = current().end
+                expect(TokenType.CloseBracket, "Nedostaje ']'")
 
                 targetObject = MemberExpression(
                     isComputed = true,
                     targetObject = targetObject,
-                    property = property
+                    property = property,
+                    targetObject.start, end
                 )
             }
             else if (current().type == TokenType.OpenParen) {
-                val callExpression = CallExpression(
+                val callExpression = parseCallExpression(targetObject)
+                /*val callExpression = CallExpression(
                     callee = targetObject,
                     args = parseArguments()
-                )
+                )*/
                 targetObject = callExpression
             }
         }
@@ -999,7 +1040,7 @@ class Parser(val js: Boolean = false) {
             return Identifier(symbol = "@", start, end)
         }
 
-        val identifier = expect(TokenType.Identifier, "Identifier expected").value
+        val identifier = expect(TokenType.Identifier, "Nedostaje očekivani identifikator").value
 
         return Identifier(symbol = identifier, start, end)
     }
@@ -1019,7 +1060,7 @@ class Parser(val js: Boolean = false) {
         if (current().type == TokenType.OpenBracket) {
             consume()
             end = current().end
-            expect(TokenType.CloseBracket, "Missing ]")
+            expect(TokenType.CloseBracket, "Nedostaje ']'")
             isArray = true
         }
         return TypeAnnotation(
@@ -1033,7 +1074,7 @@ class Parser(val js: Boolean = false) {
         if (current().type == TokenType.SimpleAssign || current().type == TokenType.ComplexAssign) {
             return consume().value
         }
-        throw Exception("Unexpected Token")
+        throw BosscriptParsingError("Pronađen neočekivan token ${current().value}", current().start)
     }
 
     /**
@@ -1043,12 +1084,14 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseAdditiveExpression(): Expression {
         var left = parseMultiplicativeExpression()
+        val start = left.start
 
         while (current().value == "+" || current().value == "-") {
             val operator = consume().value
 
             val right = parseMultiplicativeExpression()
-            left = BinaryExpression(left, right, operator)
+            val end = right.end
+            left = BinaryExpression(left, right, operator, start, end)
         }
 
         return left
@@ -1061,12 +1104,14 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseMultiplicativeExpression(): Expression {
         var left = parseExponentiationExpression()
+        val start = left.start
 
         while (current().value == "*" || current().value == "/" || current().value == "%") {
             val operator = consume().value
 
             val right = parseExponentiationExpression()
-            left = BinaryExpression(left, right, operator)
+            val end = right.end
+            left = BinaryExpression(left, right, operator, start, end)
         }
 
         return left
@@ -1079,12 +1124,14 @@ class Parser(val js: Boolean = false) {
      */
     private fun parseExponentiationExpression(): Expression {
         var left = parseUnaryExpression()
+        val start = left.start
 
         while (current().type == TokenType.Exponent) {
             val operator = consume().value
 
             val right = parseUnaryExpression()
-            left = BinaryExpression(left, right, operator)
+            val end = right.end
+            left = BinaryExpression(left, right, operator, start, end)
         }
 
         return left
@@ -1100,15 +1147,19 @@ class Parser(val js: Boolean = false) {
     private fun parseUnaryExpression(): Expression {
         var operator: String? = null
         val validOperators = listOf("+", "-", "++", "--", "!")
+        val start = current().start
 
         if (current().value in validOperators) {
             operator = consume().value
         }
 
         if (operator != null) {
+            val operand = parseUnaryExpression()
             return UnaryExpression(
                 operator = operator,
-                operand = parseUnaryExpression()
+                operand = operand,
+                start,
+                operand.end
             )
         }
 
@@ -1184,9 +1235,9 @@ class Parser(val js: Boolean = false) {
     private fun parseStringLiteral(): StringLiteral {
         val start = current().start
         consume() //opening double quote
-        val str = expect(TokenType.String, "Unexpected token at [${getLineCol()}}]: String literal expected")
+        val str = expect(TokenType.String, "Nedostaje očekivani tekst")
         val end = current().end
-        expect(TokenType.DoubleQuote, "Expected closing double quote (\")")
+        expect(TokenType.DoubleQuote, "Nedostaju navodnici na kraju teksta ('\"')")
         return StringLiteral(str.value, start, end)
     }
 
@@ -1218,16 +1269,16 @@ class Parser(val js: Boolean = false) {
      *      ;
      */
     private fun parseParenthesizedExpression(): Expression {
-        expect(TokenType.OpenParen, "Expected '('")
+        expect(TokenType.OpenParen, "Nedostaje '('")
         val expression = parseExpression()
-        expect(TokenType.CloseParen, "Expected ')'")
+        expect(TokenType.CloseParen, "Nedostaje ')'")
         return expression
     }
 
     private fun parseArrayLiteral(): ArrayLiteral {
         val array = arrayListOf<Expression>()
         val start = current().start
-        expect(TokenType.OpenBracket, "Missing [")
+        expect(TokenType.OpenBracket, "Nedostaje '['")
 
         if (current().type == TokenType.CloseBracket) {
             // Empty array
@@ -1239,10 +1290,10 @@ class Parser(val js: Boolean = false) {
         do {
             val exp = parseExpression()
             array.add(exp)
-        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Missing ','") != null)
+        } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Nedostaje ','") != null)
 
         val end = current().end
-        expect(TokenType.CloseBracket, "Missing ]")
+        expect(TokenType.CloseBracket, "Nedostaje ']'")
 
         return ArrayLiteral(
             arr = array,
@@ -1252,23 +1303,23 @@ class Parser(val js: Boolean = false) {
 
     private fun parseObjectLiteral(): ObjectLiteral {
         val start = current().start
-        expect(TokenType.OpenBrace, "Missing {")
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
         val properties = arrayListOf<Property>()
 
         while (notEOF() && current().type != TokenType.CloseBrace) {
-            val key = expect(TokenType.Identifier, "Object key expected").value
+            val key = expect(TokenType.Identifier, "Nedostaje očekivani ključ. Ključ mora biti alfanumerička vrijednost - identifikator ili tekst").value
 
-            expect(TokenType.Colon, "Missing :")
+            expect(TokenType.Colon, "Nedostaje ':'")
             val value = parseExpression()
 
             properties.add(Property(key, value))
 
             if (current().type != TokenType.CloseBrace) {
-                expect(TokenType.Comma, "Expected , or }")
+                expect(TokenType.Comma, "Nedostaje ',' ili '}'")
             }
         }
         val end = current().end
-        expect(TokenType.CloseBrace, "Expected }")
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
 
         return ObjectLiteral(
             properties = properties,
