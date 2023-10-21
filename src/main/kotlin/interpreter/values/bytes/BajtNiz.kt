@@ -64,7 +64,7 @@ class BajtNiz(
         get() = "bajt"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("BajtNiz has no property $prop")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'BajtNiz'")
     }
 
     override fun equals(other: Any?): Boolean {

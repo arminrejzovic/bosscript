@@ -14,10 +14,10 @@ class ContextualNativeFunction(
         get() = "funkcija"
 
     override fun getProperty(prop: String): RuntimeValue {
-        throw Exception("Native functions do not have properties")
+        throw Exception("Native funkcije nemaju pripadajuće vrijednosti.")
     }
 
     override fun toString(): String {
-        return "ƒ $name() {[native code]}"
+        return "ƒ $name() {[native kod]}"
     }
 }

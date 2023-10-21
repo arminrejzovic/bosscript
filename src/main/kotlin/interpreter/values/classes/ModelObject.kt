@@ -8,8 +8,8 @@ data class ModelObject(
     var instanceObject: HashMap<String, RuntimeValue> = hashMapOf(),
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(
-        "__proto__" to (prototype ?: Null()),
-        "__roditelj__" to (prototype?.prototype ?: Null())
+        "proto" to (prototype ?: Null()),
+        "roditelj" to (prototype?.prototype ?: Null())
     ),
     override val typename: String = "model"
 ): RuntimeValue {
@@ -21,7 +21,7 @@ data class ModelObject(
             return builtIns[prop]!!
         }
         if(prototype == null){
-            throw Exception("Model $typename has no property $prop")
+            throw Exception("Model '$typename' ne sadrži vrijednost '$prop'")
         }
         return prototype.getProperty(prop)
     }

@@ -58,7 +58,7 @@ class Environment(
             return this
         }
         if(parent == null) {
-            throw Exception("$name does not exist")
+            throw Exception("$name ne postoji.")
         }
 
         return parent.resolve(name)
@@ -89,10 +89,15 @@ class Environment(
     fun importEnv(env: Environment){
         variables.putAll(env.variables)
         constants.addAll(env.constants)
+        typeDefinitions.putAll(env.typeDefinitions)
     }
 
     fun addTypeDefinition(definition: TipDefinitionStatement){
         typeDefinitions[definition.name.symbol] = Tip(name = definition.name.symbol, properties = definition.properties)
+    }
+
+    fun importTypeDefinition(definition: Tip){
+        typeDefinitions[definition.name] = definition
     }
 
     private fun resolveTypeDefinitionEnv(name: String): Environment?{
@@ -282,7 +287,7 @@ class Environment(
                     throw RuntimeException("Funkcija 'izazoviGrešku' očekuje 1 argument (greška: objekat)")
                 }
                 val exception = args[0] as Objekat
-                throw BosscriptRuntimeException(exception)
+                throw BosscriptRuntimeException(exception, args[0].toString(), Pair(0, 0))
             }
         )
     }

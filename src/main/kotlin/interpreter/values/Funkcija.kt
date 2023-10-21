@@ -45,7 +45,7 @@ data class Funkcija(
         get() = "funkcija"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("$prop does not exist on type Function")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'funkcija'")
     }
 
     override fun hashCode(): Int {

@@ -4,15 +4,15 @@ data class Logicki(
     override val value: Boolean,
 ) : RuntimeValue {
     override fun toString(): String {
-        return if (value) "tacno" else "netacno"
+        return if (value) "tačno" else "netačno"
     }
 
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf()
     override val typename: String
-        get() = "logicki"
+        get() = "logički"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("$prop does not exist on type Bool")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'logički'")
     }
 }

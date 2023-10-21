@@ -12,6 +12,6 @@ class Null: RuntimeValue {
         get() = "nedefinisano"
 
     override fun getProperty(prop: String): RuntimeValue {
-        throw NullPointerException("Null has no properties")
+        throw NullPointerException("Nije moguće pristupiti vrijednostima nedefinisanog objekta.")
     }
 }

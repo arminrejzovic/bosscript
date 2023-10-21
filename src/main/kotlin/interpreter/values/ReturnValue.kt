@@ -10,7 +10,7 @@ data class ReturnValue(
          This should never happen in reality, but let's have code handling it just in case
          */
         if (value is ReturnValue) {
-            throw Exception("Something went wrong")
+            throw Exception("Došlo je do neočekivane greške")
         }
     }
 
@@ -21,6 +21,6 @@ data class ReturnValue(
 
 
     override fun getProperty(prop: String): RuntimeValue {
-        throw Exception("ReturnValue members should never be accessed")
+        throw Exception("Došlo je do neočekivane greške")
     }
 }

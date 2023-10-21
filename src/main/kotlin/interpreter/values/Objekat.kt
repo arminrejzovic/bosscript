@@ -37,7 +37,7 @@ open class Objekat(
         get() = "objekat"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return (builtIns[prop] ?: properties[prop]) ?: throw Exception("Property $prop does not exist on object $this")
+        return (builtIns[prop] ?: properties[prop]) ?: throw Exception("Vrijednost $prop ne postoji na objektu $this")
     }
 
     private val zakljucaj = NativeFunction("zakljucaj"){

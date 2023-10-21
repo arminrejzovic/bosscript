@@ -16,16 +16,16 @@ data class Tip(
         get() = "Tip"
 
     override fun getProperty(prop: String): RuntimeValue {
-        throw Exception("Tip has no properties of itself")
+        throw Exception("Definicija tipa nema pripadajuće vrijednosti.")
     }
 
     fun constructor(args: ArrayList<RuntimeValue>, env: Environment): Objekat{
         if(args.size < properties.size){
-            throw Exception("Type Error: Missing properties")
+            throw Exception("Nedovoljno argumenata: Konstruktor tipa $name prihvata ${properties.size} argumenata.")
         }
 
         if(args.size > properties.size){
-            throw Exception("Type Error:  properties")
+            throw Exception("Višak argumenata: Konstruktor tipa $name prihvata ${properties.size} argumenata.")
         }
 
         val typeChecker = TypeChecker(env)

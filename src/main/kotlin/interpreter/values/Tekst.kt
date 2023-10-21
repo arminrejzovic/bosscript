@@ -10,24 +10,30 @@ data class Tekst(
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf(
             "duzina" to duzina,
+            "dužina" to duzina,
             "zavrsavaNa" to zavrsavaNa,
+            "završavaNa" to zavrsavaNa,
             "podtekst" to podtekst,
             "podtekstIndeks" to podtekstIndeks,
             "zamijeni" to zamijeni,
             "sadrzi" to sadrzi,
+            "sadrži" to sadrzi,
             "malimSlovima" to malimSlovima,
             "velikimSlovima" to velikimSlovima,
             "broj" to broj,
             "logicki" to logicki,
+            "logički" to logicki,
             "srezi" to srezi,
+            "sreži" to srezi,
             "razdvoji" to razdvoji,
-            "pocinjeNa" to pocinjeNa
+            "pocinjeNa" to pocinjeNa,
+            "počinjeNa" to pocinjeNa
         )
     override val typename: String
         get() = "tekst"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("$prop does not exist on type Text")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'tekst'")
     }
 
     override fun equals(other: Any?): Boolean {
@@ -43,13 +49,13 @@ data class Tekst(
         return value.hashCode()
     }
 
-    private val duzina = NativeFunction("duzina") {
+    private val duzina = NativeFunction("dužina") {
         Broj(value.length.toDouble())
     }
 
     private val malimSlovima = NativeFunction("malimSlovima") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("malimSlovima accepts no arguments")
+            throw Exception("Funkcija 'malimSlovima' prihvata 0 argumenata")
         }
         Tekst(
             value = value.lowercase()
@@ -58,7 +64,7 @@ data class Tekst(
 
     private val velikimSlovima = NativeFunction("velikimSlovima") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("velikimSlovima accepts no arguments")
+            throw Exception("Funkcija 'velikimSlovima' prihvata 0 argumenata")
         }
         Tekst(
             value = value.uppercase()
@@ -67,16 +73,16 @@ data class Tekst(
 
     private val broj = NativeFunction("broj") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("broj accepts no arguments")
+            throw Exception("Funkcija 'broj' prihvata 0 argumenata")
         }
         Broj(
             value = value.toDouble()
         )
     }
 
-    private val logicki = NativeFunction("logicki") { args ->
+    private val logicki = NativeFunction("logički") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("logicki accepts no arguments")
+            throw Exception("Funkcija 'logički' prihvata 0 argumenata")
         }
 
         val boolValue = when (value.lowercase()) {
@@ -91,9 +97,9 @@ data class Tekst(
         )
     }
 
-    private val srezi = NativeFunction("srezi") { args ->
+    private val srezi = NativeFunction("sreži") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("logicki accepts no arguments")
+            throw Exception("Funkcija 'sreži' prihvata 0 argumenata")
         }
         Tekst(
             value = value.trim()
@@ -102,7 +108,7 @@ data class Tekst(
 
     private val razdvoji = NativeFunction("razdvoji") { args ->
         if (args.size != 1 && args[0] !is Tekst) {
-            throw Exception("razdvoji accepts one argument: (delimiter: tekst)")
+            throw Exception("Funkcija 'razdvoji' prihvata 1 argument: (delimiter: tekst)")
         }
         val delimiter = (args[0] as Tekst).value
         val strings = value.split(delimiter).map { Tekst(it) } as ArrayList<RuntimeValue>
@@ -112,9 +118,9 @@ data class Tekst(
         )
     }
 
-    private val pocinjeNa = NativeFunction("pocinjeNa") { args ->
+    private val pocinjeNa = NativeFunction("počinjeNa") { args ->
         if (args.size != 1 && args[0] !is Tekst) {
-            throw Exception("pocinjeNa accepts one argument: (delimiter: tekst)")
+            throw Exception("Funkcija 'počinjeNa' prihvata 1 argument: (delimiter: tekst)")
         }
         val prefix = (args[0] as Tekst).value
 
@@ -123,9 +129,9 @@ data class Tekst(
         )
     }
 
-    private val zavrsavaNa = NativeFunction("zavrsavaNa") { args ->
+    private val zavrsavaNa = NativeFunction("završavaNa") { args ->
         if (args.size != 1 && args[0] !is Tekst) {
-            throw Exception("zavrsavaNa accepts one argument: (delimiter: tekst)")
+            throw Exception("Funkcija 'završavaNa' prihvata 1 argument: (razgraničenje: tekst)")
         }
         val prefix = (args[0] as Tekst).value
 
@@ -147,7 +153,7 @@ data class Tekst(
                 value = value.substring(startIndex, endIndex)
             )
         } else {
-            throw Exception("podtekst accepts two arguments: (start: broj, end: broj)")
+            throw Exception("Funkcija 'podtekst' prihvata 2 argumenta: (od: broj, do: broj)")
         }
     }
 
@@ -158,7 +164,7 @@ data class Tekst(
                 value = value.indexOf(substring).toDouble()
             )
         } else {
-            throw Exception("podtekstIndeks accepts one argument: (substring: Tekst)")
+            throw Exception("Funkcija 'podtekstIndeks' prihvata 1 argument: (podtekst: Tekst)")
         }
     }
 
@@ -170,18 +176,18 @@ data class Tekst(
                 value = value.replace(old, new)
             )
         } else {
-            throw Exception("zamijeni accepts two arguments: (old: Tekst, new: Tekst)")
+            throw Exception("Funkcija 'zamijeni' prihvata 2 argumenta: (stari: Tekst, novi: Tekst)")
         }
     }
 
-    private val sadrzi = NativeFunction("sadrzi") { args ->
+    private val sadrzi = NativeFunction("sadrži") { args ->
         if (args.size == 1 && args[0] is Tekst) {
             val substring = (args[0] as Tekst).value
             Logicki(
                 value = value.contains(substring)
             )
         } else {
-            throw Exception("sadrzi accepts one argument: (substring: Tekst)")
+            throw Exception("Funkcija 'sadrži' prihvata 1 argument: (podtekst: Tekst)")
         }
     }
 

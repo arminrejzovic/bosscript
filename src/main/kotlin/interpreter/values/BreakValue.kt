@@ -6,6 +6,6 @@ data class BreakValue(
     override val typename: String = "prekid"
 ) : RuntimeValue {
     override fun getProperty(prop: String): RuntimeValue {
-        throw Exception("Break has no properties")
+        throw Exception("prekid nema pripadajućih vrijednosti.")
     }
 }

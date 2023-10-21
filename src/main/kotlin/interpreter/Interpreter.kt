@@ -11,6 +11,8 @@ import typechecker.TypeChecker
 import java.io.File
 import kotlin.math.pow
 
+// TODO Implement try-catch for native functions and other places where Exceptions are thrown without access to line-col
+
 class Interpreter {
     private val globalEnv = Environment()
     private val parser = Parser(false)
@@ -155,7 +157,10 @@ class Interpreter {
             }
 
             else -> {
-                throw Exception("Unexpected token, $node")
+                throw BosscriptRuntimeException(
+                    text = "Nepodržan token pronađen.",
+                    location = node.start
+                )
             }
         }
     }
@@ -185,13 +190,18 @@ class Interpreter {
                         value = left.value + rightStr
                     )
                 }
-
-                throw Exception("Type error: Operator '+' is not defined for ${left.javaClass.simpleName} and ${right.javaClass.simpleName}")
+                throw BosscriptRuntimeException(
+                    text = "Operator '+' nije definisan za operande ${left.typename} i ${right.typename}",
+                    location = expr.start
+                )
             }
 
             "-" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '-' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '-' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Broj(
@@ -201,7 +211,10 @@ class Interpreter {
 
             "*" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '*' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '*' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Broj(
@@ -211,7 +224,10 @@ class Interpreter {
 
             "/" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '/' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '/' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Broj(
@@ -221,7 +237,10 @@ class Interpreter {
 
             "%" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '%' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '%' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Broj(
@@ -231,7 +250,10 @@ class Interpreter {
 
             "^" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '^' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '^' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Broj(
@@ -241,7 +263,10 @@ class Interpreter {
 
             "<" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '<' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '<' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Logicki(
@@ -251,7 +276,10 @@ class Interpreter {
 
             "<=" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '<=' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '<=' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Logicki(
@@ -261,7 +289,10 @@ class Interpreter {
 
             ">" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '>' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '>' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Logicki(
@@ -271,7 +302,10 @@ class Interpreter {
 
             ">=" -> {
                 if (left !is Broj || right !is Broj) {
-                    throw Exception("Type error: Operator '>=' is not defined for provided operands")
+                    throw BosscriptRuntimeException(
+                        text = "Operator '>=' nije definisan za operande ${left.typename} i ${right.typename}",
+                        location = expr.start
+                    )
                 }
 
                 return Logicki(
@@ -299,7 +333,7 @@ class Interpreter {
             }
 
             else -> {
-                throw NotImplementedError("Unsupported operator")
+                throw NotImplementedError("Nepodržani operator pronađen")
             }
         }
     }
@@ -309,14 +343,17 @@ class Interpreter {
             "+", "-", "*", "/", "<", ">", "==", "!=" -> {
                 val operatorFun = left.getProperty(operatorToFunctionName(operator))
                 if(operatorFun !is Funkcija){
-                    throw Exception("$operatorFun is not a function.")
+                    throw BosscriptRuntimeException(
+                        text = "$operatorFun nije funkcija",
+                        location = Pair(-1, -1) // TODO
+                    )
                 }
                 `this` = left
                 val activationRecord = hashMapOf<String, RuntimeValue>("@" to `this`)
                 val typeChecker = TypeChecker(env)
 
                 if(operatorFun.params[0].type != null){
-                    operatorFun.params[0].type?.let { typeChecker.expect(it, right) }
+                    operatorFun.params[0].type?.let { typeChecker.expect(it, right) } // TODO
                 }
 
                 activationRecord[operatorFun.params[0].identifier.symbol] = right
@@ -326,8 +363,8 @@ class Interpreter {
 
                 if (operatorFun.returnType != null) {
                     when (functionResult) {
-                        is ReturnValue -> typeChecker.expect(operatorFun.returnType, functionResult.value)
-                        else -> typeChecker.expect(operatorFun.returnType, functionResult)
+                        is ReturnValue -> typeChecker.expect(operatorFun.returnType, functionResult.value) // TODO
+                        else -> typeChecker.expect(operatorFun.returnType, functionResult) // TODO
                     }
                 }
 
@@ -335,7 +372,10 @@ class Interpreter {
             }
 
             else -> {
-                throw Exception("Operator $operator is not defined for provided model: ${left.typename}")
+                throw BosscriptRuntimeException(
+                    text = "Operator $operator nije definisan za dati model '${left.typename}",
+                    location = Pair(-1, -1) // TODO
+                )
             }
         }
     }
@@ -372,14 +412,17 @@ class Interpreter {
                             val memberValue = evaluate(vd.value ?: NullLiteral(), modelEnv)
                             if(vd.type != null && memberValue !is Null){
                                 val typeChecker = TypeChecker(modelEnv)
-                                typeChecker.expect(vd.type, memberValue)
+                                typeChecker.expect(vd.type, memberValue, vd.start)
                             }
                             members[vd.identifier] = memberValue
                         }
                     }
 
                     else -> {
-                        throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+                        throw BosscriptRuntimeException(
+                            text = "Pronađen nedozvoljen iskaz unutar javnog bloka modela.",
+                            location = it.start
+                        )
                     }
                 }
             }
@@ -397,7 +440,7 @@ class Interpreter {
                             val memberValue = evaluate(vd.value ?: NullLiteral(), modelEnv)
                             if(vd.type != null && memberValue !is Null){
                                 val typeChecker = TypeChecker(modelEnv)
-                                typeChecker.expect(vd.type, memberValue)
+                                typeChecker.expect(vd.type, memberValue, vd.start)
                             }
                             privateMembers.add(vd.identifier)
                             members[vd.identifier] = memberValue
@@ -405,7 +448,10 @@ class Interpreter {
                     }
 
                     else -> {
-                        throw Exception("An invalid statement was found - ${it.javaClass.simpleName}")
+                        throw BosscriptRuntimeException(
+                            text = "Pronađen nedozvoljen iskaz unutar privatnog bloka modela.",
+                            location = it.start
+                        )
                     }
                 }
             }
@@ -454,16 +500,16 @@ class Interpreter {
         return result
     }
     private fun evaluatePackage(src: String, env: Environment) {
-        /* TODO Refactor evaluatePackage method to evaluate only:
-                1. Functions
-                2. Variable declarations
-                3. Model declarations
-                4. Type definitions
-            Since other things cannot be imported (loops, if-else, etc). It will help performance a little bit
-    */
-        val program = parser.parseProgram(src)
-        program.body.forEach {
-            evaluate(it, env)
+        val packageAST = parser.parseProgram(src)
+        packageAST.body.forEach {
+            if(
+                it is FunctionDeclaration
+                || it is VariableStatement
+                || it is ModelDefinitionStatement
+                || it is TipDefinitionStatement
+            ){
+                evaluate(it, env)
+            }
         }
     }
 
@@ -481,7 +527,10 @@ class Interpreter {
     private fun evaluateImportUserPackage(packageName: String, imports: ArrayList<Identifier>?, env: Environment) {
         val pckg = File(packageName)
         if (!pckg.exists()) {
-            throw Exception("Package $packageName does not exist")
+            throw BosscriptRuntimeException(
+                text = "Paket $packageName ne postoji",
+                location = Pair(-1, -1) // TODO
+            )
         }
 
         val tempEnv = Environment()
@@ -492,8 +541,14 @@ class Interpreter {
         }
         else {
             imports.forEach {
-                val packageElement = tempEnv.getVariable(it.symbol)
-                env.declareVariable(it.symbol, packageElement)
+                val packageElement = tempEnv.getVariableOrNull(it.symbol)
+                if(packageElement == null){
+                    val typeDef = tempEnv.resolveTypeDefinition(it.symbol) ?: throw BosscriptRuntimeException(text = "${it.symbol} ne postoji u paketu $packageName", location = it.start)
+                    env.importTypeDefinition(typeDef)
+                }
+                else {
+                    env.declareVariable(it.symbol, packageElement)
+                }
             }
         }
     }
@@ -524,7 +579,10 @@ class Interpreter {
                 if (arg is Broj) {
                     return arg
                 }
-                throw Exception("Type error: Unary + is not defined for ${arg.javaClass.simpleName}")
+                throw BosscriptRuntimeException(
+                    text = "Unarni operator '+' nije definisan za operand ${arg.typename}",
+                    location = expr.start
+                )
             }
 
             "-" -> {
@@ -538,7 +596,10 @@ class Interpreter {
                         value = -arg.value
                     )
                 }
-                throw Exception("Type error: Unary - is not defined for ${arg.javaClass.simpleName}")
+                throw BosscriptRuntimeException(
+                    text = "Unarni operator '-' nije definisan za operand ${arg.typename}",
+                    location = expr.start
+                )
             }
 
             "++" -> {
@@ -548,7 +609,10 @@ class Interpreter {
                         value = arg.value + 1
                     )
                 }
-                throw Exception("Type error: Increment operator is not defined for ${arg.javaClass.simpleName}")
+                throw BosscriptRuntimeException(
+                    text = "Unarni operator inkrementiranja '++' nije definisan za operand ${arg.typename}",
+                    location = expr.start
+                )
             }
 
             "--" -> {
@@ -558,7 +622,10 @@ class Interpreter {
                         value = arg.value - 1
                     )
                 }
-                throw Exception("Type error: Decrement operator is not defined for ${arg.javaClass.simpleName}")
+                throw BosscriptRuntimeException(
+                    text = "Unarni operator dekrementiranja '--' nije definisan za operand ${arg.typename}",
+                    location = expr.start
+                )
             }
 
             "!" -> {
@@ -573,7 +640,10 @@ class Interpreter {
             }
 
             else -> {
-                throw Exception("Unexpected unary operator found: ${expr.operator}")
+                throw BosscriptRuntimeException(
+                    text = "Pronađen nepodržani operator ${expr.operator}",
+                    location = expr.start
+                )
             }
         }
     }
@@ -582,8 +652,18 @@ class Interpreter {
         val left = evaluate(expr.left, env)
         val right = evaluate(expr.right, env)
 
-        if (left.value !is Boolean || right.value !is Boolean) {
-            throw Exception("Type error: Logical expression operands must be booleans")
+        if (left.value !is Boolean){
+            throw BosscriptRuntimeException(
+                text = "Vrijednost $left (${left.typename}) nije odgovarajućeg tipa. Oba operanda logičkog izraza moraju biti tipa 'logički'.",
+                location = expr.left.start
+            )
+        }
+
+        if (right.value !is Boolean){
+            throw BosscriptRuntimeException(
+                text = "Vrijednost $right (${right.typename}) nije odgovarajućeg tipa. Oba operanda logičkog izraza moraju biti tipa 'logički'.",
+                location = expr.right.start
+            )
         }
 
         left as Logicki
@@ -603,14 +683,23 @@ class Interpreter {
             }
 
             else -> {
-                throw Exception("Unrecognized logical operator")
+                throw BosscriptRuntimeException(
+                    text = "Pronađen nepodržani operator ${expr.operator}",
+                    location = expr.start
+                )
             }
         }
     }
 
     private fun evaluateIdentifier(identifier: Identifier, environment: Environment): RuntimeValue {
-        val typeDefinition = environment.resolveTypeDefinition(identifier.symbol)
-        return typeDefinition ?: environment.getVariable(identifier.symbol)
+        val variable = environment.getVariableOrNull(identifier.symbol)
+        if(variable == null) {
+            return environment.resolveTypeDefinition(identifier.symbol) ?: throw BosscriptRuntimeException(
+                text = "${identifier.symbol} ne postoji.",
+                location = identifier.start
+            )
+        }
+        return variable
     }
 
     private fun evaluateVariableStatement(stmt: VariableStatement, env: Environment) {
@@ -627,7 +716,10 @@ class Interpreter {
 
     private fun evaluateAssignmentExpression(expr: AssignmentExpression, env: Environment): RuntimeValue {
         if (expr.assignee !is Identifier && expr.assignee !is MemberExpression) {
-            throw Exception("Invalid assignment target: ${expr.assignee}")
+            throw BosscriptRuntimeException(
+                text = "Datoj lijevoj strani nije moguće dodijeliti vrijednost",
+                location = expr.assignee.start
+            )
         }
 
         return when (expr.assignmentOperator) {
@@ -637,7 +729,10 @@ class Interpreter {
             "*=" -> evaluateTimesAssignment(expr, env)
             "/=" -> evaluateDivisionAssignment(expr, env)
             "%=" -> evaluateRemainderAssignment(expr, env)
-            else -> throw Exception("Invalid assignment operator ${expr.assignmentOperator}")
+            else -> throw BosscriptRuntimeException(
+                text = "Pronađen nepodržani operator ${expr.assignmentOperator}",
+                location = expr.start
+            )
         }
     }
 
@@ -648,7 +743,10 @@ class Interpreter {
             target.value %= addedValue.value
             return target
         }
-        throw Exception("Type error: Operator '%=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+        throw BosscriptRuntimeException(
+            text = "Operator '%=' nije definisan za operande ${target.typename} i ${addedValue.typename}",
+            location = expr.start
+        )
     }
 
     private fun evaluateDivisionAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
@@ -658,7 +756,10 @@ class Interpreter {
             target.value /= addedValue.value
             return target
         }
-        throw Exception("Type error: Operator '/=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+        throw BosscriptRuntimeException(
+            text = "Operator '/=' nije definisan za operande ${target.typename} i ${addedValue.typename}",
+            location = expr.start
+        )
     }
 
     private fun evaluateTimesAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
@@ -668,7 +769,10 @@ class Interpreter {
             target.value *= addedValue.value
             return target
         }
-        throw Exception("Type error: Operator '*=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+        throw BosscriptRuntimeException(
+            text = "Operator '*=' nije definisan za operande ${target.typename} i ${addedValue.typename}",
+            location = expr.start
+        )
     }
 
     /**
@@ -681,7 +785,10 @@ class Interpreter {
             target.value -= addedValue.value
             return target
         }
-        throw Exception("Type error: Operator '-=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+        throw BosscriptRuntimeException(
+            text = "Operator '-=' nije definisan za operande ${target.typename} i ${addedValue.typename}",
+            location = expr.start
+        )
     }
 
     /**
@@ -698,7 +805,10 @@ class Interpreter {
             target.value = target.value + addedValue.value
             return target
         }
-        throw Exception("Type error: Operator '+=' is not defined for types ${target.javaClass.simpleName} and ${addedValue.javaClass.simpleName}")
+        throw BosscriptRuntimeException(
+            text = "Operator '+=' nije definisan za operande ${target.typename} i ${addedValue.typename}",
+            location = expr.start
+        )
     }
 
     private fun evaluateSimpleAssignment(expr: AssignmentExpression, env: Environment): RuntimeValue {
@@ -711,7 +821,10 @@ class Interpreter {
             val newValue = evaluate(expr.value, env)
 
             if(target is ReadonlyObject){
-                throw Exception("${target.typename} is readonly.")
+                throw BosscriptRuntimeException(
+                    text = "Nije moguće dodijeliti novu vrijednost polju zaključanog objekta",
+                    location = expr.assignee.start
+                )
             }
 
             if (target is Objekat) {
@@ -722,7 +835,10 @@ class Interpreter {
                         return target.setProperty(prop.value, evaluate(expr.value, env))
                     }
                     if (prop is Broj) {
-                        throw Exception("${target.javaClass.simpleName} is not indexable")
+                        throw BosscriptRuntimeException(
+                            text = "Tip '${target.typename}' ne podržava pristupanje poljima preko indeksa",
+                            location = expr.assignee.start
+                        )
                     }
                 }
                 else if (expr.assignee.property is Identifier) {
@@ -730,7 +846,10 @@ class Interpreter {
                     return target.setProperty(expr.assignee.property.symbol, newValue)
                 }
                 else {
-                    throw Exception("Invalid Assignment Expression")
+                    throw BosscriptRuntimeException(
+                        text = "Neispravno dodjeljivanje vrijednosti",
+                        location = expr.start
+                    )
                 }
             }
 
@@ -743,12 +862,18 @@ class Interpreter {
             }
 
             if (target is ModelObject) {
-                val modelDefinition = env.getVariable(target.typename) as ModelDefinition
+                val modelDefinition = env.getVariableOrNull(target.typename)
+                    ?: throw BosscriptRuntimeException(text = "${target.typename} ne postoji.", location = expr.start)
+                modelDefinition as ModelDefinition
+
                 val prop = (expr.assignee.property as Identifier).symbol
 
                 if (modelDefinition.isPrivate(prop)) {
                     if (env.getVariableOrNull("@") == null || env.getVariableOrNull("@")!!.typename != target.typename) {
-                        throw Exception("$prop is private.")
+                        throw BosscriptRuntimeException(
+                            text = "'$prop' je privatno polje modela ${target.typename}.",
+                            location = expr.assignee.property.start
+                        )
                     }
                 }
 
@@ -758,7 +883,10 @@ class Interpreter {
             }
 
         }
-        throw Exception("Invalid assignment operation ${expr}")
+        throw BosscriptRuntimeException(
+            text = "Neispravno dodjeljivanje vrijednosti",
+            location = expr.start
+        )
     }
 
     fun evaluateBlockStatement(block: BlockStatement, env: Environment): RuntimeValue {
@@ -791,7 +919,7 @@ class Interpreter {
 
     private fun evaluateFunctionExpression(expr: FunctionExpression, env: Environment): Funkcija {
         return Funkcija(
-            name = "",
+            name = "λ",
             params = expr.params,
             returnType = expr.returnType,
             body = expr.body,
@@ -856,7 +984,10 @@ class Interpreter {
             }
 
             else -> {
-                throw Exception("${fn.typename} is not a function")
+                throw BosscriptRuntimeException(
+                    text = "${fn.typename} nije funkcija",
+                    location = call.callee.start
+                )
             }
         }
     }
@@ -896,10 +1027,13 @@ class Interpreter {
             return instance
         }
 
-        else{
+        else {
             val firstExpression = definition.constructor.body.body.first()
             if(firstExpression !is CallExpression || firstExpression.callee != Identifier("prototip")){
-                throw Exception("Constructors for derived classes must contain a 'prototip' call.")
+                throw BosscriptRuntimeException(
+                    text = "Nedostaje poziv konstruktoru prototipa modela 'prototip()'",
+                    location = firstExpression.start
+                )
             }
 
             val typeChecker = TypeChecker(env)
@@ -939,7 +1073,10 @@ class Interpreter {
     private fun evaluateIfStatement(stmt: IfStatement, env: Environment): RuntimeValue {
         val condition = evaluate(stmt.condition, env)
         if (condition.value !is Boolean) {
-            throw Exception("Type Error: Condition is not a boolean")
+            throw BosscriptRuntimeException(
+                text = "Uslov ako-izraza mora biti tipa 'logički'. '${condition.typename}' nije odgovarajući tip.",
+                location = stmt.condition.start
+            )
         }
 
         var result: RuntimeValue = Null()
@@ -957,7 +1094,10 @@ class Interpreter {
     private fun evaluateUnlessStatement(stmt: UnlessStatement, env: Environment): RuntimeValue {
         val condition = evaluate(stmt.condition, env)
         if (condition.value !is Boolean) {
-            throw Exception("Type Error: Condition is not a boolean")
+            throw BosscriptRuntimeException(
+                text = "Uslov osim-ako-izraza mora biti tipa 'logički'. '${condition.typename}' nije odgovarajući tip.",
+                location = stmt.condition.start
+            )
         }
 
         var result: RuntimeValue = Null()
@@ -975,8 +1115,20 @@ class Interpreter {
         val startValue = evaluate(stmt.startValue, env)
         val endValue = evaluate(stmt.endValue, env)
 
-        if (startValue.value !is Double || endValue.value !is Double) {
-            throw Exception("Type Error: For loop bounds must be numbers")
+
+
+        if (startValue.value !is Double) {
+            throw BosscriptRuntimeException(
+                text = "Početna vrijednost petlje mora biti broj. ${startValue.typename} nije odgovarajući tip.",
+                location = stmt.startValue.start
+            )
+        }
+
+        if (endValue.value !is Double) {
+            throw BosscriptRuntimeException(
+                text = "Gornja granica petlje mora biti broj. ${startValue.typename} nije odgovarajući tip.",
+                location = stmt.endValue.start
+            )
         }
 
         val start = startValue.value as Double
@@ -991,7 +1143,10 @@ class Interpreter {
             // Otherwise interpret the provided step
             val stepVal = evaluate(stmt.step, env)
             if (stepVal.value !is Double) {
-                throw Exception("Type Error: For loop step must be a number")
+                throw BosscriptRuntimeException(
+                    text = "Korak petlje mora biti broj. ${startValue.typename} nije odgovarajući tip.",
+                    location = stmt.endValue.start
+                )
             }
             step = stepVal.value as Double
         }
@@ -1087,7 +1242,10 @@ class Interpreter {
                 is Broj -> {
                     // obj[1];
                     if (!prop.value.isInt()) {
-                        throw Exception("Index must be an integer")
+                        throw BosscriptRuntimeException(
+                            text = "Indeks mora biti cijeli broj. ${prop.value} nije validan indeks.",
+                            location = expr.property.start
+                        )
                     }
 
                     if (target is Niz) {
@@ -1099,22 +1257,35 @@ class Interpreter {
                         )
                     }
 
-                    throw Exception("${target.javaClass.simpleName} is not indexable")
+                    throw BosscriptRuntimeException(
+                        text = "Tip '${target.typename}' ne podržava pristupanje poljima preko indeksa",
+                        location = expr.property.start
+                    )
                 }
 
                 else -> {
-                    throw Exception("Type ${prop.javaClass.simpleName} cannot be used as an index type")
+                    throw BosscriptRuntimeException(
+                        text = "Vrijednost tipa '${target.typename}' se ne može koristiti kao indeks",
+                        location = expr.property.start
+                    )
                 }
             }
 
         }
         else {
             val propertyName = (expr.property as Identifier).symbol
+
             if (target is ModelObject && propertyName != "__proto__") {
-                val modelDefinition = env.getVariable(target.typename) as ModelDefinition
+                val modelDefinition = env.getVariableOrNull(target.typename)
+                    ?: throw BosscriptRuntimeException(text = "${target.typename} ne postoji.", location = expr.start)
+                modelDefinition as ModelDefinition
+
                 if (modelDefinition.isPrivate(propertyName)) {
                     if (env.getVariableOrNull("@") == null || env.getVariableOrNull("@")!!.typename != target.typename) {
-                        throw Exception("$propertyName is private.")
+                        throw BosscriptRuntimeException(
+                            text = "'$propertyName' je privatno polje modela ${target.typename}.",
+                            location = expr.property.start
+                        )
                     }
                 }
             }

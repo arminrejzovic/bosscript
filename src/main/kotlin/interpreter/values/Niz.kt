@@ -11,21 +11,21 @@ data class Niz(
         return value.toString()
     }
 
-    private val duzina = NativeFunction("duzina"){
+    private val duzina = NativeFunction("dužina"){
         Broj(value = value.size.toDouble())
     }
 
     private val dodaj = NativeFunction("dodaj"){ args ->
         if (args.size != 1) {
-            throw Exception("Type Error: Function 'dodaj' accepts 1 argument (item: nepoznato)")
+            throw Exception("Greška u tipovima: Funkcija 'dodaj' prihvata 1 argument (a: nepoznato)")
         }
         value.add(args[0])
         Null()
     }
 
-    private val dodajNaPocetak = NativeFunction("dodajNaPocetak"){ args ->
+    private val dodajNaPocetak = NativeFunction("dodajNaPočetak"){ args ->
         if (args.size != 1) {
-            throw Exception("Type Error: Function 'dodajNaPocetak' accepts 1 argument (item: nepoznato)")
+            throw Exception("Greška u tipovima: Funkcija 'dodajNaPočetak' prihvata 1 argument (a: nepoznato)")
         }
         value.add(0, args[0])
         Broj(
@@ -38,7 +38,7 @@ data class Niz(
 
         args.forEach {
             if (it !is Niz) {
-                throw Exception("Type Error: Function 'spoji' expects 1 or more Arrays as arguments")
+                throw Exception("Greška u tipovima: Funkcija 'spoji' očekuje 1 ili više nizova kao argumente")
             }
             newArray += it.value
         }
@@ -50,7 +50,7 @@ data class Niz(
 
     private val poravnaj = NativeFunction("poravnaj"){args ->
         if (args.isNotEmpty()) {
-            throw Exception("Type Error: Function 'poravnaj' accepts 0 arguments")
+            throw Exception("Greška u tipovima: Funkcija 'poravnaj' prihvata 0 argumenata")
         }
         Niz(
             value = value.flatten()
@@ -59,20 +59,20 @@ data class Niz(
 
     private val izbaci = NativeFunction("izbaci"){args ->
         if (args.isNotEmpty()) {
-            throw Exception("Type Error: Function 'izbaci' accepts 0 arguments")
+            throw Exception("Greška u tipovima: Funkcija 'izbaci' prihvata 0 argumenata")
         }
         if (value.isEmpty()) {
-            throw Exception("Array is empty!")
+            throw Exception("Nije moguće iznbaciti prvi član iz niza. Niz je prazan!")
         }
         value.removeLast()
     }
 
     private val izbaciPrvi = NativeFunction("izbaciPrvi"){ args ->
         if (args.isNotEmpty()) {
-            throw Exception("Type Error: Function 'izbaciPrvi' accepts 0 arguments")
+            throw Exception("Greška u tipovima: Funkcija 'izbaciPrvi' prihvata 0 argumenata")
         }
         if (value.isEmpty()) {
-            throw Exception("Array is empty!")
+            throw Exception("Nije moguće iznbaciti prvi član iz niza. Niz je prazan!")
         }
         value.removeFirst()
     }
@@ -89,10 +89,10 @@ data class Niz(
 
     private val sortirajPo = NativeFunction("sortirajPo"){ args ->
         if (args.size != 1 && args[0] !is Tekst) {
-            throw Exception("Type Error: Function 'sortirajPo' accepts 1 argument (key: Tekst)")
+            throw Exception("Greška u tipovima: Funkcija 'sortirajPo' prihvata 1 argument (ključ: tekst)")
         }
         if (value.any { it !is Objekat }) {
-            throw Exception("Type Error: Cannot call 'sortirajPo' on primitive values")
+            throw Exception("Greška u tipovima: Funkcija 'sortirajPo' se može koristiti samo sa objektima.")
         }
 
         value as ArrayList<Objekat>
@@ -105,10 +105,10 @@ data class Niz(
 
     private val sortirajSilaznoPo = NativeFunction("sortirajSilaznoPo"){ args ->
         if (args.size != 1 && args[0] !is Tekst) {
-            throw Exception("Type Error: Function 'sortirajSilaznoPo' accepts 1 argument (key: Tekst)")
+            throw Exception("Greška u tipovima: Funkcija 'sortirajSilaznoPo' prihvata 1 argument (ključ: tekst)")
         }
         if (value.any { it !is Objekat }) {
-            throw Exception("Type Error: Cannot call 'sortirajSilaznoPo' on primitive values")
+            throw Exception("Greška u tipovima: Funkcija 'sortirajSilaznoPo' se može koristiti samo sa objektima.")
         }
 
         value as ArrayList<Objekat>
@@ -122,7 +122,7 @@ data class Niz(
     private val isijeci = NativeFunction("isijeci"){ args ->
         if (args.size == 1) {
             if (args[0] !is Broj) {
-                throw Exception("Type Error: Function 'isijeci' accepts 2 arguments (start: Broj, end: Broj)")
+                throw Exception("Greška u tipovima: Funkcija 'isijeci' prihvata 2 argumenta (od: broj, do: broj)")
             }
             val startIndex = (args[0] as Broj).value
             if (!startIndex.isInt()) {
@@ -135,7 +135,7 @@ data class Niz(
 
         if (args.size == 2) {
             if (args[0] !is Broj || args[1] !is Broj) {
-                throw Exception("Type Error: Function 'isijeci' accepts 2 arguments (start: Broj, end: Broj)")
+                throw Exception("Greška u tipovima: Funkcija 'isijeci' prihvata 2 argumenta (od: broj, do: broj)")
             }
 
             val startIndex = (args[0] as Broj).value
@@ -151,13 +151,13 @@ data class Niz(
             )
         }
 
-        throw Exception("Type Error: Function 'isijeci' accepts 2 arguments (start: Broj, end: Broj)")
+        throw Exception("Greška u tipovima: Funkcija 'isijeci' prihvata 2 argumenta (od: broj, do: broj)")
     }
 
     private val primijeni = ContextualNativeFunction("primijeni"){ args, interpreterInstance ->
         if (args[0] is NativeFunction) {
             if (args.size != 1) {
-                throw Exception("Function 'primijeni' accepts 1 argument (fun: Funkcija)")
+                throw Exception("Funkcija 'primijeni' prihvata 1 argument (fun: funkcija)")
             }
             val fn = args[0] as NativeFunction
             val newValues = arrayListOf<RuntimeValue>()
@@ -196,7 +196,7 @@ data class Niz(
     private val zaSvaki = ContextualNativeFunction("zaSvaki") { args, interpreterInstance ->
         if (args[0] is NativeFunction) {
             if (args.size != 1) {
-                throw Exception("Function 'zaSvaki' accepts 1 argument (fun: Funkcija)")
+                throw Exception("Funkcija 'zaSvaki' prihvata 1 argument (fun: funkcija)")
             }
             val fn = args[0] as NativeFunction
             value.forEach {
@@ -223,7 +223,7 @@ data class Niz(
     private val zaSvakiUnazad = ContextualNativeFunction("zaSvakiUnazad"){ args, interpreterInstance ->
         if (args[0] is NativeFunction) {
             if (args.size != 1) {
-                throw Exception("Function 'zaSvakiUnazad' accepts 1 argument (fun: Funkcija)")
+                throw Exception("Funkcija 'zaSvakiUnazad' prihvata 1 argument (fun: funkcija)")
             }
             val fn = args[0] as NativeFunction
             value.reversed().forEach {
@@ -249,11 +249,11 @@ data class Niz(
 
     private val sortirajSa = ContextualNativeFunction("sortirajSa"){ args, interpreterInstance ->
         if (args.size != 1 || args[0] !is Funkcija) {
-            throw Exception("Type Error: Function 'sortirajSa' accepts 1 argument (sortingFunction: Funkcija)")
+            throw Exception("Greška u tipovima: Funkcija 'sortirajSa' prihvata 1 argument (sortingFunkcija: Funkcija)")
         }
         val fn = args[0] as Funkcija
         if (fn.params.size != 2) {
-            throw Exception("Type Error: Comparator function must accept 2 arguments (item1: nepoznato, item2: nepoznato)")
+            throw Exception("Greška u tipovima: Komparator Funkcija mora prihvatati 2 argumenta (a: nepoznato, b: nepoznato)")
         }
 
         for (i in 0 until value.size - 1) {
@@ -265,7 +265,7 @@ data class Niz(
                 val result =
                     (interpreterInstance.evaluateBlockStatement(fn.body, functionEnv) as ReturnValue).value
                 if (result !is Broj) {
-                    throw Exception("Type Error: Comparator function must return Broj, got $result")
+                    throw Exception("Greška u tipovima: Komparator funkcija mora vraćati 'broj'. Pronađeno:  ${result.typename}")
                 }
                 if (result.value > 0) {
                     val temp = value[i]
@@ -288,8 +288,10 @@ data class Niz(
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf(
             "duzina" to duzina,
+            "dužina" to duzina,
             "dodaj" to dodaj,
             "dodajNaPocetak" to dodajNaPocetak,
+            "dodajNaPočetak" to dodajNaPocetak,
             "spoji" to spoji,
             "poravnaj" to poravnaj,
             "izbaci" to izbaci,
@@ -311,7 +313,7 @@ data class Niz(
         get() = "niz"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("$prop does not exist on type Array")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'niz'")
     }
 
     fun getElement(index: Int): RuntimeValue {

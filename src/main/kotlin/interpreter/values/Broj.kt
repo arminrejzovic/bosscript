@@ -10,13 +10,14 @@ data class Broj(
     override val builtIns: HashMap<String, RuntimeValue>
         get() = hashMapOf(
             "zaokruzi" to zaokruzi,
+            "zaokruži" to zaokruzi,
             "tekst" to tekst
         )
     override val typename: String
         get() = "broj"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("$prop does not exist on type Number")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'broj'")
     }
 
     override fun toString(): String {
@@ -27,9 +28,9 @@ data class Broj(
         return "$value"
     }
 
-    private val zaokruzi = NativeFunction("zaokruzi") { args ->
+    private val zaokruzi = NativeFunction("zaokruži") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("Function 'zaokruzi' takes 0 arguments")
+            throw Exception("Funkcija 'zaokruži' prihvata 0 argumenata.")
         }
         Broj(value = value.roundToInt().toDouble())
     }

@@ -11,6 +11,6 @@ data class Bajt(
         get() = "bajt"
 
     override fun getProperty(prop: String): RuntimeValue {
-        return builtIns[prop] ?: throw Exception("Bajt has no property $prop")
+        return builtIns[prop] ?: throw Exception("Vrijednost '$prop' ne postoji na tipu 'bajt'")
     }
 }
