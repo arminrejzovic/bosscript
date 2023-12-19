@@ -11,7 +11,13 @@ class MapFactory {
                 "velicina" to NativeFunction("velicina"){
                     Broj(map.size)
                 },
+                "veličina" to NativeFunction("veličina"){
+                    Broj(map.size)
+                },
                 "kljucevi" to NativeFunction("kljucevi"){
+                    Niz(ArrayList(map.keys))
+                },
+                "ključevi" to NativeFunction("ključevi"){
                     Niz(ArrayList(map.keys))
                 },
                 "vrijednosti" to NativeFunction("vrijednosti"){
@@ -19,14 +25,14 @@ class MapFactory {
                 },
                 "dobavi" to NativeFunction("dobavi"){args ->
                     if(args.size != 1){
-                        throw Exception("Argument mismatch")
+                        throw Exception("Funkcija 'dobavi' prihvata 1 argument (ključ: objekat) (pronađeno ${args.size})")
                     }
                     val key = args[0]
                     map[key] ?: Null()
                 },
                 "postavi" to NativeFunction("postavi"){args ->
                     if(args.size != 2){
-                        throw Exception("Argument mismatch")
+                        throw Exception("Funkcija 'postavi' prihvata 2 argumenta (ključ: objekat, vrijednost: objekat) (pronađeno ${args.size})")
                     }
                     val key = args[0]
                     val value = args[1]
@@ -35,7 +41,7 @@ class MapFactory {
                 },
                 "postaviAkoNePostoji" to NativeFunction("postaviAkoNePostoji"){args ->
                     if(args.size != 2){
-                        throw Exception("Argument mismatch")
+                        throw Exception("Function 'postaviAkoNePostoji' accepts 2 arguments (ključ: objekat, vrijednost: objekat) (pronađeno ${args.size})")
                     }
                     val key = args[0]
                     val value = args[1]
@@ -43,7 +49,14 @@ class MapFactory {
                 },
                 "sadrziKljuc" to NativeFunction("sadrziKljuc"){args ->
                     if(args.size != 1){
-                        throw Exception("Argument mismatch")
+                        throw Exception("Function 'sadrziKljuc' accepts 1 argument (ključ: objekat) (pronađeno ${args.size})")
+                    }
+                    val key = args[0]
+                    Logicki(map.containsKey(key))
+                },
+                "sadržiKljuc" to NativeFunction("sadržiKljuc"){args ->
+                    if(args.size != 1){
+                        throw Exception("Function 'sadržiKljuc' accepts 1 argument (ključ: objekat) (pronađeno ${args.size})")
                     }
                     val key = args[0]
                     Logicki(map.containsKey(key))
@@ -51,6 +64,7 @@ class MapFactory {
                 "parovi" to NativeFunction("parovi"){
                     val entries = map.entries.map { e -> ReadonlyObject(hashMapOf(
                         "kljuc" to e.key,
+                        "ključ" to e.key,
                         "vrijednost" to e.value
                     )) }
                     Niz(ArrayList(entries))
@@ -62,7 +76,7 @@ class MapFactory {
                 "zaSvaki" to ContextualNativeFunction("zaSvaki") { args, interpreterInstance ->
                     if (args[0] is NativeFunction) {
                         if (args.size != 1) {
-                            throw Exception("Function 'zaSvaki' accepts 1 argument (fun: Funkcija)")
+                            throw Exception("Funkcija 'zaSvaki' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
                         }
                         val fn = args[0] as NativeFunction
                         map.forEach {
@@ -82,12 +96,12 @@ class MapFactory {
                         }
                         return@ContextualNativeFunction Null()
                     }
-                    else throw Exception("Type Error")
+                    else throw Exception("Funkcija 'zaSvaki' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
                 },
                 "primijeni" to ContextualNativeFunction("primijeni"){ args, interpreterInstance ->
                     if (args[0] is NativeFunction) {
                         if (args.size != 1) {
-                            throw Exception("Function 'primijeni' accepts 1 argument (fun: Funkcija)")
+                            throw Exception("Funkcija 'primijeni' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
                         }
                         val fn = args[0] as NativeFunction
                         val newValues = arrayListOf<RuntimeValue>()
@@ -119,7 +133,7 @@ class MapFactory {
                             value = newArray
                         )
                     }
-                    else throw Exception("Type Error $args")
+                    else throw Exception("Funkcija 'primijeni' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
                 }
             ))
         }

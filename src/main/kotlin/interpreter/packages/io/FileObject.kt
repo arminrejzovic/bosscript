@@ -38,25 +38,25 @@ class FileObject(file: File) {
     private val postoji =  NativeFunction("postoji") {
         Logicki(file.exists())
     }
-    private val velicina = NativeFunction("velicina") {
+    private val velicina = NativeFunction("veličina") {
         Broj(file.length().toDouble())
     }
-    private val velicinaParticije = NativeFunction("velicinaParticije") {
+    private val velicinaParticije = NativeFunction("veličinaParticije") {
         Broj(file.totalSpace.toDouble())
     }
     private val dozvoljenoPisati = NativeFunction("dozvoljenoPisati") {
         Logicki(file.canWrite())
     }
-    private val dozvoljenoCitati = NativeFunction("dozvoljenoCitati") {
+    private val dozvoljenoCitati = NativeFunction("dozvoljenoČitati") {
         Logicki(file.canRead())
     }
     private val dozvoljenoPokrenuti = NativeFunction("dozvoljenoPokrenuti") {
         Logicki(file.canExecute())
     }
 
-    private val ponisti = NativeFunction("ponisti") { args ->
+    private val ponisti = NativeFunction("poništi") { args ->
         if (args.isNotEmpty()) {
-            throw Exception("Argument mismatch")
+            throw Exception("Funkcija 'poništi' ne prihvata argumente.")
         }
         val ok = file.delete()
         Logicki(ok)
@@ -74,7 +74,7 @@ class FileObject(file: File) {
 
     private val premjesti = NativeFunction("premjesti") { args ->
         if (args.size != 1 || args[0] !is Tekst) {
-            throw Exception("Argument mismatch")
+            throw Exception("Funkcija 'premjesti' prihvata 1 argument (putanja: Tekst) (pronađeno ${args.size})")
         }
         val pathname = (args[0] as Tekst).value
 
@@ -82,17 +82,17 @@ class FileObject(file: File) {
         Logicki(ok)
     }
 
-    private val pisac = NativeFunction("pisac") {
+    private val pisac = NativeFunction("pisač") {
         val writer = file.bufferedWriter()
         BufferObjectFactory.constructWriter(writer)
     }
 
-    private val citac = NativeFunction("citac") {
+    private val citac = NativeFunction("čitač") {
         val reader = file.bufferedReader()
         BufferObjectFactory.constructReader(reader)
     }
 
-    private val sadrzaj = NativeFunction("sadrzaj") {
+    private val sadrzaj = NativeFunction("sadržaj") {
         if(file.exists()){
             Tekst(value = file.readText())
         }
@@ -100,11 +100,8 @@ class FileObject(file: File) {
     }
 
     private val postaviTekst = NativeFunction(name = "postaviTekst") { nestedArgs ->
-        if (nestedArgs.size != 1) {
-            throw Exception("Function 'postaviTekst' accepts only one argument (tekst: Tekst)")
-        }
-        if (nestedArgs[0] !is Tekst) {
-            throw Exception("Type Error: tekst must be Tekst, got ${nestedArgs[0].javaClass.simpleName}")
+        if (nestedArgs.size != 1 || nestedArgs[0] !is Tekst) {
+            throw Exception("Funkcija 'postaviTekst' prihvata samo jedan argument (tekst: Tekst) (pronađeno ${nestedArgs.size})")
         }
 
         val text = (nestedArgs[0] as Tekst).value
@@ -118,9 +115,9 @@ class FileObject(file: File) {
         Niz(value = lines)
     }
 
-    private val dopisi = NativeFunction(name = "dopisi") { nestedArgs ->
+    private val dopisi = NativeFunction(name = "dopiši") { nestedArgs ->
         if (nestedArgs.size != 1) {
-            throw Exception("Function 'dopisi' accepts only one argument (tekst: Tekst)")
+            throw Exception("Funkcija 'dopiši' prihvata samo jedan argument (tekst: Tekst) (pronađeno ${nestedArgs.size})")
         }
 
         val text = nestedArgs[0].toString()
@@ -181,19 +178,27 @@ class FileObject(file: File) {
             "jeSakriven" to jeSakriven,
             "postoji" to postoji,
             "velicina" to velicina,
+            "veličina" to velicina,
             "velicinaParticije" to velicinaParticije,
+            "veličinaParticije" to velicinaParticije,
             "dozvoljenoPisati" to dozvoljenoPisati,
             "dozvoljenoCitati" to dozvoljenoCitati,
+            "dozvoljenoČitati" to dozvoljenoCitati,
             "dozvoljenoPokrenuti" to dozvoljenoPokrenuti,
             "ponisti" to ponisti,
+            "poništi" to ponisti,
             "preimenuj" to preimenuj,
             "premjesti" to premjesti,
             "pisac" to pisac,
+            "pisač" to pisac,
             "citac" to citac,
+            "čitač" to citac,
             "sadrzaj" to sadrzaj,
+            "sadržaj" to sadrzaj,
             "postaviTekst" to postaviTekst,
             "linije" to linije,
             "dopisi" to dopisi,
+            "dopiši" to dopisi,
             "vrijemeZadnjePromjene" to vrijemeZadnjePromjene,
             "listaDatoteka" to listaDatoteka,
             "kreiraj" to kreiraj,

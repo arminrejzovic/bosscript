@@ -1,7 +1,9 @@
 package interpreter.packages.datetime
 
 import interpreter.Environment
-import interpreter.values.*
+import interpreter.values.Broj
+import interpreter.values.NativeFunction
+import interpreter.values.Tekst
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -12,7 +14,7 @@ val DateTime = Environment(
         },
         "puniDatum" to NativeFunction("puniDatum"){args ->
             if(args.size != 7){
-                throw Exception("Argument mismatch")
+                throw Exception("Funkcija 'puniDatum' prihvata 7 argumenata (godina: broj, mjesec: broj, dan: broj, sati: broj, minute: broj, sekunde: broj, nanosekunde: broj) (pronađeno ${args.size})")
             }
             val year = (args[0] as Broj).value.toInt()
             val month = (args[1] as Broj).value.toInt()
@@ -26,7 +28,7 @@ val DateTime = Environment(
         },
         "DatumVrijeme" to NativeFunction("DatumVrijeme"){args ->
             if(args.size != 5){
-                throw Exception("Argument mismatch")
+                throw Exception("Funkcija 'DatumVrijeme' prihvata 5 argumenata (dan: broj, mjesec: broj, godina: broj, sati: broj, minute: broj) (pronađeno ${args.size})")
             }
             val year = (args[2] as Broj).value.toInt()
             val month = (args[1] as Broj).value.toInt()
@@ -38,7 +40,7 @@ val DateTime = Environment(
         },
         "datumVrijemeIzTeksta" to NativeFunction("datumVrijemeIzTeksta"){args ->
             if(args.size != 1 || args[0] !is Tekst){
-                throw Exception("Argument mismatch")
+                throw Exception("Funkcija 'datumVrijemeIzTeksta' prihvata 1 argument (datumVrijeme: tekst) (pronađeno ${args.size})")
             }
             val dateString = (args[0] as Tekst).value
             val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")
@@ -46,7 +48,7 @@ val DateTime = Environment(
         },
         "datumVrijemePoFormatu" to NativeFunction("datumVrijemePoFormatu"){args ->
             if(args.size != 2 || args[0] !is Tekst || args[1] !is Tekst){
-                throw Exception("Argument mismatch")
+                throw Exception("Funckija 'datumVrijemePoFormatu' prihvata 2 argumenta (datumVrijeme: tekst, format: tekst) (pronađeno ${args.size})")
             }
             val dateString = (args[0] as Tekst).value
             val format = (args[1] as Tekst).value

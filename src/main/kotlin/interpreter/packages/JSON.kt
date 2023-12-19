@@ -10,7 +10,7 @@ import java.math.BigDecimal
 val JSON = Environment(variables = hashMapOf(
     "objekatIzJSON" to NativeFunction("objekatIzJSON"){ args ->
         if(args.size != 1 && args[0] !is Tekst){
-            throw Exception("Argument mismatch")
+            throw Exception("Funkcija 'objekatIzJSON' prihvata 1 argument (json: tekst) (pronađeno ${args.size})")
         }
         val jsonString = (args[0] as Tekst).value
 
@@ -19,9 +19,9 @@ val JSON = Environment(variables = hashMapOf(
     },
     "JSONTekst" to NativeFunction("JSONTekst"){ args ->
         if(args.size != 1){
-            throw Exception("Argument mismatch")
+            throw Exception("Funkcija 'JSONTekst' prihvata 1 argument (objekat: objekat) (pronađeno ${args.size})")
         }
-        return@NativeFunction Tekst(value = JSONStringify(args[0]))
+        return@NativeFunction Tekst(value = jsonStringify(args[0]))
     }
 ))
 
@@ -45,11 +45,11 @@ private fun parseJSONAttribute(attr: Any?): RuntimeValue{
         is JSONObject -> parseJSONObject(attr)
         is JSONArray -> Niz(ArrayList(attr.map { parseJSONAttribute(it) }))
         JSONObject.NULL -> Null()
-        else -> throw Exception("Unsupported JSON attribute encountered: $attr ${attr?.javaClass?.simpleName}")
+        else -> throw Exception("Nepodržani JSON atribut pronađen: $attr ${attr?.javaClass?.simpleName}")
     }
 }
 
-fun JSONStringify(rv: RuntimeValue): String{
+fun jsonStringify(rv: RuntimeValue): String{
     return when(rv){
         is Broj, is Logicki -> rv.value.toString()
         is Tekst -> "\"${rv.value}\""
@@ -57,7 +57,7 @@ fun JSONStringify(rv: RuntimeValue): String{
         is Niz -> {
             val sb = StringBuilder("[")
             rv.value.forEach {
-                sb.append(JSONStringify(it))
+                sb.append(jsonStringify(it))
                 sb.append(", ")
             }
             sb.append("\b\b]")
@@ -65,6 +65,6 @@ fun JSONStringify(rv: RuntimeValue): String{
         }
         is Objekat -> rv.JSONString()
         is ModelObject -> rv.JSONString()
-        else -> throw Exception("Cannot serialize $rv to JSON")
+        else -> throw Exception("Greška prilikom serijalizacije vrijednosti $rv u JSON format.")
     }
 }

@@ -1,7 +1,9 @@
 package interpreter.packages.http
 
 import interpreter.Environment
-import interpreter.values.*
+import interpreter.values.NativeFunction
+import interpreter.values.Objekat
+import interpreter.values.Tekst
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -28,7 +30,7 @@ fun fetch(url: String, method: String = "GET", headers: Map<String, String>? = n
 val http = Environment(variables = hashMapOf(
     "zahtjev" to NativeFunction("zahtjev"){ args ->
         if(args.isEmpty() || args[0] !is Tekst){
-            throw Exception("Argument mismatch")
+            throw Exception("Funkcija 'zahtjev' prihvata 4 argumenta (url: tekst, metoda: tekst, zaglavlja: objekat, tijelo: tekst). Argument 'url' je obavezan. (pronađeno ${args.size})")
         }
 
         val url = (args[0] as Tekst).value

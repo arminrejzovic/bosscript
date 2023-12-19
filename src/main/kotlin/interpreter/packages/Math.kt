@@ -1,18 +1,16 @@
 package interpreter.packages
 
 import interpreter.Environment
-import interpreter.values.*
+import interpreter.values.Broj
+import interpreter.values.NativeFunction
 import kotlin.math.*
 
 @OptIn(ExperimentalStdlibApi::class)
 val math = Environment(
     variables = hashMapOf(
         "apsolutnaVrijednost" to NativeFunction(name = "apsolutnaVrijednost"){args ->
-            if (args.size != 1){
-                throw Exception("Function apsolutnaVrijednost accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function apsolutnaVrijednost. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'apsolutnaVrijednost' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -24,11 +22,8 @@ val math = Environment(
         "pi" to Broj(value = PI),
 
         "arccos" to NativeFunction(name = "arccos"){args ->
-            if (args.size != 1){
-                throw Exception("Function arccos accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function arccos. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'arccos' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -38,11 +33,8 @@ val math = Environment(
         },
 
         "arcsin" to NativeFunction(name = "arcsin"){args ->
-            if (args.size != 1){
-                throw Exception("Function arcsin accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function arcsin. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'arcsin' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -52,11 +44,8 @@ val math = Environment(
         },
 
         "sin" to NativeFunction(name = "sin"){args ->
-            if (args.size != 1){
-                throw Exception("Function sin accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function sin. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'sin' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -66,11 +55,8 @@ val math = Environment(
         },
 
         "cos" to NativeFunction(name = "cos"){args ->
-            if (args.size != 1){
-                throw Exception("Function cos accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function cos. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'cos' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -80,11 +66,8 @@ val math = Environment(
         },
 
         "tg" to NativeFunction(name = "tg"){args ->
-            if (args.size != 1){
-                throw Exception("Function tg accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function tg. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'tg' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -94,11 +77,8 @@ val math = Environment(
         },
 
         "arctg" to NativeFunction(name = "arctg"){args ->
-            if (args.size != 1){
-                throw Exception("Function arctg accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function arctg. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'arctg' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -108,17 +88,14 @@ val math = Environment(
         },
 
         "korijen" to NativeFunction(name = "korijen"){args ->
-            if (args.size != 1){
-                throw Exception("Function korijen accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function korijen. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'korijen' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
 
             if(num.value < 0){
-                throw Exception("Square root cannot be calculated for negative numbers. Value ${num.value} is invalid")
+                throw Exception("Argument 'n' mora biti pozitivan broj. Nije moguće izračunati korijen negativnog broja.")
             }
 
             return@NativeFunction Broj(
@@ -129,11 +106,8 @@ val math = Environment(
         "e" to Broj(value = E),
 
         "eNa" to NativeFunction(name = "eNa"){args ->
-            if (args.size != 1){
-                throw Exception("Function eNa accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function eNa. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'eNa' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -145,17 +119,14 @@ val math = Environment(
         },
 
         "ln" to NativeFunction(name = "ln"){args ->
-            if (args.size != 1){
-                throw Exception("Function ln accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function ln. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'ln' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
 
             if(num.value < 0.0){
-                throw Exception("Cannot calculate ln of ${num.value}: Value must be a positive number")
+                throw Exception("Argument 'n' mora biti pozitivan broj. Nije moguće izračunati prirodni logaritam negativnog broja.")
             }
 
             return@NativeFunction Broj(
@@ -164,15 +135,8 @@ val math = Environment(
         },
 
         "log" to NativeFunction(name = "log"){args ->
-            if (args.size != 2){
-                throw Exception("Function log accepts two parameters (x: Broj, base: Broj)")
-            }
-            if(args[0] !is Broj){
-                throw Exception("Type Error: Value must be Broj")
-            }
-
-            if(args[1] !is Broj){
-                throw Exception("Type Error: Base must be a number")
+            if (args.size != 2 || args[0] !is Broj || args[1] !is Broj){
+                throw Exception("Funkcija 'log' prihvata 2 argumenta (n: broj, baza: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -184,11 +148,8 @@ val math = Environment(
         },
 
         "log10" to NativeFunction(name = "log10"){args ->
-            if (args.size != 1){
-                throw Exception("Function log10 accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function log10. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'log10' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -199,11 +160,8 @@ val math = Environment(
         },
 
         "log2" to NativeFunction(name = "log2"){args ->
-            if (args.size != 1){
-                throw Exception("Function log2 accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function log2. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'log2' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -214,15 +172,8 @@ val math = Environment(
         },
 
         "max" to NativeFunction(name = "max"){args ->
-            if (args.size != 2){
-                throw Exception("Function max accepts two parameters (value1: Broj, value2: Broj)")
-            }
-            if(args[0] !is Broj){
-                throw Exception("Type Error: Value1 must be Broj")
-            }
-
-            if(args[1] !is Broj){
-                throw Exception("Type Error: Value2 must be a number")
+            if (args.size != 2 || args[0] !is Broj || args[1] !is Broj){
+                throw Exception("Funkcija 'max' prihvata 2 argumenta (x: broj, y: broj) (pronađeno ${args.size})")
             }
 
             val value1 = args[0] as Broj
@@ -234,15 +185,8 @@ val math = Environment(
         },
 
         "min" to NativeFunction(name = "min"){args ->
-            if (args.size != 2){
-                throw Exception("Function min accepts two parameters (value1: Broj, value2: Broj)")
-            }
-            if(args[0] !is Broj){
-                throw Exception("Type Error: Value1 must be Broj")
-            }
-
-            if(args[1] !is Broj){
-                throw Exception("Type Error: Value2 must be a number")
+            if (args.size != 2 || args[0] !is Broj || args[1] !is Broj){
+                throw Exception("Funkcija 'min' prihvata 2 argumenta (x: broj, y: broj) (pronađeno ${args.size})")
             }
 
             val value1 = args[0] as Broj
@@ -254,11 +198,20 @@ val math = Environment(
         },
 
         "zaokruzi" to NativeFunction(name = "zaokruzi"){args ->
-            if (args.size != 1){
-                throw Exception("Function zaokruzi accepts only one parameter")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'zaokruzi' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function zaokruzi. It accepts Broj")
+
+            val num = args[0] as Broj
+
+            return@NativeFunction Broj(
+                value = round(num.value)
+            )
+        },
+
+        "zaokruži" to NativeFunction(name = "zaokruži"){args ->
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'zaokruži' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -269,11 +222,8 @@ val math = Environment(
         },
 
         "kubniKorijen" to NativeFunction(name = "kubniKorijen"){args ->
-            if (args.size != 1){
-                throw Exception("Function kubniKorijen accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function kubniKorijen. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'kubniKorijen' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj
@@ -284,11 +234,8 @@ val math = Environment(
         },
 
         "uStepenima" to NativeFunction(name = "uStepenima"){args ->
-            if (args.size != 1){
-                throw Exception("Function uStepenima accepts only one parameter")
-            }
-            if(args[0] !is Broj){
-                throw Exception("${args[0].javaClass.simpleName} is not a valid argument for function uStepenima. It accepts Broj")
+            if (args.size != 1 || args[0] !is Broj){
+                throw Exception("Funkcija 'zaokruži' prihvata 1 argument (radijani: broj) (pronađeno ${args.size})")
             }
 
             val num = args[0] as Broj

@@ -13,7 +13,7 @@ val system = Environment(variables = hashMapOf(
     "tempiraj" to ContextualNativeFunction("tempiraj"){ args, interpreterInstance ->
         if (args[0] is NativeFunction) {
             if (args.size != 1) {
-                throw Exception("Function 'tempiraj' accepts 1 argument (fun: Funkcija)")
+                throw Exception("Funkcija 'tempiraj' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
             }
             val fn = args[0] as NativeFunction
 
@@ -31,13 +31,13 @@ val system = Environment(variables = hashMapOf(
             }
             return@ContextualNativeFunction Broj(executionTime.toDouble())
         }
-        else throw Exception("Type Error")
+        else throw Exception("Funkcija 'tempiraj' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
     },
 
     "tempirajNano" to ContextualNativeFunction("tempirajNano"){ args, interpreterInstance ->
         if (args[0] is NativeFunction) {
             if (args.size != 1) {
-                throw Exception("Function 'tempirajNano' accepts 1 argument (fun: Funkcija)")
+                throw Exception("Funkcija 'tempirajNano' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
             }
             val fn = args[0] as NativeFunction
 
@@ -55,12 +55,12 @@ val system = Environment(variables = hashMapOf(
             }
             return@ContextualNativeFunction Broj(executionTime.toDouble())
         }
-        else throw Exception("Type Error")
+        else throw Exception("Funkcija 'tempirajNano' prihvata 1 argument (fun: Funkcija) (pronađeno ${args.size})")
     },
 
     "zatvoriProces" to NativeFunction("zatvoriProces"){args ->
         if (args.size != 1 || args[0] !is Broj){
-            throw Exception("Argument mismatch")
+            throw Exception("Funkcija 'zatvoriProces' prihvata 1 argument (status: broj) (pronađeno ${args.size})")
         }
         val status = (args[0] as Broj).value.toInt()
         exitProcess(status)

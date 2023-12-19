@@ -13,6 +13,7 @@ class ResponseFactory {
             return ReadonlyObject(hashMapOf(
                 "status" to Broj(statusCode.toDouble()),
                 "headeri" to Objekat(headersMap),
+                "zaglavlja" to Objekat(headersMap),
                 "tijelo" to if(body == null) Null() else Tekst(body)
             ))
         }

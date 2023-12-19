@@ -15,64 +15,64 @@ class TimeObjectFactory{
                 "sekunde" to Broj(value = time.second.toDouble()),
                 "nanosekunde" to Broj(value = time.nano.toDouble()),
                 "plusSati" to NativeFunction("plusSati"){args ->
-                    if (args.size != 1 && args[0] !is Broj) {
-                        throw Exception("plusSati accepts 1 argument (n: broj)")
+                    if (args.size != 1 || args[0] !is Broj) {
+                        throw Exception("Funkcija 'plusSati' prihvata 1 argument (n: broj) (pronađeno ${args.size})")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.plusHours(nDays))
                 },
                 "minusSati" to NativeFunction("minusSati"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("minusSati accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'minusSati' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.minusHours(nDays))
                 },
                 "plusMinuta" to NativeFunction("plusMinuta"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("plusMinuta accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'plusMinuta' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.plusMinutes(nDays))
                 },
                 "minusMinuta" to NativeFunction("minusMinuta"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("minusMinuta accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'minusMinuta' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.minusMinutes(nDays))
                 },
                 "plusSekundi" to NativeFunction("plusSekundi"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("plusSekundi accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'plusSekundi' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.plusSeconds(nDays))
                 },
                 "minusSekundi" to NativeFunction("minusSekundi"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("minusSekundi accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'minusSekundi' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.minusSeconds(nDays))
                 },
                 "plusNanosekundi" to NativeFunction("plusNanosekundi"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("plusNanosekundi accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'plusNanosekundi' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.plusNanos(nDays))
                 },
                 "minusNanosekundi" to NativeFunction("minusNanosekundi"){args ->
                     if(args.size != 1 && args[0] !is Broj){
-                        throw Exception("minusNanosekundi accepts 1 argument (n: broj)")
+                        throw Exception("Funkcija 'minusNanosekundi' prihvata 1 argument (n: broj)")
                     }
                     val nDays = (args[0] as Broj).value.toLong()
                     return@NativeFunction construct(time.minusNanos(nDays))
                 },
                 "periodIzmedju" to NativeFunction("periodIzmedju"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
-                        throw Exception("periodIzmedju accepts 1 argument (v: Vrijeme)")
+                        throw Exception("Funkcija 'periodIzmedju' prihvata 1 argument (v: Vrijeme)")
                     }
                     val providedTime = args[0] as Objekat
                     val hours = (providedTime.getProperty("sati") as Broj).value
@@ -95,7 +95,7 @@ class TimeObjectFactory{
                 },
                 "jePoslije" to NativeFunction("jePoslije"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
-                        throw Exception("jePoslije accepts 1 argument (d: Datum)")
+                        throw Exception("Funkcija 'jePoslije' prihvata 1 argument (d: Datum)")
                     }
                     val providedDate = args[0] as Objekat
                     val hours = (providedDate.getProperty("sati") as Broj).value
@@ -114,7 +114,7 @@ class TimeObjectFactory{
                 },
                 "jePrije" to NativeFunction("jePrije"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
-                        throw Exception("jePrije accepts 1 argument (d: Datum)")
+                        throw Exception("Funkcija 'jePrije' prihvata 1 argument (d: Datum)")
                     }
                     val providedDate = args[0] as Objekat
 
@@ -134,7 +134,7 @@ class TimeObjectFactory{
                 },
                 "naDatum" to NativeFunction("naDatum"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
-                        throw Exception("naDatum accepts 1 argument (d: Datum)")
+                        throw Exception("Funkcija 'naDatum' prihvata 1 argument (d: Datum)")
                     }
                     val providedDate = args[0] as Objekat
                     val year = (providedDate.getProperty("godina") as Broj).value
@@ -150,7 +150,7 @@ class TimeObjectFactory{
                 },
                 "jednako" to NativeFunction("jednako"){args ->
                     if(args.size != 1 && args[0] !is Objekat){
-                        throw Exception("jednako accepts 1 argument (d: Datum)")
+                        throw Exception("Funkcija 'jednako' prihvata 1 argument (d: Datum)")
                     }
                     val hours = (args[0].getProperty("sati") as Broj).value
                     val minutes = (args[0].getProperty("minute") as Broj).value
