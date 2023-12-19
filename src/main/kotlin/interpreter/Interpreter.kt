@@ -933,6 +933,13 @@ class Interpreter {
                 val activationRecord = hashMapOf("@" to `this`)
                 val typeChecker = TypeChecker(env)
 
+                if(fn.params.size != call.args.size){
+                    throw BosscriptRuntimeException(
+                        text = "Očekivani broj argumenata je ${fn.params.size}, a proslijeđeno je ${call.args.size}",
+                        location = call.start
+                    )
+                }
+
                 fn.params.forEachIndexed { index, param ->
                     val providedParam = evaluate(call.args[index], env)
                     if (param.type != null) {
@@ -1012,6 +1019,13 @@ class Interpreter {
 
             val activationRecord = hashMapOf<String, RuntimeValue>("@" to `this`)
             val typeChecker = TypeChecker(env)
+
+            if(definition.constructor.params.size != constructorArgs.size){
+                throw BosscriptRuntimeException(
+                    text = "Očekivani broj argumenata je ${definition.constructor.params.size}, a proslijeđeno je ${constructorArgs.size}",
+                    location = constructorArgs[0].start
+                )
+            }
 
             definition.constructor.params.forEachIndexed { index, param ->
                 val providedParam = evaluate(constructorArgs[index], env)
