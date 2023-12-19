@@ -25,7 +25,7 @@ class Environment(
 
     fun declareVariable(name: String, value: RuntimeValue, type: TypeAnnotation? = null, isConstant: Boolean = false): RuntimeValue {
         if(variables.containsKey(name)){
-            throw Exception("Error: $name has already been defined")
+            throw Exception("Varijabla $name već postoji.")
         }
 
         if(type != null && value !is Null){
@@ -43,7 +43,7 @@ class Environment(
     fun assignVariable(name: String, value: RuntimeValue): RuntimeValue {
         val env = resolve(name)
         if(env.constants.contains(name)){
-            throw Exception("Constants cannot be reassigned")
+            throw Exception("Konstante nije moguće mijenjati.")
         }
         val expectedType = env.variableTypes[name]
         if(expectedType != null && value !is Null){
@@ -164,6 +164,22 @@ class Environment(
         )
 
         env.declareVariable(
+            "greška",
+            NativeFunction(name = "greška"){ args ->
+
+                val reset = "\u001b[0m"
+                val red = "\u001b[31m"
+
+                args.forEach {
+                    println(red + "⚠ " + it.value.toString() + reset)
+                }
+                Null()
+
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
             "unos",
             NativeFunction(name = "unos"){args ->
                     if(args.size == 1){
@@ -198,10 +214,22 @@ class Environment(
         )
 
         env.declareVariable(
+            "nasumični",
+            NativeFunction(name = "nasumični"){args ->
+                val until = if(args.size == 1) args[0] as Broj else Broj(value = 100.0)
+                val untilVal = until.value
+                Broj(
+                    value = (Random.nextInt(until = untilVal.toInt())).toDouble()
+                )
+            },
+            isConstant = true
+        )
+
+        env.declareVariable(
             "brojOd",
-            NativeFunction("broj"){args ->
+            NativeFunction("brojOd"){args ->
                 if(args.size != 1){
-                    throw Exception("Argument mismatch: Function 'broj' accepts 1 argument (obj: nepoznato)")
+                    throw Exception("Funkcija brojOd prihvata 1 argument (obj: objekat)")
                 }
 
                 when(args[0]){
@@ -210,7 +238,7 @@ class Environment(
                     }
                     is Tekst -> {
                         val t = args[0] as Tekst
-                        val numberValue = t.value.toDoubleOrNull() ?: throw Exception("Cannot parse ${t.value} to Broj.")
+                        val numberValue = t.value.toDoubleOrNull() ?: throw Exception("Nije moguće pretvoriti vrijednost ${t.value} u broj")
                         return@NativeFunction Broj(
                             value = numberValue
                         )
@@ -223,7 +251,7 @@ class Environment(
                     }
 
                     else -> {
-                        throw Exception("Cannot convert ${args[0]} to Broj")
+                        throw Exception("Nije moguće pretvoriti vrijednost ${args[0]} u broj")
                     }
                 }
             }
@@ -231,9 +259,9 @@ class Environment(
 
         env.declareVariable(
             "logickiOd",
-            NativeFunction("logicki"){args ->
+            NativeFunction("logickiOd"){args ->
                 if(args.size != 1){
-                    throw Exception("Argument mismatch: Function 'logicki' accepts 1 argument (obj: nepoznato)")
+                    throw Exception("Funkcija 'logickiOd' prihvata 1 argument (obj: objekat)")
                 }
 
                 when(args[0]){
@@ -267,6 +295,43 @@ class Environment(
         )
 
         env.declareVariable(
+            "logičkiOd",
+            NativeFunction("logičkiOd"){args ->
+                if(args.size != 1){
+                    throw Exception("Funkcija 'logičkiOd' prihvata 1 argument (obj: objekat)")
+                }
+
+                when(args[0]){
+                    is Logicki -> {
+                        return@NativeFunction Logicki((args[0] as Logicki).value)
+                    }
+                    is Broj -> {
+                        val b = args[0] as Broj
+                        return@NativeFunction Logicki(b.value.toInt() != 0)
+                    }
+                    is Tekst -> {
+                        val t = args[0] as Tekst
+
+                        val boolValue = when(t.value.lowercase()){
+                            "tacno" -> true
+                            "tačno" -> true
+                            "netacno" -> false
+                            "netačno" -> false
+                            else -> throw Exception("'${t.value}' nije logička vrijednost")
+                        }
+                        return@NativeFunction Logicki(
+                            value = boolValue
+                        )
+                    }
+
+                    else -> {
+                        throw Exception("Nije moguće pretvoriti vrijednost ${args[0]} u logički")
+                    }
+                }
+            }
+        )
+
+        env.declareVariable(
             "nizOd",
             NativeFunction("nizOd"){args ->
                 Niz(value = args.toCollection(ArrayList()))
@@ -285,6 +350,17 @@ class Environment(
             NativeFunction("izazoviGrešku"){ args ->
                 if (args.size != 1 || args[0] !is Objekat){
                     throw RuntimeException("Funkcija 'izazoviGrešku' očekuje 1 argument (greška: objekat)")
+                }
+                val exception = args[0] as Objekat
+                throw BosscriptRuntimeException(exception, args[0].toString(), Pair(0, 0))
+            }
+        )
+
+        env.declareVariable(
+            "izazoviGresku",
+            NativeFunction("izazoviGresku"){ args ->
+                if (args.size != 1 || args[0] !is Objekat){
+                    throw RuntimeException("Funkcija 'izazoviGresku' očekuje 1 argument (greska: objekat)")
                 }
                 val exception = args[0] as Objekat
                 throw BosscriptRuntimeException(exception, args[0].toString(), Pair(0, 0))
