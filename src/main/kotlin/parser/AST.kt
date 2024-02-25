@@ -200,7 +200,7 @@ data class ModelBlock(
             body.add(stmt)
             return
         }
-        throw Exception("Expected member declaration")
+        throw Exception("Nedostaje očekivani izraz pristupanja članu")
     }
 }
 
@@ -260,7 +260,20 @@ data class Identifier(
     override val start: Pair<Int, Int> = Pair(0, 0),
     override val end: Pair<Int, Int> = Pair(0, 0),
     override val kind: NodeType = NodeType.Identifier
-) : Expression
+) : Expression {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Identifier
+
+        return symbol == other.symbol
+    }
+
+    override fun hashCode(): Int {
+        return symbol.hashCode()
+    }
+}
 
 data class NumericLiteral(
     val value: Double,

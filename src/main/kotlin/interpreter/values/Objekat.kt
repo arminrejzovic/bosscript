@@ -1,6 +1,6 @@
 package interpreter.values
 
-import interpreter.packages.JSONStringify
+import interpreter.packages.jsonStringify
 
 open class Objekat(
     val properties: HashMap<String, RuntimeValue>,
@@ -91,7 +91,7 @@ open class Objekat(
         val sb = StringBuilder("{")
         properties.forEach {
             if(it.value !is Funkcija && it.value !is NativeFunction && it.value !is ContextualNativeFunction){
-                sb.append("\"${it.key}\": ${JSONStringify(it.value)}")
+                sb.append("\"${it.key}\": ${jsonStringify(it.value)}")
                 sb.append(", ")
             }
         }

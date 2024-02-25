@@ -261,7 +261,7 @@ class Environment(
             "logickiOd",
             NativeFunction("logickiOd"){args ->
                 if(args.size != 1){
-                    throw Exception("Funkcija 'logickiOd' prihvata 1 argument (obj: objekat)")
+                    throw Exception("Funkcija 'logičkiOd' prihvata 1 argument (obj: objekat)")
                 }
 
                 when(args[0]){
@@ -280,7 +280,7 @@ class Environment(
                             "tačno" -> true
                             "netacno" -> false
                             "netačno" -> false
-                            else -> throw Exception("${t.value} is not a boolean")
+                            else -> throw Exception("'${t.value}' nije logička vrijednost")
                         }
                         return@NativeFunction Logicki(
                             value = boolValue
@@ -288,7 +288,7 @@ class Environment(
                     }
 
                     else -> {
-                        throw Exception("Cannot convert ${args[0]} to Logicki")
+                        throw Exception("Nije moguće pretvoriti vrijednost ${args[0]} u logički")
                     }
                 }
             }

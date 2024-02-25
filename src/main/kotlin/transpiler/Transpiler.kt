@@ -160,11 +160,11 @@ class Transpiler {
             }
 
             is TipDefinitionStatement -> {
-                throw Exception("Type Definitions are not supported in JS Transpilation mode")
+                throw Exception("Prilikom transpilacije u JavaScript nije moguće definisati tipove")
             }
 
             else -> {
-                throw Exception("Unexpected token, $node")
+                throw Exception("Pronađen neočekivani token '$node'")
             }
         }
     }
@@ -206,7 +206,7 @@ class Transpiler {
             sb.append(";")
             return sb.toString()
         }
-        throw Exception("Invalid model property.")
+        throw Exception("Neispravan član modela")
     }
 
     private fun transpileTryCatch(stmt: TryCatchStatement): String {

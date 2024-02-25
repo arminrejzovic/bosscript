@@ -1,6 +1,6 @@
 package interpreter.values.classes
 
-import interpreter.packages.JSONStringify
+import interpreter.packages.jsonStringify
 import interpreter.values.*
 
 data class ModelObject(
@@ -65,7 +65,7 @@ data class ModelObject(
         val sb = java.lang.StringBuilder("{")
         instanceObject.forEach {
             if(it.value !is Funkcija && it.value !is NativeFunction && it.value !is ContextualNativeFunction){
-                sb.append("\"${it.key}\": ${JSONStringify(it.value)}")
+                sb.append("\"${it.key}\": ${jsonStringify(it.value)}")
                 sb.append(", ")
             }
         }
@@ -73,7 +73,7 @@ data class ModelObject(
         while (obj != null){
             obj.instanceObject.forEach{ (k, v) ->
                 if(v !is Funkcija && v !is Null){
-                    sb.append("\"${k}\": ${JSONStringify(v)}")
+                    sb.append("\"${k}\": ${jsonStringify(v)}")
                     sb.append(", ")
                 }
             }

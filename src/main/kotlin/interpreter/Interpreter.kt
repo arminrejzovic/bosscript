@@ -169,7 +169,7 @@ class Interpreter {
         val left = evaluate(expr.left, env)
         val right = evaluate(expr.right, env)
         if(left is ModelObject){
-            return evaluateModelBinaryExpression(left, right, expr.operator, env)
+            return evaluateModelBinaryExpression(left, right, expr.operator, env, expr)
         }
         when (expr.operator) {
             "+" -> {
@@ -338,14 +338,14 @@ class Interpreter {
         }
     }
 
-    private fun evaluateModelBinaryExpression(left: ModelObject, right: RuntimeValue, operator: String, env: Environment): RuntimeValue {
+    private fun evaluateModelBinaryExpression(left: ModelObject, right: RuntimeValue, operator: String, env: Environment, exprRef: BinaryExpression): RuntimeValue {
         when(operator){
             "+", "-", "*", "/", "<", ">", "==", "!=" -> {
                 val operatorFun = left.getProperty(operatorToFunctionName(operator))
                 if(operatorFun !is Funkcija){
                     throw BosscriptRuntimeException(
                         text = "$operatorFun nije funkcija",
-                        location = Pair(-1, -1) // TODO
+                        location = exprRef.start
                     )
                 }
                 `this` = left
@@ -353,7 +353,13 @@ class Interpreter {
                 val typeChecker = TypeChecker(env)
 
                 if(operatorFun.params[0].type != null){
-                    operatorFun.params[0].type?.let { typeChecker.expect(it, right) } // TODO
+                    val expectedType = operatorFun.params[0].type!!
+                    try {
+                        typeChecker.expect(expectedType, right)
+                    }
+                    catch (e: BosscriptRuntimeException){
+                        throw BosscriptRuntimeException(e.exceptionObject, e.text, exprRef.right.start)
+                    }
                 }
 
                 activationRecord[operatorFun.params[0].identifier.symbol] = right
@@ -374,7 +380,7 @@ class Interpreter {
             else -> {
                 throw BosscriptRuntimeException(
                     text = "Operator $operator nije definisan za dati model '${left.typename}",
-                    location = Pair(-1, -1) // TODO
+                    location = exprRef.start
                 )
             }
         }
@@ -966,7 +972,12 @@ class Interpreter {
                 call.args.forEach {
                     args.add(evaluate(it, env))
                 }
-                return fn.call(args)
+                try {
+                    return fn.call(args)
+                }
+                catch (e: Exception){
+                    throw BosscriptRuntimeException(text = "${e.message}", location = call.start)
+                }
             }
 
             is ContextualNativeFunction -> {
@@ -974,7 +985,12 @@ class Interpreter {
                 call.args.forEach {
                     args.add(evaluate(it, env))
                 }
-                return fn.call(args, this)
+                try {
+                    return fn.call(args, this)
+                }
+                catch (e: Exception){
+                    throw BosscriptRuntimeException(text = "${e.message}", location = call.start)
+                }
             }
 
             is Tip -> {
