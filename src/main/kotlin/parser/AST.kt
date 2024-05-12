@@ -62,7 +62,7 @@ data class FunctionExpression(
 ) : Expression
 
 data class FunctionParameter(
-    val identifier: Identifier,
+    val identifier: String,
     val type: TypeAnnotation?,
     override val start: Pair<Int, Int> = Pair(0, 0),
     override val end: Pair<Int, Int> = Pair(0, 0),
@@ -212,13 +212,22 @@ data class TypeProperty(
     override val kind: NodeType = NodeType.TypePropertyDefinition
 ): Statement
 
-data class TypeAnnotation(
+open class TypeAnnotation(
     val typeName: String,
     val isArrayType: Boolean = false,
     override val start: Pair<Int, Int> = Pair(0, 0),
     override val end: Pair<Int, Int> = Pair(0, 0),
     override val kind: NodeType = NodeType.TypeAnnotation
 ): Statement
+
+data class FunctionTypeAnnotation (
+    val parameters: ArrayList<FunctionParameter>,
+    val returnType: TypeAnnotation
+) : TypeAnnotation("funkcija", isArrayType = false)
+
+data class UnionTypeAnnotation (
+    val possibleTypes: ArrayList<TypeAnnotation>
+): TypeAnnotation("unija", false)
 
 data class ImportStatement(
     val packageName: String,

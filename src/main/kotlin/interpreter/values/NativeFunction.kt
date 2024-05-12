@@ -2,7 +2,7 @@ package interpreter.values
 
 class NativeFunction(
     val name: String,
-    val call: (args: List<RuntimeValue>) -> RuntimeValue,
+    val call: (args: List<RuntimeValue>) -> RuntimeValue
 ): RuntimeValue {
     override val value: Any?
         get() = null

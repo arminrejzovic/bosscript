@@ -280,7 +280,7 @@ class Transpiler {
     private fun transpileParams(params: ArrayList<FunctionParameter>): String {
         val sb = StringBuilder()
         params.forEachIndexed { i, it ->
-            sb.append(it.identifier.symbol)
+            sb.append(it.identifier)
             if(i != params.lastIndex){
                 sb.append(", ")
             }

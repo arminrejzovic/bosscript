@@ -25,10 +25,6 @@ class Parser(val js: Boolean = false) {
         return tokens.removeFirst()
     }
 
-    private fun getLineCol(): String {
-        return current().getLineCol()
-    }
-
     private fun checkValidAssignmentTarget(node: Expression): Expression {
         if (node.kind == NodeType.Identifier || node.kind == NodeType.MemberExpression) {
             return node
@@ -636,7 +632,7 @@ class Parser(val js: Boolean = false) {
                 typeAnnotation = parseTypeAnnotation()
                 end = typeAnnotation.end
             }
-            params.add(FunctionParameter(identifier = typename, type = typeAnnotation, start, end))
+            params.add(FunctionParameter(identifier = typename.symbol, type = typeAnnotation, start, end))
         } while (current().type == TokenType.Comma && expect(TokenType.Comma, "Nedostaje ','") != null)
 
         return params
@@ -1049,9 +1045,27 @@ class Parser(val js: Boolean = false) {
      * TypeAnnotation
      *      : Identifier
      *      | Identifier[]
+     *      | (TypeAnnotation...) => TypeAnnotation
+     *      | Identifier / Identifier / ... Identifier
      *      ;
      */
     private fun parseTypeAnnotation(): TypeAnnotation {
+        if(current().type == TokenType.OpenParen){
+            // Function Type
+            return parseFunctionTypeAnnotation()
+        }
+
+        val type = parseSimpleTypeAnnotation()
+
+        if(current().value == "||"){
+            // Union Type
+            return parseUnionTypeAnnotation(type)
+        }
+
+        return type
+    }
+
+    private fun parseSimpleTypeAnnotation(): TypeAnnotation {
         val start = current().start
         var end = current().end
 
@@ -1068,6 +1082,33 @@ class Parser(val js: Boolean = false) {
             isArrayType = isArray,
             start, end
         )
+    }
+
+    private fun parseFunctionTypeAnnotation() : FunctionTypeAnnotation {
+        expect(TokenType.OpenParen, "Nedostaje očekivana otvorena zagrada")
+        var params = arrayListOf<FunctionParameter>()
+        if(current().type != TokenType.CloseParen) {
+            params = parseFormalParameterList()
+        }
+        expect(TokenType.CloseParen, "Nedostaje očekivana zatvorena zagrada")
+        expect(TokenType.Arrow, "Nedostaje '=>'")
+        val returnType = parseTypeAnnotation()
+
+        return FunctionTypeAnnotation(
+            params,
+            returnType
+        )
+    }
+
+    private fun parseUnionTypeAnnotation(firstMember: TypeAnnotation): UnionTypeAnnotation {
+        val possibleTypes = arrayListOf(firstMember)
+        expect(TokenType.LogicalOr, "Nedostaje '||'")
+        do {
+            val exp = parseSimpleTypeAnnotation()
+            possibleTypes.add(exp)
+        } while (current().type == TokenType.LogicalOr && expect(TokenType.LogicalOr, "Nedostaje '||'") != null)
+
+        return UnionTypeAnnotation(possibleTypes)
     }
 
     private fun parseAssignmentOperator(): String {

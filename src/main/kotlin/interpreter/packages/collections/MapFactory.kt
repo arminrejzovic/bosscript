@@ -88,8 +88,8 @@ class MapFactory {
                         val fn = args[0] as Funkcija
                         map.forEach {
                             val activationRecord = hashMapOf<String, RuntimeValue>()
-                            activationRecord[fn.params[0].identifier.symbol] = it.key
-                            activationRecord[fn.params[1].identifier.symbol] = it.value
+                            activationRecord[fn.params[0].identifier] = it.key
+                            activationRecord[fn.params[1].identifier] = it.value
 
                             val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
                             interpreterInstance.evaluateBlockStatement(fn.body, functionEnv)
@@ -117,8 +117,8 @@ class MapFactory {
                         val newArray = arrayListOf<RuntimeValue>()
                         map.forEach {
                             val activationRecord = hashMapOf<String, RuntimeValue>()
-                            activationRecord[fn.params[0].identifier.symbol] = it.key
-                            activationRecord[fn.params[1].identifier.symbol] = it.value
+                            activationRecord[fn.params[0].identifier] = it.key
+                            activationRecord[fn.params[1].identifier] = it.value
 
                             val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
                             val functionResult = interpreterInstance.evaluateBlockStatement(fn.body, functionEnv)

@@ -28,7 +28,7 @@ data class Funkcija(
 
     override fun toString(): String {
         val paramString =
-            params.map { "${it.identifier.symbol}:${it.type?.typeName ?: "nepoznato"}" }
+            params.map { "${it.identifier}:${it.type?.typeName ?: "nepoznato"}" }
                 .toString()
                 .replace("[", "")
                 .replace("]", "")

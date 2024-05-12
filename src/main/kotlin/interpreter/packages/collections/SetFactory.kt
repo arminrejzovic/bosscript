@@ -97,7 +97,7 @@ class SetFactory {
                         set.forEach {
                             val activationRecord = hashMapOf<String, RuntimeValue>()
                             fn.params.forEach { param ->
-                                activationRecord[param.identifier.symbol] = it
+                                activationRecord[param.identifier] = it
                             }
 
                             val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
@@ -127,7 +127,7 @@ class SetFactory {
                         set.forEach {
                             val activationRecord = hashMapOf<String, RuntimeValue>()
                             fn.params.forEach { param ->
-                                activationRecord[param.identifier.symbol] = it
+                                activationRecord[param.identifier] = it
                             }
 
                             val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)

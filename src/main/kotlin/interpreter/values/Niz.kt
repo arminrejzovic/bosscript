@@ -174,7 +174,7 @@ data class Niz(
             value.forEach {
                 val activationRecord = hashMapOf<String, RuntimeValue>()
                 fn.params.forEach { param ->
-                    activationRecord[param.identifier.symbol] = it
+                    activationRecord[param.identifier] = it
                 }
 
                 val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
@@ -209,7 +209,7 @@ data class Niz(
             value.forEach {
                 val activationRecord = hashMapOf<String, RuntimeValue>()
                 fn.params.forEach { param ->
-                    activationRecord[param.identifier.symbol] = it
+                    activationRecord[param.identifier] = it
                 }
 
                 val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
@@ -236,7 +236,7 @@ data class Niz(
             value.reversed().forEach {
                 val activationRecord = hashMapOf<String, RuntimeValue>()
                 fn.params.forEach { param ->
-                    activationRecord[param.identifier.symbol] = it
+                    activationRecord[param.identifier] = it
                 }
 
                 val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
@@ -259,8 +259,8 @@ data class Niz(
         for (i in 0 until value.size - 1) {
             for (j in i + 1 until value.size) {
                 val activationRecord = hashMapOf<String, RuntimeValue>()
-                activationRecord[fn.params[0].identifier.symbol] = value[i]
-                activationRecord[fn.params[1].identifier.symbol] = value[j]
+                activationRecord[fn.params[0].identifier] = value[i]
+                activationRecord[fn.params[1].identifier] = value[j]
                 val functionEnv = Environment(parent = fn.parentEnv, variables = activationRecord)
                 val result =
                     (interpreterInstance.evaluateBlockStatement(fn.body, functionEnv) as ReturnValue).value

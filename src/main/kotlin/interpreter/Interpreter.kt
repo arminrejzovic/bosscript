@@ -362,7 +362,7 @@ class Interpreter {
                     }
                 }
 
-                activationRecord[operatorFun.params[0].identifier.symbol] = right
+                activationRecord[operatorFun.params[0].identifier] = right
 
                 val functionEnv = Environment(parent = env, variables = activationRecord)
                 val functionResult = evaluateBlockStatement(operatorFun.body, functionEnv)
@@ -951,7 +951,7 @@ class Interpreter {
                     if (param.type != null) {
                         typeChecker.expect(param.type, providedParam)
                     }
-                    activationRecord[param.identifier.symbol] = providedParam
+                    activationRecord[param.identifier] = providedParam
                 }
 
                 val functionEnv = Environment(parent = env, variables = activationRecord)
@@ -1048,7 +1048,7 @@ class Interpreter {
                 if (param.type != null) {
                     typeChecker.expect(param.type, providedParam)
                 }
-                activationRecord[param.identifier.symbol] = providedParam
+                activationRecord[param.identifier] = providedParam
             }
 
             val functionEnv = Environment(parent = env, variables = activationRecord)
@@ -1074,7 +1074,7 @@ class Interpreter {
                 if (param.type != null) {
                     typeChecker.expect(param.type, providedParam)
                 }
-                activationRecord[param.identifier.symbol] = providedParam
+                activationRecord[param.identifier] = providedParam
             }
 
             val functionEnv = Environment(parent = env, variables = activationRecord)
