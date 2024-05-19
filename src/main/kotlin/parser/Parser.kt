@@ -121,11 +121,15 @@ class Parser(val js: Boolean = false) {
                 return parseReturnStatement()
             }
 
+            TokenType.Trait -> {
+                return parseTraitDefinitionStatement()
+            }
+
             TokenType.Tip -> {
                 return parseTypeDefinitionStatement()
             }
 
-            TokenType.Model -> {
+            TokenType.TraitSpecifier, TokenType.Model -> {
                 return parseModelDefinitionStatement()
             }
 
@@ -147,6 +151,24 @@ class Parser(val js: Boolean = false) {
         }
     }
 
+    private fun parseTraitDefinitionStatement(): TraitDefinitionStatement {
+        val start = current().start
+        val end = current().end
+        expect(TokenType.Trait, "Nedostaje ključna riječ 'osobina'")
+        val traitName = parseIdentifier()
+        expect(TokenType.OpenBrace, "Nedostaje '{'")
+
+        val trait = TraitDefinitionStatement(traitName, arrayListOf(), start, end)
+
+        while (current().type != TokenType.CloseBrace) {
+            trait.functions.add(parseFunctionDeclaration())
+        }
+
+        expect(TokenType.CloseBrace, "Nedostaje '}'")
+
+        return trait
+    }
+
     private fun parseJavascriptSnippet(): JavascriptSnippet {
         if(!js){
             throw BosscriptParsingError("Javascript kod nije dozvoljen ovdje.", current().start)
@@ -159,6 +181,12 @@ class Parser(val js: Boolean = false) {
 
     private fun parseModelDefinitionStatement(): ModelDefinitionStatement {
         val start = current().start
+        val traits = arrayListOf<Identifier>()
+        while(current().type == TokenType.TraitSpecifier){
+            // parse all traits
+            val traitToken = expect(TokenType.TraitSpecifier, "Nedostaje očekivana osobina")
+            traits.add(Identifier(symbol = traitToken.value, traitToken.start, traitToken.end))
+        }
         expect(TokenType.Model, "Nedostaje ključna riječ 'model'")
         val classname = parseIdentifier()
         var parentClassName: Identifier? = null
@@ -222,7 +250,9 @@ class Parser(val js: Boolean = false) {
             constructor = constructor,
             privateBlock = privateBlock,
             publicBlock = publicBlock,
-            start, end
+            start = start,
+            end = end,
+            implementsTraits = traits
         )
     }
 
@@ -568,6 +598,18 @@ class Parser(val js: Boolean = false) {
             // Non-void return function
             consume()
             returnType = parseTypeAnnotation()
+        }
+
+        if(current().type == TokenType.Semicolon){
+            val end = current().end
+            consume()
+            return AbstractFunctionDeclaration(
+                name = functionName,
+                params = params,
+                returnType = returnType,
+                start,
+                end
+            )
         }
 
         val functionBody: BlockStatement = if (current().type == TokenType.Arrow) {

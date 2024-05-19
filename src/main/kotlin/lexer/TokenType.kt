@@ -28,6 +28,13 @@ enum class TokenType{
     Konst,
     //    Models
     Model,
+    This,
+    Private,
+    Public,
+    Static,
+    Constructor,
+    Trait,
+    TraitSpecifier,
     //    Loops
     Za,
     Svako,
@@ -63,13 +70,8 @@ enum class TokenType{
     UnaryIncrement,
     UnaryDecrement,
     Tip,
-    This,
-    Private,
-    Public,
-    Static,
     Try,
     Catch,
     Finally,
-    Constructor,
     Javascript
 }

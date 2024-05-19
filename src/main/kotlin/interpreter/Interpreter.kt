@@ -156,6 +156,10 @@ class Interpreter {
                 return evaluateTryCatch(node, environment)
             }
 
+            is TraitDefinitionStatement -> {
+                return evaluateTraitDefinition(node, environment)
+            }
+
             else -> {
                 throw BosscriptRuntimeException(
                     text = "Nepodržan token pronađen.",
@@ -163,6 +167,21 @@ class Interpreter {
                 )
             }
         }
+    }
+
+    private fun evaluateTraitDefinition(traitDefinition: TraitDefinitionStatement, env: Environment): RuntimeValue {
+        val trait = Trait(traitDefinition.name.symbol, arrayListOf())
+
+        val traitEnv = Environment(parent = env)
+
+        traitDefinition.functions.forEach { tf ->
+            val fn = evaluateFunctionDeclaration(tf, traitEnv)
+            trait.functions.add(fn)
+        }
+
+        env.declareTrait(trait)
+
+        return Null()
     }
 
     private fun evaluateBinaryExpression(expr: BinaryExpression, env: Environment): RuntimeValue {
@@ -354,12 +373,7 @@ class Interpreter {
 
                 if(operatorFun.params[0].type != null){
                     val expectedType = operatorFun.params[0].type!!
-                    try {
-                        typeChecker.expect(expectedType, right)
-                    }
-                    catch (e: BosscriptRuntimeException){
-                        throw BosscriptRuntimeException(e.exceptionObject, e.text, exprRef.right.start)
-                    }
+                    typeChecker.expect(expectedType, right, exprRef.right.start)
                 }
 
                 activationRecord[operatorFun.params[0].identifier] = right
@@ -369,8 +383,12 @@ class Interpreter {
 
                 if (operatorFun.returnType != null) {
                     when (functionResult) {
-                        is ReturnValue -> typeChecker.expect(operatorFun.returnType, functionResult.value) // TODO
-                        else -> typeChecker.expect(operatorFun.returnType, functionResult) // TODO
+                        is ReturnValue -> typeChecker.expect(
+                            operatorFun.returnType,
+                            functionResult.value,
+                            operatorFun.returnType.start
+                        )
+                        else -> typeChecker.expect(operatorFun.returnType, functionResult, operatorFun.body.end)
                     }
                 }
 
@@ -463,17 +481,61 @@ class Interpreter {
             }
         }
 
+        val traits = stmt.implementsTraits.map { traitDef ->
+            env.resolveTrait(traitDef.symbol)
+        }.distinctBy { it.name }
+
+        if(traits.isNotEmpty()){
+            assertNoConflictsBetweenTraits(traits, stmt.start)
+            traits.forEach { trait ->
+                // Check if model implements all trait functions
+                trait.abstractFunctions().forEach { absFn ->
+                    val implementation = members[absFn.name]
+                    if(implementation == null || implementation !is Funkcija){
+                        throw BosscriptRuntimeException(text = "Model ${stmt.className.symbol} ne ispunjava uslove osobine '${trait.name}': \n Nedostaje funkcija '${absFn}'", location = stmt.start)
+                    }
+
+                    TypeChecker.assertTraitConformity(absFn, implementation, stmt.start)
+                }
+                // Provide default implementations from trait, or require conformity if an implementation exists
+                trait.nonAbstractFunctions().forEach { nonAbsFn ->
+                    if(!members.containsKey(nonAbsFn.name)){
+                        members[nonAbsFn.name] = nonAbsFn
+                    }
+                    else {
+                        TypeChecker.assertTraitConformity(nonAbsFn, members[nonAbsFn.name] as Funkcija, location = stmt.start)
+                    }
+                }
+            }
+        }
+
         val definition = ModelDefinition(
             className = classname,
             superclass = superclass,
             constructor = constructor,
             members = members,
-            privateMembers = privateMembers
+            privateMembers = privateMembers,
+            traits = traits
         )
 
         env.declareVariable(classname, definition)
 
         return Null()
+    }
+
+    private fun assertNoConflictsBetweenTraits(traits: List<Trait>, location: Pair<Int, Int>) {
+        val traitFunctions = HashSet<String>()
+        traits.forEach { trait ->
+            trait.functions.forEach { fn ->
+                if(traitFunctions.contains(fn.name)){
+                    throw BosscriptRuntimeException(
+                        text = "Date osobine imaju različite definicije funkcije '${fn.name}'. Samo jedna osobina može definisati određenu funkciju.",
+                        location = location
+                    )
+                }
+                traitFunctions.add(fn.name)
+            }
+        }
     }
 
     private fun evaluateTryCatch(stmt: TryCatchStatement, env: Environment): RuntimeValue {
@@ -949,7 +1011,7 @@ class Interpreter {
                 fn.params.forEachIndexed { index, param ->
                     val providedParam = evaluate(call.args[index], env)
                     if (param.type != null) {
-                        typeChecker.expect(param.type, providedParam)
+                        typeChecker.expect(param.type, providedParam, call.args[index].start)
                     }
                     activationRecord[param.identifier] = providedParam
                 }
@@ -959,8 +1021,8 @@ class Interpreter {
 
                 if (fn.returnType != null) {
                     when (functionResult) {
-                        is ReturnValue -> typeChecker.expect(fn.returnType, functionResult.value)
-                        else -> typeChecker.expect(fn.returnType, functionResult)
+                        is ReturnValue -> typeChecker.expect(fn.returnType, functionResult.value, fn.body.end)
+                        else -> typeChecker.expect(fn.returnType, functionResult, fn.body.end)
                     }
                 }
 
@@ -1046,7 +1108,7 @@ class Interpreter {
             definition.constructor.params.forEachIndexed { index, param ->
                 val providedParam = evaluate(constructorArgs[index], env)
                 if (param.type != null) {
-                    typeChecker.expect(param.type, providedParam)
+                    typeChecker.expect(param.type, providedParam, constructorArgs[index].start)
                 }
                 activationRecord[param.identifier] = providedParam
             }
@@ -1072,7 +1134,7 @@ class Interpreter {
             definition.constructor.params.forEachIndexed { index, param ->
                 val providedParam = evaluate(constructorArgs[index], env)
                 if (param.type != null) {
-                    typeChecker.expect(param.type, providedParam)
+                    typeChecker.expect(param.type, providedParam, constructorArgs[index].start)
                 }
                 activationRecord[param.identifier] = providedParam
             }

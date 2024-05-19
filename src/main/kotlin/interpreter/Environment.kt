@@ -12,7 +12,8 @@ class Environment(
     private val variables: HashMap<String, RuntimeValue> = HashMap(),
     private val variableTypes: HashMap<String, TypeAnnotation> = HashMap(),
     private val constants: MutableSet<String> = mutableSetOf(),
-    private val typeDefinitions: HashMap<String, Tip> = HashMap()
+    private val typeDefinitions: HashMap<String, Tip> = HashMap(),
+    private val traits: HashMap<String, Trait> = HashMap()
 ){
 
     init {
@@ -90,6 +91,7 @@ class Environment(
         variables.putAll(env.variables)
         constants.addAll(env.constants)
         typeDefinitions.putAll(env.typeDefinitions)
+        traits.putAll(env.traits)
     }
 
     fun addTypeDefinition(definition: TipDefinitionStatement){
@@ -98,6 +100,30 @@ class Environment(
 
     fun importTypeDefinition(definition: Tip){
         typeDefinitions[definition.name] = definition
+    }
+
+    fun declareTrait(trait: Trait){
+        traits[trait.name] = trait
+    }
+
+    fun resolveTrait(name: String): Trait {
+        if(traits[name] != null) {
+            return traits[name]!!
+        }
+        if(parent == null){
+            throw Exception("TODO $name")
+        }
+        return parent.resolveTrait(name)
+    }
+
+    fun resolveTraitNullable(name: String): Trait? {
+        if(traits[name] != null) {
+            return traits[name]!!
+        }
+        if(parent == null){
+            return null
+        }
+        return parent.resolveTrait(name)
     }
 
     private fun resolveTypeDefinitionEnv(name: String): Environment?{
@@ -366,6 +392,10 @@ class Environment(
                 throw BosscriptRuntimeException(exception, args[0].toString(), Pair(0, 0))
             }
         )
+    }
+
+    private fun checkIdentifierAlreadyInUse(identifier: String){
+        return
     }
 
     override fun toString(): String {

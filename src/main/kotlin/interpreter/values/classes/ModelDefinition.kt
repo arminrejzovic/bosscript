@@ -2,6 +2,7 @@ package interpreter.values.classes
 
 import interpreter.values.Funkcija
 import interpreter.values.RuntimeValue
+import interpreter.values.Trait
 
 class ModelDefinition(
     val className: String,
@@ -9,6 +10,7 @@ class ModelDefinition(
     val constructor: Funkcija,
     val members: HashMap<String, RuntimeValue> = hashMapOf(),
     val privateMembers: Set<String> = setOf(),
+    val traits: List<Trait> = listOf(),
     override val value: Any? = null,
     override val builtIns: HashMap<String, RuntimeValue> = hashMapOf(),
     override val typename: String = "model"

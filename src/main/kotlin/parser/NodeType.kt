@@ -25,6 +25,7 @@ enum class NodeType {
     DoWhileStatement,
     ForStatement,
     FunctionDeclaration,
+    AbstractFunctionDeclaration,
     ReturnStatement,
     TypeDefinition,
     TypePropertyDefinition,
@@ -36,5 +37,6 @@ enum class NodeType {
     ImportStatement,
     TryCatch,
     ModelDefinition,
-    ModelBlock
+    ModelBlock,
+    TraitDefinition
 }

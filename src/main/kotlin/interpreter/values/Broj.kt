@@ -11,7 +11,7 @@ data class Broj(
         get() = hashMapOf(
             "zaokruzi" to zaokruzi,
             "zaokruži" to zaokruzi,
-            "tekst" to tekst
+            "kaoTekst" to tekst
         )
     override val typename: String
         get() = "broj"
@@ -35,7 +35,7 @@ data class Broj(
         Broj(value = value.roundToInt().toDouble())
     }
 
-    private val tekst = NativeFunction("tekst") { args ->
+    private val tekst = NativeFunction("kaoTekst") { _ ->
         Tekst(value = value.toString())
     }
 

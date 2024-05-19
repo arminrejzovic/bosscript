@@ -42,15 +42,31 @@ data class TryCatchStatement(
     override val kind: NodeType = NodeType.TryCatch
 ): Statement
 
-data class FunctionDeclaration(
-    val name: Identifier,
-    val params: ArrayList<FunctionParameter>,
-    val returnType: TypeAnnotation?,
+open class FunctionDeclaration(
+    open val name: Identifier,
+    open val params: ArrayList<FunctionParameter>,
+    open val returnType: TypeAnnotation?,
     val body: BlockStatement,
     override val start: Pair<Int, Int> = Pair(0, 0),
     override val end: Pair<Int, Int> = Pair(0, 0),
     override val kind: NodeType = NodeType.FunctionDeclaration
 ) : Statement
+
+data class AbstractFunctionDeclaration(
+    override val name: Identifier,
+    override val params: ArrayList<FunctionParameter>,
+    override val returnType: TypeAnnotation?,
+    override val start: Pair<Int, Int> = Pair(0, 0),
+    override val end: Pair<Int, Int> = Pair(0, 0),
+) : FunctionDeclaration(
+    name,
+    params,
+    returnType,
+    BlockStatement(arrayListOf()),
+    start,
+    end,
+    NodeType.AbstractFunctionDeclaration
+)
 
 data class FunctionExpression(
     val params: ArrayList<FunctionParameter>,
@@ -174,9 +190,18 @@ data class TipDefinitionStatement(
     override val kind: NodeType = NodeType.TypeDefinition
 ): Statement
 
+data class TraitDefinitionStatement(
+    val name: Identifier,
+    val functions: ArrayList<FunctionDeclaration>,
+    override val start: Pair<Int, Int> = Pair(0, 0),
+    override val end: Pair<Int, Int> = Pair(0, 0),
+    override val kind: NodeType = NodeType.TraitDefinition
+): Statement
+
 data class ModelDefinitionStatement(
     val className: Identifier,
     val parentClassName: Identifier?,
+    val implementsTraits: ArrayList<Identifier>,
     val constructor: FunctionDeclaration,
     val privateBlock: ModelBlock?,
     val publicBlock: ModelBlock?,
@@ -218,7 +243,20 @@ open class TypeAnnotation(
     override val start: Pair<Int, Int> = Pair(0, 0),
     override val end: Pair<Int, Int> = Pair(0, 0),
     override val kind: NodeType = NodeType.TypeAnnotation
-): Statement
+): Statement {
+    override fun equals(other: Any?): Boolean {
+        if(other !is TypeAnnotation){
+            return false
+        }
+        return (typeName == other.typeName) && (isArrayType == other.isArrayType)
+    }
+
+    override fun hashCode(): Int {
+        var result = typeName.hashCode()
+        result = 31 * result + isArrayType.hashCode()
+        return result
+    }
+}
 
 data class FunctionTypeAnnotation (
     val parameters: ArrayList<FunctionParameter>,
@@ -342,4 +380,3 @@ data class CallExpression(
     override val end: Pair<Int, Int> = Pair(0, 0),
     override val kind: NodeType = NodeType.CallExpression
 ) : Expression
-

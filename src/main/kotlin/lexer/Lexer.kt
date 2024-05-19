@@ -7,7 +7,7 @@ import isIgnoredWhitespace
 import isNumeric
 import isValidVariableChar
 
-val keywords = mutableMapOf(
+val keywords = mapOf(
     "var" to TokenType.Var,
     "konst" to TokenType.Konst,
     "za" to TokenType.Za,
@@ -43,6 +43,7 @@ val keywords = mutableMapOf(
     "opsta" to TokenType.Static,
     "opšta" to TokenType.Static,
     "konstruktor" to TokenType.Constructor,
+    "osobina" to TokenType.Trait,
 )
 
 fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
@@ -99,7 +100,7 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 throw BosscriptTokenException(src[cursor], line, col)
             }
         }
-        else if(src[cursor] == '+' || src[cursor] == '-' || src[cursor] == '*' || src[cursor] == '/' || src[cursor] == '%'){
+        else if(src[cursor] == '+' || src[cursor] == '-' || src[cursor] == '*' || src[cursor] == '%'){
             if(src.length > 1 && src[cursor + 1] == '='){
                 tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.ComplexAssign, start = Pair(line, col), end = Pair(line, col + 2)))
                 col+=2
@@ -113,6 +114,34 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 col+=2
             }
             else{
+                tokens.add(Token(src[cursor++].toString(), TokenType.BinaryOperator, start = Pair(line, col++), end = Pair(line, col)))
+            }
+        }
+        else if(src[cursor] == '/'){
+            if(src.length > 1 && src[cursor + 1] == '='){
+                // /= operator
+                tokens.add(Token(value = "${src[cursor++]}${src[cursor++]}", TokenType.ComplexAssign, start = Pair(line, col), end = Pair(line, col + 2)))
+                col+=2
+            }
+            else if(src.length > 1 && src[cursor + 1] == '/'){
+                // comments
+                while (cursor < src.length && src[cursor] != '\n') {
+                    cursor++
+                }
+            }
+            else if(src.length > 1 && src[cursor + 1] == '*'){
+                // multiline comments
+                cursor += 2 // consume the '/*'
+                while(cursor < src.length && src[cursor] != '*' && src[cursor + 1] != '/'){
+                    if (src[cursor] == '\n') {
+                        line++
+                        col = 1
+                    }
+                    cursor++
+                }
+                cursor += 2 // consume the '/*'
+            }
+            else {
                 tokens.add(Token(src[cursor++].toString(), TokenType.BinaryOperator, start = Pair(line, col++), end = Pair(line, col)))
             }
         }
@@ -166,11 +195,6 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
             }
             else{
                 tokens.add(Token(src[cursor++].toString(), TokenType.RelationalOperator, start = Pair(line, col++), end = Pair(line, col)))
-            }
-        }
-        else if (src[cursor] == '#') {
-            while (cursor < src.length && src[cursor] != '\n') {
-                cursor++
             }
         }
         else if (src[cursor] == '\n') {
@@ -229,6 +253,16 @@ fun tokenize(src: String, js: Boolean): ArrayDeque<Token>{
                 else{
                     throw BosscriptTokenException(src[cursor], line, col)
                 }
+            }
+
+            // Trait Specifier
+            else if(src[cursor] == '#'){
+                cursor++ // consume the #
+                var trait = ""
+                while (cursor < src.length && src[cursor].isValidVariableChar()){
+                    trait += src[cursor++]
+                }
+                tokens.add(Token(trait, TokenType.TraitSpecifier, start = Pair(line, col), end = Pair(line, col + trait.length)))
             }
 
             // Identifiers
