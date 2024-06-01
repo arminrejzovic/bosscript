@@ -1,39 +1,27 @@
 package cli
 
-import picocli.CommandLine.*
+import picocli.CommandLine.Command
+import picocli.CommandLine.Parameters
 import java.io.File
 
 @Command(name = "kreiraj-projekat", description = ["Kreiraj novi Bosscript projekat"])
 class InitializeProjectCommand : Runnable {
-    @Option(names = ["--ime"], description = ["Ime projekta"], required = true)
+    @Parameters(
+        index = "0",
+        description = ["Ime projekta"],
+        arity = "1",
+        paramLabel = "IME_PROJEKTA"
+    )
     lateinit var projectName: String
 
     @Parameters(
-        index = "0",
+        index = "1",
         description = ["Folder u kojem će se kreirati projekat"],
         defaultValue = ".",
-        arity = "0..1"
+        arity = "0..1",
+        paramLabel = "FOLDER"
     )
     lateinit var targetDirectory: String
-
-    private val defaultMainContent = """
-        funkcija main(){
-            ispis("Pozdrav svijetu!");
-        }
-    """.trimIndent()
-
-    private val defaultTestContent = """
-        paket "testovi" {moraBitiTačno};
-    
-        funkcija test(){
-            moraBitiTačno(tačno);
-        }
-    """.trimIndent()
-
-    private val tomlContent = """
-        [projekat]
-        program = "main.boss"
-    """.trimIndent()
 
     override fun run() {
         val targetDir = File(targetDirectory)
@@ -64,7 +52,7 @@ class InitializeProjectCommand : Runnable {
 
             mainBosscriptFile.writeText(defaultMainContent)
             mainTestFile.writeText(defaultTestContent)
-            projectTomlFile.writeText(tomlContent)
+            projectTomlFile.writeText(defaultTomlContent)
 
             println("Projekat uspješno kreiran: ${projectDir.absolutePath}")
         } catch (e: Exception) {

@@ -1,54 +1,29 @@
-import picocli.CommandLine.*
+
+import cli.defaultTestContent
+import cli.webMainContent
+import cli.webTomlContent
+import picocli.CommandLine.Command
+import picocli.CommandLine.Parameters
 import java.io.File
 
 @Command(name = "kreiraj-web-projekat", description = ["Kreiraj novi Bosscript web projekat"])
 class InitializeWebProjectCommand : Runnable {
-    @Option(names = ["--ime"], description = ["Ime projekta"], required = true)
+    @Parameters(
+        index = "0",
+        description = ["Ime projekta"],
+        arity = "1",
+        paramLabel = "IME_PROJEKTA"
+    )
     lateinit var projectName: String
 
-    @Parameters(index = "0", description = ["Folder u kojem će se kreirati projekat"], defaultValue = ".", arity = "0..1")
+    @Parameters(
+        index = "1",
+        description = ["Folder u kojem će se kreirati projekat"],
+        defaultValue = ".",
+        arity = "0..1",
+        paramLabel = "FOLDER"
+    )
     lateinit var targetDirectory: String
-
-    private val defaultMainContent = """
-        model Pozdrav < BosscriptWebKomponenta {
-        
-            konstruktor() {
-                prototip();
-            }
-            
-            javno {
-                var ${'$'}ime = "Default"; 
-                
-                var stil = css(`
-                    h1 {
-                        color: blue
-                    }
-                `);
-                
-                funkcija render(){
-                    vrati html(`
-                        <div>
-                            <h1>Pozdrav, ${'$'}{ime}!</h1>
-                        </div>
-                    `);
-                }
-            }
-        }
-    """.trimIndent()
-
-    private val defaultTestContent = """
-        paket "testovi" {moraBitiTačno};
-    
-        funkcija test(){
-            moraBitiTačno(tačno);
-        }
-    """.trimIndent()
-
-    private val tomlContent = """
-        [web]
-        index = 'projekat/index.html'
-        cilj = 'js'
-    """.trimIndent()
 
 
     override fun run() {
@@ -83,9 +58,9 @@ class InitializeWebProjectCommand : Runnable {
             componentsFolder.mkdirs()
             testsFolder.mkdirs()
 
-            mainBosscriptFile.writeText(defaultMainContent)
+            mainBosscriptFile.writeText(webMainContent)
             mainTestFile.writeText(defaultTestContent)
-            projectTomlFile.writeText(tomlContent)
+            projectTomlFile.writeText(webTomlContent)
 
             val defaultHtmlContent = """
                 <!DOCTYPE html>
