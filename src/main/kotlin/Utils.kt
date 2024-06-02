@@ -35,7 +35,7 @@ fun ArrayList<RuntimeValue>.flatten(): ArrayList<RuntimeValue> {
 }
 
 fun operatorToFunctionName(operator: String): String{
-    val map = hashMapOf<String, String>(
+    val map = hashMapOf(
         "+" to "plus",
         "-" to "minus",
         "*" to "puta",
