@@ -7,7 +7,8 @@ import picocli.CommandLine.Command
     name = "example-cli",
     subcommands = [
         InitializeProjectCommand::class,
-        InitializeWebProjectCommand::class
+        InitializeWebProjectCommand::class,
+        RunProjectCommand::class
     ],
     mixinStandardHelpOptions = true,
     version = ["bosscript-cli 1.0"],
